@@ -35,7 +35,7 @@ export default function BrochureButton({ page, programId, className = '' }) {
       id={`download-brochure-${page || 'program'}`}
     >
       <HiDownload size={18} />
-      {brochure ? 'Download Brochure' : 'Brochure Coming Soon'}
+      Download Brochure
     </button>
   )
 }
