@@ -36,13 +36,11 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Aharada Education API is running' });
 });
 
-// Serve React app in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../client/dist')));
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../client/dist/index.html'));
-  });
-}
+// Since frontend is hosted on Vercel, the backend acts purely as an API.
+// Send a simple welcome message for root visits.
+app.get('/', (req, res) => {
+  res.json({ message: 'Aharada Education API is running successfully.' });
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
