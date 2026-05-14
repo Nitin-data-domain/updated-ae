@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/api/:match*",
-      "destination": "https://ae-com-website.onrender.com/api/:match*"
+      "destination": "https://updated-ae-1.onrender.com/api/:match*"
     },
     {
       "source": "/uploads/:match*",
-      "destination": "https://ae-com-website.onrender.com/uploads/:match*"
+      "destination": "https://updated-ae-1.onrender.com/uploads/:match*"
     },
     {
       "source": "/(.*)",
