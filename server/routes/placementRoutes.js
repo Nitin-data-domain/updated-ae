@@ -1,12 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const path = require('path');
-const fs = require('fs');
 const {
   getPlacements, getAllPlacements, getPlacement, createPlacement, updatePlacement, deletePlacement
 } = require('../controllers/placementController');
 const { protect } = require('../middleware/auth');
-const { uploadImage } = require('../middleware/upload');
+const { uploadImage, cloudinary } = require('../middleware/upload');
 
 router.get('/', getPlacements);
 router.get('/admin', protect, getAllPlacements);
@@ -15,16 +13,16 @@ router.post('/', protect, createPlacement);
 router.put('/:id', protect, updatePlacement);
 router.delete('/:id', protect, deletePlacement);
 
-// Upload student photo → returns local URL
+// Upload student photo → Cloudinary
 router.post('/upload-image', protect, uploadImage.single('image'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ success: false, message: 'No image provided' });
   }
-  const baseUrl = `${req.protocol}://${req.get('host')}`;
-  res.json({ success: true, url: `${baseUrl}/uploads/images/${req.file.filename}` });
+  // Cloudinary returns the permanent URL in req.file.path
+  res.json({ success: true, url: req.file.path });
 });
 
-// Fetch image from external URL (Google Drive, etc.)
+// Fetch image from external URL (Google Drive, etc.) → upload to Cloudinary
 router.post('/fetch-image', protect, async (req, res) => {
   try {
     let { url } = req.body;
@@ -37,21 +35,13 @@ router.post('/fetch-image', protect, async (req, res) => {
     const fileId = (m1 && m1[1]) || (m2 && m2[1]) || (m3 && m3[1]);
     if (fileId) url = `https://drive.google.com/uc?export=download&id=${fileId}`;
 
-    const response = await fetch(url, {
-      headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'image/*' },
-      redirect: 'follow'
+    // Upload directly from URL to Cloudinary (no local disk needed)
+    const result = await cloudinary.uploader.upload(url, {
+      folder: 'aharada-education',
+      transformation: [{ width: 1200, height: 800, crop: 'limit', quality: 'auto' }],
     });
-    if (!response.ok) return res.status(400).json({ success: false, message: `HTTP ${response.status}` });
 
-    const ct = response.headers.get('content-type') || '';
-    const ext = ct.includes('png') ? '.png' : ct.includes('webp') ? '.webp' : '.jpg';
-    const filename = `img-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
-    const imagesDir = path.join(__dirname, '..', 'uploads', 'images');
-    if (!fs.existsSync(imagesDir)) fs.mkdirSync(imagesDir, { recursive: true });
-    fs.writeFileSync(path.join(imagesDir, filename), Buffer.from(await response.arrayBuffer()));
-
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    res.json({ success: true, url: `${baseUrl}/uploads/images/${filename}` });
+    res.json({ success: true, url: result.secure_url });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

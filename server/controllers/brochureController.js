@@ -1,6 +1,5 @@
 const Brochure = require('../models/Brochure');
-const path = require('path');
-const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
 
 // @desc    Upload brochure
 // @route   POST /api/brochures
@@ -12,9 +11,26 @@ exports.uploadBrochure = async (req, res) => {
 
     const { title, linkedPage, linkedProgram } = req.body;
 
+    // Upload PDF buffer to Cloudinary (raw resource type for non-image files)
+    const uploadResult = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        {
+          resource_type: 'raw',
+          folder: 'aharada-brochures',
+          public_id: `brochure-${Date.now()}`,
+          format: 'pdf',
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      stream.end(req.file.buffer);
+    });
+
     const brochure = await Brochure.create({
       title: title || req.file.originalname,
-      fileUrl: `/uploads/brochures/${req.file.filename}`,
+      fileUrl: uploadResult.secure_url,
       fileName: req.file.originalname,
       linkedPage: linkedPage || 'general',
       linkedProgram: linkedProgram || null,
@@ -64,12 +80,8 @@ exports.downloadBrochure = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Brochure not found' });
     }
 
-    const filePath = path.join(__dirname, '..', brochure.fileUrl);
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ success: false, message: 'File not found on server' });
-    }
-
-    res.download(filePath, brochure.fileName);
+    // Redirect to Cloudinary URL for direct download
+    res.redirect(brochure.fileUrl);
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error' });
   }
@@ -99,12 +111,6 @@ exports.deleteBrochure = async (req, res) => {
     const brochure = await Brochure.findById(req.params.id);
     if (!brochure) {
       return res.status(404).json({ success: false, message: 'Brochure not found' });
-    }
-
-    // Delete file from server
-    const filePath = path.join(__dirname, '..', brochure.fileUrl);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
     }
 
     await Brochure.findByIdAndDelete(req.params.id);

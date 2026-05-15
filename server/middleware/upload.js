@@ -1,46 +1,22 @@
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
-// Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, '..', 'uploads');
-const brochuresDir = path.join(uploadsDir, 'brochures');
-const imagesDir = path.join(uploadsDir, 'images');
-
-[uploadsDir, brochuresDir, imagesDir].forEach(dir => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
+// ── Cloudinary config ──────────────────────────────────────────────────────
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Brochure upload config
-const brochureStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, brochuresDir);
+// ── Cloudinary storage for images ──────────────────────────────────────────
+const cloudinaryImageStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'aharada-education',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
+    transformation: [{ width: 1200, height: 800, crop: 'limit', quality: 'auto' }],
   },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'brochure-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
-
-const brochureFilter = (req, file, cb) => {
-  if (file.mimetype === 'application/pdf') {
-    cb(null, true);
-  } else {
-    cb(new Error('Only PDF files are allowed for brochures'), false);
-  }
-};
-
-// Image upload config
-const imageStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, imagesDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'img-' + uniqueSuffix + path.extname(file.originalname));
-  }
 });
 
 const imageFilter = (req, file, cb) => {
@@ -52,16 +28,28 @@ const imageFilter = (req, file, cb) => {
   }
 };
 
+// ── Memory storage for brochures (PDFs streamed to Cloudinary) ─────────────
+const brochureStorage = multer.memoryStorage();
+
+const brochureFilter = (req, file, cb) => {
+  if (file.mimetype === 'application/pdf') {
+    cb(null, true);
+  } else {
+    cb(new Error('Only PDF files are allowed for brochures'), false);
+  }
+};
+
+// ── Exported multer instances ──────────────────────────────────────────────
 const uploadBrochure = multer({
   storage: brochureStorage,
   fileFilter: brochureFilter,
-  limits: { fileSize: 20 * 1024 * 1024 } // 20MB
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20 MB
 });
 
 const uploadImage = multer({
-  storage: imageStorage,
+  storage: cloudinaryImageStorage,
   fileFilter: imageFilter,
-  limits: { fileSize: 5 * 1024 * 1024 } // 5MB
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
 });
 
-module.exports = { uploadBrochure, uploadImage };
+module.exports = { uploadBrochure, uploadImage, cloudinary };

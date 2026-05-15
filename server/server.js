@@ -14,13 +14,28 @@ const app = express();
 
 // Middleware
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-app.use(cors());
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (Postman, curl, server-to-server)
+    if (!origin) return callback(null, true);
+    // Allow any *.vercel.app subdomain or specific production domains
+    const allowed = [
+      /\.vercel\.app$/,
+      /^http:\/\/localhost:\d+$/,
+    ];
+    // Also allow CLIENT_URL env var if set
+    if (process.env.CLIENT_URL) allowed.push(process.env.CLIENT_URL);
+    const isAllowed = allowed.some(pattern =>
+      typeof pattern === 'string' ? pattern === origin : pattern.test(origin)
+    );
+    callback(isAllowed ? null : new Error('Not allowed by CORS'), isAllowed);
+  },
+  credentials: true,
+}));
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Static files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // API Routes
 app.use('/api/auth', require('./routes/authRoutes'));
