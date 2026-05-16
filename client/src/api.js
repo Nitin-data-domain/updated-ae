@@ -78,6 +78,7 @@ export const getEnquiries = (params) => api.get('/enquiries', { params });
 export const getAdmissionLeads = (params) => api.get('/enquiries', { params: { ...params, type: 'admission_lead' } });
 export const getContactEnquiries = (params) => api.get('/enquiries', { params: { ...params, type: 'enquiry' } });
 export const getEnquiryStats = (type) => api.get('/enquiries/stats', { params: type ? { type } : {} });
+export const getProgramLeadStats = () => api.get('/enquiries/program-stats');
 export const updateEnquiry = (id, data) => api.put(`/enquiries/${id}`, data);
 export const deleteEnquiry = (id) => api.delete(`/enquiries/${id}`);
 
@@ -103,4 +104,24 @@ export const uploadPlacementImage = (formData) =>
   api.post('/placements/upload-image', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
 export const fetchPlacementImage = (url) => api.post('/placements/fetch-image', { url });
 
+// Site Content — Campus Photos
+export const getCampusPhotos = () => api.get('/site-content/campus-photos');
+export const getCampusPhotosAdmin = () => api.get('/site-content/campus-photos/admin');
+export const createCampusPhoto = (data) => api.post('/site-content/campus-photos', data);
+export const updateCampusPhoto = (id, data) => api.put(`/site-content/campus-photos/${id}`, data);
+export const deleteCampusPhoto = (id) => api.delete(`/site-content/campus-photos/${id}`);
+
+// Site Content — Company Partners
+export const getCompanyPartners = () => api.get('/site-content/company-partners');
+export const getCompanyPartnersAdmin = () => api.get('/site-content/company-partners/admin');
+export const createCompanyPartner = (data) => api.post('/site-content/company-partners', data);
+export const updateCompanyPartner = (id, data) => api.put(`/site-content/company-partners/${id}`, data);
+export const deleteCompanyPartner = (id) => api.delete(`/site-content/company-partners/${id}`);
+
+// Site Content — shared image upload
+export const uploadSiteImage = (formData) =>
+  api.post('/site-content/upload-image', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+export const fetchSiteImage = (url) => api.post('/site-content/fetch-image', { url });
+
 export default api;
+

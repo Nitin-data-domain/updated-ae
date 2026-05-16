@@ -50,7 +50,7 @@ const universities = [
   { name: 'Sage University', defaultPrograms: 1, location: 'Indore, MP', established: '2015', logo: sageLogo },
 ]
 
-// Airline/Company partners
+// Airline/Company partners (static)
 const companyPartners = [
   { name: 'IndiGo Airlines', logo: logoIndigo },
   { name: 'Air India', logo: logoAirIndia },
@@ -433,7 +433,7 @@ export default function Home() {
                    <FiBookOpen size={16} />
                    <div>
                      <strong>Interactive Classrooms</strong>
-                     <span>Engaging sessions & live presentations</span>
+                     <span>Engaging sessions &amp; live presentations</span>
                    </div>
                  </div>
               </motion.div>
@@ -451,7 +451,7 @@ export default function Home() {
                    <FiUsers size={16} />
                    <div>
                      <strong>Collaborative Learning</strong>
-                     <span>Group projects & industry mentorship</span>
+                     <span>Group projects &amp; industry mentorship</span>
                    </div>
                  </div>
               </motion.div>

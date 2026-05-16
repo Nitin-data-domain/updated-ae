@@ -45,6 +45,7 @@ app.use('/api/events', require('./routes/eventRoutes'));
 app.use('/api/enquiries', require('./routes/enquiryRoutes'));
 app.use('/api/brochures', require('./routes/brochureRoutes'));
 app.use('/api/placements', require('./routes/placementRoutes'));
+app.use('/api/site-content', require('./routes/siteContentRoutes'));
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -176,3 +176,28 @@ exports.getEnquiryStats = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
+// @desc    Get per-program lead counts (admission_lead only)
+// @route   GET /api/enquiries/program-stats
+exports.getProgramStats = async (req, res) => {
+  try {
+    const pipeline = [
+      { $match: { type: 'admission_lead' } },
+      {
+        $group: {
+          _id: '$program',
+          total:     { $sum: 1 },
+          new:       { $sum: { $cond: [{ $eq: ['$status', 'new'] },       1, 0] } },
+          contacted: { $sum: { $cond: [{ $eq: ['$status', 'contacted'] }, 1, 0] } },
+          enrolled:  { $sum: { $cond: [{ $eq: ['$status', 'enrolled'] },  1, 0] } },
+          closed:    { $sum: { $cond: [{ $eq: ['$status', 'closed'] },    1, 0] } },
+        }
+      },
+      { $sort: { total: -1 } }
+    ];
+    const data = await Enquiry.aggregate(pipeline);
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
