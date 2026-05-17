@@ -86,7 +86,7 @@
   align-items: center;
   padding-top: 0;
   padding-bottom: 0;
-  height: 76px;
+  height: 62px;
 }
 
 .navbar-brand {
@@ -167,19 +167,19 @@
   .navbar-links {
     display: none;
     position: absolute;
-    top: 76px;
+    top: 62px;
     left: 0;
     right: 0;
     background: var(--white);
     flex-direction: column;
-    padding: 20px;
+    padding: 16px;
     gap: 4px;
     border-top: 1px solid var(--gray-100);
     box-shadow: 0 20px 40px rgba(13, 59, 79, 0.1);
   }
 
   .navbar-links.active { display: flex; }
-  .nav-link { width: 100%; padding: 14px 16px; }
+  .nav-link { width: 100%; padding: 12px 16px; }
   .nav-cta { margin-left: 0; margin-top: 8px; width: 100%; text-align: center; }
 }
 
