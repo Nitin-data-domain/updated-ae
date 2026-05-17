@@ -11,13 +11,12 @@ exports.uploadBrochure = async (req, res) => {
 
     const { title, linkedPage, linkedProgram } = req.body;
 
-    // Upload PDF buffer to Cloudinary
-    // resource_type: 'auto' lets Cloudinary detect the PDF and serve it
-    // with the correct Content-Type so browsers can open/preview it.
+    // Upload PDF buffer to Cloudinary using resource_type 'raw'
+    // PDFs must use 'raw' so they are stored/served correctly.
     const uploadResult = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         {
-          resource_type: 'auto',
+          resource_type: 'raw',
           folder: 'aharada-brochures',
           public_id: `brochure-${Date.now()}`,
           format: 'pdf',
@@ -82,10 +81,23 @@ exports.downloadBrochure = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Brochure not found' });
     }
 
-    // Build a forced-download URL using Cloudinary's fl_attachment flag.
-    // This replaces /upload/ with /upload/fl_attachment/ in the URL.
-    const downloadUrl = brochure.fileUrl.replace('/upload/', '/upload/fl_attachment/');
-    res.redirect(downloadUrl);
+    // Stream the PDF through our server with proper headers.
+    // This avoids Cloudinary URL format issues in the browser.
+    const https = require('https');
+    const http = require('http');
+
+    const fileUrl = brochure.fileUrl;
+    const fileName = brochure.fileName || 'brochure.pdf';
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+
+    const protocol = fileUrl.startsWith('https') ? https : http;
+    protocol.get(fileUrl, (stream) => {
+      stream.pipe(res);
+    }).on('error', () => {
+      res.status(500).json({ success: false, message: 'Failed to download brochure' });
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error' });
   }

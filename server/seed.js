@@ -12,21 +12,22 @@ const seedData = async () => {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('Connected to MongoDB for seeding...');
 
-    // Clear existing data
-    await User.deleteMany();
-    await Program.deleteMany();
-    await Faculty.deleteMany();
-    await Event.deleteMany();
-    await Placement.deleteMany();
+    // ── SAFE SEED: Only insert if collection is EMPTY ───────────────────────
+    // This ensures `npm run seed` NEVER destroys existing admin-uploaded data.
 
-    // Create admin user
-    await User.create({
-      name: 'Admin',
-      email: 'admin@aharada.edu',
-      password: 'admin123',
-      role: 'superadmin'
-    });
-    console.log('✅ Admin user created (admin@aharada.edu / admin123)');
+    // Admin user
+    const existingUsers = await User.countDocuments();
+    if (existingUsers === 0) {
+      await User.create({
+        name: 'Admin',
+        email: 'admin@aharada.edu',
+        password: 'admin123',
+        role: 'superadmin'
+      });
+      console.log('✅ Admin user created (admin@aharada.edu / admin123)');
+    } else {
+      console.log(`ℹ️  Skipping users — ${existingUsers} already exist`);
+    }
 
     // Seed Programs
     const programs = [
@@ -235,8 +236,13 @@ const seedData = async () => {
       }
     ];
 
-    await Program.insertMany(programs);
-    console.log('✅ Programs seeded');
+    const existingPrograms = await Program.countDocuments();
+    if (existingPrograms > 0) {
+      console.log(`ℹ️  Skipping programs — ${existingPrograms} already exist`);
+    } else {
+      await Program.insertMany(programs);
+      console.log('✅ Programs seeded');
+    }
 
     // Seed Faculty
     const faculty = [
@@ -296,8 +302,13 @@ const seedData = async () => {
       }
     ];
 
-    await Faculty.insertMany(faculty);
-    console.log('✅ Faculty seeded');
+    const existingFaculty = await Faculty.countDocuments();
+    if (existingFaculty > 0) {
+      console.log(`ℹ️  Skipping faculty — ${existingFaculty} already exist`);
+    } else {
+      await Faculty.insertMany(faculty);
+      console.log('✅ Faculty seeded');
+    }
 
     // Seed Events
     const events = [
@@ -343,8 +354,13 @@ const seedData = async () => {
       }
     ];
 
-    await Event.insertMany(events);
-    console.log('✅ Events seeded');
+    const existingEvents = await Event.countDocuments();
+    if (existingEvents > 0) {
+      console.log(`ℹ️  Skipping events — ${existingEvents} already exist`);
+    } else {
+      await Event.insertMany(events);
+      console.log('✅ Events seeded');
+    }
 
     // Seed Placements
     const placements = [
@@ -404,8 +420,13 @@ const seedData = async () => {
       }
     ];
 
-    await Placement.insertMany(placements);
-    console.log('✅ Placements seeded');
+    const existingPlacements = await Placement.countDocuments();
+    if (existingPlacements > 0) {
+      console.log(`ℹ️  Skipping placements — ${existingPlacements} already exist`);
+    } else {
+      await Placement.insertMany(placements);
+      console.log('✅ Placements seeded');
+    }
 
     console.log('\n🎉 Database seeded successfully!');
     console.log('Admin Login: admin@aharada.edu / admin123');
