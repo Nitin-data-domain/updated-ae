@@ -11,11 +11,13 @@ exports.uploadBrochure = async (req, res) => {
 
     const { title, linkedPage, linkedProgram } = req.body;
 
-    // Upload PDF buffer to Cloudinary (raw resource type for non-image files)
+    // Upload PDF buffer to Cloudinary
+    // resource_type: 'auto' lets Cloudinary detect the PDF and serve it
+    // with the correct Content-Type so browsers can open/preview it.
     const uploadResult = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         {
-          resource_type: 'raw',
+          resource_type: 'auto',
           folder: 'aharada-brochures',
           public_id: `brochure-${Date.now()}`,
           format: 'pdf',
@@ -80,8 +82,10 @@ exports.downloadBrochure = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Brochure not found' });
     }
 
-    // Redirect to Cloudinary URL for direct download
-    res.redirect(brochure.fileUrl);
+    // Build a forced-download URL using Cloudinary's fl_attachment flag.
+    // This replaces /upload/ with /upload/fl_attachment/ in the URL.
+    const downloadUrl = brochure.fileUrl.replace('/upload/', '/upload/fl_attachment/');
+    res.redirect(downloadUrl);
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error' });
   }
