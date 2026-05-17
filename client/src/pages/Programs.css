@@ -8,8 +8,9 @@
 /* -------- PAGE HERO -------- */
 .page-hero {
   position: relative;
-  padding: 70px 0 50px;
+  padding: 130px 0 90px;
   overflow: hidden;
+  min-height: 500px;
   display: flex;
   align-items: center;
 }
@@ -41,9 +42,9 @@
 }
 
 .page-hero-title {
-  font-size: clamp(1.6rem, 4vw, 2.8rem);
+  font-size: clamp(2rem, 5vw, 3.4rem);
   color: var(--white);
-  margin-bottom: 12px;
+  margin-bottom: 18px;
 }
 
 .page-hero-subtitle {
@@ -174,8 +175,8 @@
 /* -------- PROGRAMS LISTING GRID -------- */
 .programs-listing-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 28px;
 }
 
 .program-list-card {
@@ -195,7 +196,7 @@
 
 /* Program card image */
 .plc-image {
-  height: 160px;
+  height: 190px;
   position: relative;
   overflow: hidden;
 }
@@ -236,8 +237,8 @@
 /* Card body */
 .plc-body {
   display: flex;
-  gap: 14px;
-  padding: 18px 18px 12px;
+  gap: 16px;
+  padding: 24px 24px 16px;
   flex: 1;
 }
 
@@ -373,7 +374,7 @@
   position: relative;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  height: 220px;
+  height: 280px;
   cursor: pointer;
   box-shadow: var(--shadow-md);
 }
@@ -470,10 +471,10 @@
 .programs-cta-banner {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
   background: var(--primary);
   border-radius: var(--radius-lg);
-  padding: 22px 28px;
+  padding: 30px 36px;
   box-shadow: var(--shadow-lg);
 }
 

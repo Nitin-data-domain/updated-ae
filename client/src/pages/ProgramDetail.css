@@ -64,17 +64,17 @@
 /* Layout */
 .pd-grid {
   display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 32px;
+  grid-template-columns: 1fr 380px;
+  gap: 48px;
   align-items: start;
 }
 
 .pd-section {
   background: var(--white);
-  padding: 24px;
+  padding: 36px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--gray-100);
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
 .pd-section h2 {
@@ -163,7 +163,7 @@
 /* Sidebar */
 .pd-sidebar {
   position: sticky;
-  top: 80px;
+  top: 100px;
 }
 
 .pd-sidebar-card {
@@ -316,11 +316,11 @@
 }
 
 .pd-sl-large {
-  min-height: 360px;
+  min-height: 460px;
 }
 
 .pd-sl-top-row .pd-sl-item {
-  min-height: 168px;
+  min-height: 210px;
 }
 
 .pd-sl-item img {

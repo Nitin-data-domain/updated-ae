@@ -8,7 +8,7 @@ import {
   FiShield, FiZap, FiHeart
 } from 'react-icons/fi'
 import { HiDownload, HiAcademicCap, HiOutlineOfficeBuilding } from 'react-icons/hi'
-import { getPrograms, getCompanyPartners, getCampusPhotos } from '../api'
+import { getPrograms } from '../api'
 import BrochureButton from '../components/BrochureButton'
 import campusIsro from '../assets/campus-isro.jpg'
 import logoIndigo from '../assets/logos/logo-indigo.png'
@@ -50,8 +50,8 @@ const universities = [
   { name: 'Sage University', defaultPrograms: 1, location: 'Indore, MP', established: '2015', logo: sageLogo },
 ]
 
-// Airline/Company partners — fallback (used if DB is empty)
-const defaultCompanyPartners = [
+// Airline/Company partners (static)
+const companyPartners = [
   { name: 'IndiGo Airlines', logo: logoIndigo },
   { name: 'Air India', logo: logoAirIndia },
   { name: 'SpiceJet', logo: logoSpiceJet },
@@ -166,34 +166,11 @@ function StatCard({ icon, value, label, index }) {
 
 export default function Home() {
   const [programs, setPrograms] = useState([])
-  const [companyPartners, setCompanyPartners] = useState(defaultCompanyPartners)
-  const [campusPhotos, setCampusPhotos] = useState([])
   const [activeTestimonial, setActiveTestimonial] = useState(0)
 
   useEffect(() => {
     document.title = 'Aharada Education | Educate . Empower . Excel'
-
-    // Fetch programs
-    getPrograms().then(res => setPrograms(res.data.data)).catch(() => {})
-
-    // Fetch company partners from DB — fallback to defaults if empty
-    getCompanyPartners()
-      .then(res => {
-        if (res.data.data && res.data.data.length > 0) {
-          setCompanyPartners(res.data.data.map(p => ({ name: p.name, logo: p.logoUrl })))
-        }
-      })
-      .catch(() => {}) // keep defaults on error
-
-    // Fetch campus photos from DB
-    getCampusPhotos()
-      .then(res => {
-        if (res.data.data && res.data.data.length > 0) {
-          setCampusPhotos(res.data.data)
-        }
-      })
-      .catch(() => {})
-
+    getPrograms().then(res => setPrograms(res.data.data)).catch(() => { })
     const interval = setInterval(() => {
       setActiveTestimonial(prev => (prev + 1) % testimonials.length)
     }, 5000)
@@ -425,7 +402,6 @@ export default function Home() {
           </motion.div>
 
           <div className="campus-gallery-grid">
-            {/* Main large image — use first DB photo if available, else fallback asset */}
             <motion.div
               className="campus-gallery-main"
               initial={{ opacity: 0, x: -40 }}
@@ -433,15 +409,12 @@ export default function Home() {
               viewport={{ once: true }}
               whileHover={{ scale: 1.01 }}
             >
-              <img
-                src={campusPhotos[0]?.imageUrl || campusIsro}
-                alt={campusPhotos[0]?.caption || 'Students at Campus'}
-              />
+              <img src={campusIsro} alt="Students at U.R. Rao Satellite Centre" />
               <div className="campus-img-caption">
                 <FiNavigation size={18} />
                 <div>
-                  <strong>{campusPhotos[0]?.caption || 'Real Airport Exposure'}</strong>
-                  <span>{campusPhotos[0]?.subCaption || 'Live industry training at major airports'}</span>
+                  <strong>Real Airport Exposure</strong>
+                  <span>Live industry training at major airports</span>
                 </div>
               </div>
             </motion.div>
@@ -455,17 +428,14 @@ export default function Home() {
                 transition={{ delay: 0.15 }}
                 whileHover={{ scale: 1.02 }}
               >
-                <img
-                  src={campusPhotos[1]?.imageUrl || campusGroupStudy}
-                  alt={campusPhotos[1]?.caption || 'Students in Classroom'}
-                />
+                <img src={campusGroupStudy} alt="Students in Classroom" />
                 <div className="campus-img-caption">
-                  <FiBookOpen size={16} />
-                  <div>
-                    <strong>{campusPhotos[1]?.caption || 'Interactive Classrooms'}</strong>
-                    <span>{campusPhotos[1]?.subCaption || 'Engaging sessions & live presentations'}</span>
-                  </div>
-                </div>
+                   <FiBookOpen size={16} />
+                   <div>
+                     <strong>Interactive Classrooms</strong>
+                     <span>Engaging sessions &amp; live presentations</span>
+                   </div>
+                 </div>
               </motion.div>
 
               <motion.div
@@ -476,17 +446,14 @@ export default function Home() {
                 transition={{ delay: 0.3 }}
                 whileHover={{ scale: 1.02 }}
               >
-                <img
-                  src={campusPhotos[2]?.imageUrl || campusClassroom}
-                  alt={campusPhotos[2]?.caption || 'Students Group Study'}
-                />
+                <img src={campusClassroom} alt="Students Group Study" />
                 <div className="campus-img-caption">
-                  <FiUsers size={16} />
-                  <div>
-                    <strong>{campusPhotos[2]?.caption || 'Collaborative Learning'}</strong>
-                    <span>{campusPhotos[2]?.subCaption || 'Group projects & industry mentorship'}</span>
-                  </div>
-                </div>
+                   <FiUsers size={16} />
+                   <div>
+                     <strong>Collaborative Learning</strong>
+                     <span>Group projects &amp; industry mentorship</span>
+                   </div>
+                 </div>
               </motion.div>
             </div>
           </div>
