@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { FiTarget, FiEye, FiAward, FiBookOpen } from 'react-icons/fi'
+import { FiTarget, FiEye, FiAward, FiBookOpen, FiArrowRight } from 'react-icons/fi'
 import './AboutUs.css'
 
 export default function AboutUs() {
@@ -19,6 +20,11 @@ export default function AboutUs() {
             <p className="page-hero-subtitle">
               Pioneering excellence in education and shaping the leaders of tomorrow through innovation and integrity.
             </p>
+            <div className="hero-cta-row">
+              <Link to="/admissions" className="btn btn-gold btn-lg" id="about-apply-btn">
+                Apply Now <FiArrowRight />
+              </Link>
+            </div>
           </motion.div>
         </div>
       </section>

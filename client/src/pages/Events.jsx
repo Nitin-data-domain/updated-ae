@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { FiCalendar, FiMapPin, FiTag } from 'react-icons/fi'
+import { FiCalendar, FiMapPin, FiTag, FiArrowRight } from 'react-icons/fi'
 import { getEvents } from '../api'
 import BrochureButton from '../components/BrochureButton'
 import './Events.css'
@@ -58,6 +59,11 @@ export default function Events() {
               Stay updated with our seminars, workshops, placement drives, and cultural events.
             </p>
             <BrochureButton page="events" />
+            <div className="hero-cta-row">
+              <Link to="/admissions" className="btn btn-gold btn-lg" id="events-apply-btn">
+                Apply Now <FiArrowRight />
+              </Link>
+            </div>
           </motion.div>
         </div>
       </section>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { FiBriefcase, FiAward, FiStar, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
+import { FiBriefcase, FiAward, FiStar, FiChevronLeft, FiChevronRight, FiArrowRight } from 'react-icons/fi'
 import { getPlacements } from '../api'
 import BrochureButton from '../components/BrochureButton'
 import './Placement.css'
@@ -44,6 +45,11 @@ export default function Placement() {
               Our placement cell ensures a brilliant start to your career.
             </p>
             <BrochureButton page="placement" />
+            <div className="hero-cta-row">
+              <Link to="/admissions" className="btn btn-gold btn-lg" id="placement-apply-btn">
+                Apply Now <FiArrowRight />
+              </Link>
+            </div>
           </motion.div>
         </div>
       </section>

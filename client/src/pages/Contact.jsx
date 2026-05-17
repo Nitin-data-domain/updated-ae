@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { FiPhone, FiMail, FiMapPin, FiClock, FiSend } from 'react-icons/fi'
+import { FiPhone, FiMail, FiMapPin, FiClock, FiSend, FiArrowRight } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 import { submitEnquiry } from '../api'
 import BrochureButton from '../components/BrochureButton'
@@ -44,6 +45,11 @@ export default function Contact() {
               Have questions? We'd love to hear from you. Reach out to our team.
             </p>
             <BrochureButton page="contact" />
+            <div className="hero-cta-row">
+              <Link to="/admissions" className="btn btn-gold btn-lg" id="contact-apply-btn">
+                Apply Now <FiArrowRight />
+              </Link>
+            </div>
           </motion.div>
         </div>
       </section>

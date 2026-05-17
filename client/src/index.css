@@ -334,6 +334,28 @@ input, textarea, select {
   background: var(--accent-light);
 }
 
+.btn-gold {
+  background: var(--gradient-gold);
+  color: var(--navy-dark);
+  font-weight: 700;
+  border: none;
+  box-shadow: 0 4px 18px rgba(201, 150, 12, 0.35);
+}
+
+.btn-gold:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(201, 150, 12, 0.5);
+  background: linear-gradient(135deg, #e0aa15 0%, #f7d060 50%, #e0aa15 100%);
+}
+
+/* CTA row shown in page heroes */
+.hero-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 28px;
+}
+
 .btn-sm {
   padding: 10px 20px;
   font-size: 0.85rem;
