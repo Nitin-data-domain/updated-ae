@@ -229,8 +229,8 @@ export default function Home() {
               <Link to="/programs" className="btn btn-secondary btn-lg" id="hero-explore-btn">
                 Explore Programs
               </Link>
+              <BrochureButton page="home" className="btn-lg" />
             </div>
-            <BrochureButton page="home" className="btn-lg hero-brochure" />
 
             {/* Trust badges */}
             <div className="hero-trust-badges">
