@@ -10,7 +10,7 @@ const { uploadBrochure: upload } = require('../middleware/upload');
 router.get('/', getBrochures);
 router.get('/admin', protect, getAllBrochures);
 router.get('/download/:id', downloadBrochure);
-router.post('/', protect, upload.single('brochure'), uploadBrochure);
+router.post('/', protect, uploadBrochure);
 router.put('/:id', protect, updateBrochure);
 router.delete('/:id', protect, deleteBrochure);
 

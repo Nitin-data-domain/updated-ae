@@ -7,8 +7,7 @@ export default function AdminBrochures() {
   const [brochures, setBrochures] = useState([])
   const [programs, setPrograms] = useState([])
   const [showModal, setShowModal] = useState(false)
-  const [file, setFile] = useState(null)
-  const [form, setForm] = useState({ title: '', linkedPage: 'general', linkedProgram: '' })
+  const [form, setForm] = useState({ title: '', fileUrl: '', linkedPage: 'general', linkedProgram: '' })
   const [uploading, setUploading] = useState(false)
   const [editId, setEditId] = useState(null)
   const [editForm, setEditForm] = useState({})
@@ -28,22 +27,15 @@ export default function AdminBrochures() {
 
   const handleUpload = async (e) => {
     e.preventDefault()
-    if (!file) { toast.error('Please select a PDF file'); return }
+    if (!form.fileUrl) { toast.error('Please provide a Google Drive Link'); return }
     if (!form.title) { toast.error('Title is required'); return }
 
     setUploading(true)
     try {
-      const formData = new FormData()
-      formData.append('brochure', file)
-      formData.append('title', form.title)
-      formData.append('linkedPage', form.linkedPage)
-      if (form.linkedProgram) formData.append('linkedProgram', form.linkedProgram)
-
-      await uploadBrochure(formData)
-      toast.success('Brochure uploaded!')
+      await uploadBrochure(form)
+      toast.success('Brochure added!')
       setShowModal(false)
-      setFile(null)
-      setForm({ title: '', linkedPage: 'general', linkedProgram: '' })
+      setForm({ title: '', fileUrl: '', linkedPage: 'general', linkedProgram: '' })
       loadBrochures()
     } catch (err) {
       toast.error(err.response?.data?.message || 'Upload failed')
@@ -89,10 +81,9 @@ export default function AdminBrochures() {
           <thead>
             <tr>
               <th>Title</th>
-              <th>File</th>
+              <th>G-Drive Link</th>
               <th>Linked To</th>
               <th>Program</th>
-              <th>Size</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -106,8 +97,10 @@ export default function AdminBrochures() {
                     <strong>{b.title}</strong>
                   )}
                 </td>
-                <td style={{ fontSize: '0.82rem' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><FiFile size={14} /> {b.fileName}</span>
+                <td style={{ fontSize: '0.82rem', maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <a href={b.fileUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><FiFile size={14} /> View Link</span>
+                  </a>
                 </td>
                 <td>
                   {editId === b._id ? (
@@ -121,10 +114,9 @@ export default function AdminBrochures() {
                 <td style={{ fontSize: '0.82rem' }}>
                   {b.linkedProgram?.title || '-'}
                 </td>
-                <td style={{ fontSize: '0.82rem' }}>{b.fileSize || '-'}</td>
                 <td>
                   <div className="admin-actions">
-                    <a href={downloadBrochure(b._id)} target="_blank" rel="noopener noreferrer" className="admin-btn admin-btn-edit"><FiDownload /></a>
+                    <a href={b.fileUrl} target="_blank" rel="noopener noreferrer" className="admin-btn admin-btn-edit" title="Open Link"><FiDownload /></a>
                     {editId === b._id ? (
                       <>
                         <button className="admin-btn admin-btn-edit" onClick={() => handleUpdate(b._id)}>Save</button>
@@ -155,15 +147,13 @@ export default function AdminBrochures() {
                 <input className="form-input" value={form.title} onChange={e => setForm({...form, title: e.target.value})} placeholder="e.g. BBA Aviation Brochure 2026" />
               </div>
               <div className="form-group">
-                <label className="form-label">PDF File *</label>
+                <label className="form-label">Google Drive Link *</label>
                 <input
-                  type="file"
-                  accept=".pdf"
                   className="form-input"
-                  onChange={e => setFile(e.target.files[0])}
-                  style={{ padding: '10px' }}
+                  value={form.fileUrl}
+                  onChange={e => setForm({...form, fileUrl: e.target.value})}
+                  placeholder="https://drive.google.com/file/d/..."
                 />
-                {file && <small style={{ color: 'var(--gray-500)', marginTop: '4px', display: 'block' }}>{file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)</small>}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div className="form-group">

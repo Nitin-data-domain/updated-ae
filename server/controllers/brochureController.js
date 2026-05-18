@@ -1,42 +1,21 @@
 const Brochure = require('../models/Brochure');
 const cloudinary = require('cloudinary').v2;
 
-// @desc    Upload brochure
+// @desc    Upload brochure link
 // @route   POST /api/brochures
 exports.uploadBrochure = async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ success: false, message: 'Please upload a PDF file' });
+    const { title, fileUrl, linkedPage, linkedProgram } = req.body;
+
+    if (!fileUrl) {
+      return res.status(400).json({ success: false, message: 'Please provide a Google Drive link' });
     }
 
-    const { title, linkedPage, linkedProgram } = req.body;
-
-    // Upload PDF buffer to Cloudinary
-    // resource_type: 'auto' lets Cloudinary detect the PDF and serve it
-    // with the correct Content-Type so browsers can open/preview it.
-    const uploadResult = await new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        {
-          resource_type: 'auto',
-          folder: 'aharada-brochures',
-          public_id: `brochure-${Date.now()}`,
-          format: 'pdf',
-        },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
-        }
-      );
-      stream.end(req.file.buffer);
-    });
-
     const brochure = await Brochure.create({
-      title: title || req.file.originalname,
-      fileUrl: uploadResult.secure_url,
-      fileName: req.file.originalname,
+      title: title || 'Brochure Link',
+      fileUrl: fileUrl,
       linkedPage: linkedPage || 'general',
-      linkedProgram: linkedProgram || null,
-      fileSize: `${(req.file.size / (1024 * 1024)).toFixed(2)} MB`
+      linkedProgram: linkedProgram || null
     });
 
     res.status(201).json({ success: true, data: brochure });

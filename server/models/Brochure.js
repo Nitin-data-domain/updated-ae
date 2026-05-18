@@ -11,8 +11,7 @@ const brochureSchema = new mongoose.Schema({
     required: [true, 'File URL is required']
   },
   fileName: {
-    type: String,
-    required: true
+    type: String
   },
   linkedPage: {
     type: String,

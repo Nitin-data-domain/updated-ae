@@ -84,10 +84,7 @@ export const deleteEnquiry = (id) => api.delete(`/enquiries/${id}`);
 
 // Brochures
 export const getBrochures = (params) => api.get('/brochures', { params });
-export const uploadBrochure = (formData) =>
-  api.post('/brochures', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
+export const uploadBrochure = (data) => api.post('/brochures', data);
 export const getAllBrochures = () => api.get('/brochures/admin');
 export const updateBrochure = (id, data) => api.put(`/brochures/${id}`, data);
 export const deleteBrochure = (id) => api.delete(`/brochures/${id}`);
