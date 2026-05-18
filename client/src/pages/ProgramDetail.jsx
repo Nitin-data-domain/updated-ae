@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { FiCheckCircle, FiBriefcase, FiTarget, FiAward, FiClock, FiBookOpen, FiChevronRight, FiArrowRight, FiCamera } from 'react-icons/fi'
 import { HiAcademicCap } from 'react-icons/hi'
 import { getProgramBySlug } from '../api'
@@ -365,7 +364,7 @@ export default function ProgramDetail() {
                             try {
                               const url = new URL(company.logo, window.location.origin);
                               e.target.src = `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=128`;
-                            } catch (err) {
+                            } catch {
                               e.target.style.display = 'none';
                               e.target.nextSibling.style.display = 'block';
                             }

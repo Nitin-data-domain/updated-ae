@@ -118,7 +118,9 @@ export default function AdminSiteContent() {
     try {
       const res = await getCompanyPartnersAdmin()
       setPartners(res.data.data)
-    } catch { }
+    } catch {
+      // ignore
+    }
     setLoading(false)
   }
 
@@ -152,14 +154,18 @@ export default function AdminSiteContent() {
     try {
       await deleteCompanyPartner(id)
       setPartners(prev => prev.filter(p => p._id !== id))
-    } catch { }
+    } catch {
+      // ignore
+    }
   }
 
   const toggleActive = async (p) => {
     try {
       const res = await updateCompanyPartner(p._id, { isActive: !p.isActive })
       setPartners(prev => prev.map(x => x._id === p._id ? res.data.data : x))
-    } catch { }
+    } catch {
+      // ignore
+    }
   }
 
   return (

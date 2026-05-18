@@ -59,7 +59,7 @@ export default function AdminFaculty() {
       setPreview(serverUrl)
       toast.success('Photo uploaded!')
     } catch (err) {
-      toast.error('Upload failed. Paste a URL manually.')
+      toast.error(err.message || 'Upload failed. Paste a URL manually.')
       setPreview('')
     } finally {
       setUploading(false)

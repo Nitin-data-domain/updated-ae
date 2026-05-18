@@ -23,7 +23,7 @@ export default function BrochureButton({ page, programId, className = '', style 
             setBrochure(res.data.data[0])
           }
         }
-      } catch (err) {
+      } catch {
         // Brochure not available — button stays hidden
       }
     }

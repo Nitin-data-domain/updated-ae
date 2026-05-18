@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { FiTarget, FiEye, FiAward, FiBookOpen, FiArrowRight } from 'react-icons/fi'
 import BrochureButton from '../components/BrochureButton'
 import './AboutUs.css'

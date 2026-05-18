@@ -62,15 +62,23 @@ export default function AdminAdmissionLeads() {
   const [showProgramStats, setShowProgramStats] = useState(false)
   const [loading, setLoading]       = useState(true)
 
-  useEffect(() => {
-    document.title = 'Admission Leads | Aharada Admin'
-    loadStats()
-    loadProgramStats()
-  }, [])
+  const loadStats = async () => {
+    try {
+      const res = await getEnquiryStats('admission_lead')
+      setStats(res.data.data)
+    } catch {
+      // ignore
+    }
+  }
 
-  useEffect(() => {
-    loadLeads()
-  }, [filter, programFilter, page])
+  const loadProgramStats = async () => {
+    try {
+      const res = await getProgramLeadStats()
+      setProgramStats(res.data.data)
+    } catch {
+      // ignore
+    }
+  }
 
   const loadLeads = async () => {
     setLoading(true)
@@ -78,26 +86,27 @@ export default function AdminAdmissionLeads() {
       const params = { page, limit: 15 }
       if (filter) params.status = filter
       if (programFilter) params.program = programFilter
+      
       const res = await getAdmissionLeads(params)
       setLeads(res.data.data)
       setTotalPages(res.data.totalPages)
-    } catch { toast.error('Failed to load admission leads') }
+    } catch {
+      toast.error('Failed to load admission leads')
+    }
     setLoading(false)
   }
 
-  const loadStats = async () => {
-    try {
-      const res = await getEnquiryStats('admission_lead')
-      setStats(res.data.data)
-    } catch {}
-  }
+  useEffect(() => {
+    document.title = 'Admission Leads | Aharada Admin'
+    loadStats()
+    loadProgramStats()
+  }, [])
 
-  const loadProgramStats = async () => {
-    try {
-      const res = await getProgramLeadStats()
-      setProgramStats(res.data.data)
-    } catch {}
-  }
+  useEffect(() => {
+    // eslint-disable-next-line
+    loadLeads()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter, programFilter, page])
 
   // Build a stable color map: program name → color style
   const programColorMap = useMemo(() => {

@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { FiPhone, FiMail, FiMapPin, FiClock, FiSend, FiArrowRight } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 import { submitEnquiry } from '../api'

@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { FiBriefcase, FiAward, FiStar, FiChevronLeft, FiChevronRight, FiArrowRight } from 'react-icons/fi'
 import { getPlacements } from '../api'
 import BrochureButton from '../components/BrochureButton'

@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import {
   FiArrowRight, FiTarget, FiCheckCircle, FiBookOpen, FiNavigation,
   FiCpu, FiTrendingUp, FiBriefcase, FiLayers, FiUsers, FiAward,
@@ -319,7 +318,7 @@ export default function Programs() {
                           try {
                             const url = new URL(company.logo, window.location.origin);
                             e.target.src = `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=128`;
-                          } catch(err) {
+                          } catch {
                             e.target.style.display = 'none';
                             e.target.nextSibling.style.display = 'block';
                           }

@@ -10,15 +10,6 @@ export default function AdminEnquiries() {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
 
-  useEffect(() => {
-    document.title = 'Enquiries | Aharada Admin'
-    loadStats()
-  }, [])
-
-  useEffect(() => {
-    loadEnquiries()
-  }, [filter, page])
-
   const loadEnquiries = async () => {
     try {
       const params = { page, limit: 15 }
@@ -26,15 +17,30 @@ export default function AdminEnquiries() {
       const res = await getContactEnquiries(params)
       setEnquiries(res.data.data)
       setTotalPages(res.data.totalPages)
-    } catch { toast.error('Failed to load enquiries') }
+    } catch {
+      toast.error('Failed to load enquiries')
+    }
   }
 
   const loadStats = async () => {
     try {
       const res = await getEnquiryStats('enquiry')
       setStats(res.data.data)
-    } catch {}
+    } catch {
+      // ignore
+    }
   }
+
+  useEffect(() => {
+    document.title = 'Enquiries | Aharada Admin'
+    loadStats()
+   
+  }, [])
+
+  useEffect(() => {
+    loadEnquiries()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter, page])
 
   const handleStatusChange = async (id, status) => {
     try {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import { FiUpload, FiTrash2, FiDownload, FiEdit2, FiFile } from 'react-icons/fi'
-import { getAllBrochures, uploadBrochure, updateBrochure, deleteBrochure, getPrograms, downloadBrochure } from '../../api'
+import { getAllBrochures, uploadBrochure, updateBrochure, deleteBrochure, getPrograms } from '../../api'
 
 export default function AdminBrochures() {
   const [brochures, setBrochures] = useState([])

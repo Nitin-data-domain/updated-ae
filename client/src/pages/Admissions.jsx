@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from 'react'
-import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { FiSend, FiCheck, FiCheckCircle } from 'react-icons/fi'
 import { HiAcademicCap } from 'react-icons/hi'

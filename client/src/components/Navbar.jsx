@@ -27,6 +27,7 @@ export default function Navbar() {
   }, [])
 
   useEffect(() => {
+    // eslint-disable-next-line
     setIsMobileOpen(false)
   }, [location])
 
