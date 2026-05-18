@@ -91,14 +91,14 @@ const getStudentLifeByCategory = (category) => {
     engineering: {
       subtitle: 'Hands-on labs, aerospace workshops, ISRO visits, and groundbreaking research moments.',
       large: {
-        src: 'https://images.unsplash.com/photo-1581092334651-ddf26d9a09d0?w=800&q=80',
-        alt: 'Aerospace engineering lab', tag: 'Engineering Lab', caption: 'Students in aerospace design lab',
+        src: techImg1,
+        alt: 'Aerospace engineering lab', tag: 'Engineering Lab', caption: 'Students building advanced prototypes',
       },
       grid: [
-        { src: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80', alt: 'Circuit and avionics', tag: 'Avionics', caption: 'Avionics & electronics workshop', alwaysShow: false },
-        { src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80', alt: 'HAL ISRO visit', tag: 'Industry', caption: 'HAL & ISRO facility visits', alwaysShow: true, tagGold: true },
-        { src: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600&q=80', alt: 'CAD simulation', tag: 'CAD/CFD', caption: 'Advanced CAD & CFD simulation', alwaysShow: false },
-        { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=600&q=80', alt: 'Graduation aerospace', tag: 'Convocation', caption: 'Graduation Day 2024', alwaysShow: false },
+        { src: techImg5, alt: 'Circuit and avionics', tag: 'Avionics', caption: 'BTech Aerospace Engine Workshop', alwaysShow: false },
+        { src: techImg3, alt: 'HAL ISRO visit', tag: 'Industry', caption: 'Aerospace industry facility visits', alwaysShow: true, tagGold: true },
+        { src: techImg4, alt: 'CAD simulation', tag: 'Research', caption: 'Asteroid and Space Research', alwaysShow: false },
+        { src: techImg2, alt: 'Graduation aerospace', tag: 'Guest Lecture', caption: 'Industry experts sharing knowledge', alwaysShow: false },
       ],
     },
     technology: {
