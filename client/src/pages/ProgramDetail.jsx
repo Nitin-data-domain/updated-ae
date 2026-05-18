@@ -13,6 +13,11 @@ import techImg3 from '../assets/technology/tech_img3.jpg'
 import techImg4 from '../assets/technology/tech_img4.jpg'
 import techImg5 from '../assets/technology/tech_img5.png'
 
+import avImg1 from '../assets/aviation/av_img1.jpg'
+import avImg2 from '../assets/aviation/av_img2.jpg'
+import avImg3 from '../assets/aviation/av_img3.jpg'
+import avImg4 from '../assets/aviation/av_img4.jpg'
+
 const getRecruitersByCategory = (category) => {
   const airlines = [
     { name: 'IndiGo', logo: 'https://logo.clearbit.com/goindigo.in' },
@@ -77,14 +82,14 @@ const getStudentLifeByCategory = (category) => {
     aviation: {
       subtitle: 'Real moments from our campus — classrooms, airports, simulators, and celebrations.',
       large: {
-        src: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80',
-        alt: 'Aviation students at training academy',
+        src: avImg1,
+        alt: 'Aviation students with helicopter',
         tag: 'Campus Life', caption: 'Aviation students at training facility',
       },
       grid: [
-        { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&q=80', alt: 'Classroom learning', tag: 'Academics', caption: 'Collaborative learning sessions', alwaysShow: false },
-        { src: 'https://images.unsplash.com/photo-1556388158-158ea5ccacbd?w=600&q=80', alt: 'Airport industry visit', tag: 'Industry', caption: 'Industry Visits', alwaysShow: true, tagGold: true },
-        { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=600&q=80', alt: 'Graduation ceremony', tag: 'Convocation', caption: 'Graduation Day 2024', alwaysShow: false },
+        { src: avImg2, alt: 'Group photo in auditorium', tag: 'Events', caption: 'Student events and seminars', alwaysShow: false },
+        { src: avImg3, alt: 'Students in library', tag: 'Academics', caption: 'Collaborative learning in library', alwaysShow: true, tagGold: true },
+        { src: avImg4, alt: 'Students with counselor', tag: 'Mentorship', caption: 'Expert guidance and counseling', alwaysShow: false },
         { src: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&q=80', alt: 'Cockpit simulator', tag: 'Simulation', caption: 'Cockpit & flight simulator training', alwaysShow: false },
       ],
     },
