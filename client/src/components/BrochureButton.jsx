@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { HiDownload } from 'react-icons/hi'
 import { getBrochures, downloadBrochure } from '../api'
 
-export default function BrochureButton({ page, programId, className = '' }) {
+export default function BrochureButton({ page, programId, className = '', style = {} }) {
   const [brochure, setBrochure] = useState(null)
 
   useEffect(() => {
@@ -40,6 +40,7 @@ export default function BrochureButton({ page, programId, className = '' }) {
   return (
     <button
       className={`btn btn-download ${className}`}
+      style={style}
       onClick={handleDownload}
       id={`download-brochure-${page || 'program'}`}
     >

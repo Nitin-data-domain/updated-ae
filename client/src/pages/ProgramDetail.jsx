@@ -382,10 +382,12 @@ export default function ProgramDetail() {
               <div className="pd-sidebar-cta">
                 <h3>Ready to Apply?</h3>
                 <p>Take the first step towards your dream career.</p>
-                <Link to="/admissions" className="btn btn-accent btn-sm" style={{ width: '100%' }}>
-                  Apply Now <FiArrowRight />
-                </Link>
-                <BrochureButton programId={program._id} page="programs" className="btn-sm" />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <Link to="/admissions" className="btn btn-accent btn-sm" style={{ width: '100%' }}>
+                    Apply Now <FiArrowRight />
+                  </Link>
+                  <BrochureButton programId={program._id} page="programs" className="btn-sm" style={{ width: '100%' }} />
+                </div>
               </div>
             </aside>
           </div>
