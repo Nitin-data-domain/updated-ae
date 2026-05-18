@@ -223,7 +223,12 @@ export default function ProgramDetail() {
                 ))}
               </div>
             )}
-            <BrochureButton programId={program._id} />
+            <div className="hero-cta-row">
+              <Link to="/admissions" className="btn btn-gold btn-lg" id="pd-hero-apply-btn">
+                Apply Now <FiArrowRight />
+              </Link>
+              <BrochureButton programId={program._id} page="programs" className="btn-lg" />
+            </div>
           </motion.div>
         </div>
       </section>
@@ -380,6 +385,7 @@ export default function ProgramDetail() {
                 <Link to="/admissions" className="btn btn-accent btn-sm" style={{ width: '100%' }}>
                   Apply Now <FiArrowRight />
                 </Link>
+                <BrochureButton programId={program._id} page="programs" className="btn-sm" />
               </div>
             </aside>
           </div>

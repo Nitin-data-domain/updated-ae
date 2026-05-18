@@ -8,15 +8,23 @@ export default function BrochureButton({ page, programId, className = '' }) {
   useEffect(() => {
     const fetchBrochure = async () => {
       try {
-        const params = {}
-        if (page) params.linkedPage = page
-        if (programId) params.linkedProgram = programId
-        const res = await getBrochures(params)
-        if (res.data.data.length > 0) {
-          setBrochure(res.data.data[0])
+        // 1st: try to find a brochure linked to this specific program
+        if (programId) {
+          const res = await getBrochures({ linkedProgram: programId })
+          if (res.data.data.length > 0) {
+            setBrochure(res.data.data[0])
+            return
+          }
+        }
+        // 2nd: fall back to a page-level brochure (e.g. "programs", "home")
+        if (page) {
+          const res = await getBrochures({ linkedPage: page })
+          if (res.data.data.length > 0) {
+            setBrochure(res.data.data[0])
+          }
         }
       } catch (err) {
-        // Brochure not available
+        // Brochure not available — button stays hidden
       }
     }
     fetchBrochure()
