@@ -148,14 +148,14 @@ const getStudentLifeByCategory = (category) => {
     science: {
       subtitle: 'ATC tower visits, meteorology labs, navigation systems training, and DGCA interactions.',
       large: {
-        src: 'https://images.unsplash.com/photo-1464037866556-6812c9d1c72e?w=800&q=80',
+        src: techImg3,
         alt: 'Aeronautical science field', tag: 'Field Training', caption: 'Students at aeronautical science labs',
       },
       grid: [
-        { src: 'https://images.unsplash.com/photo-1613690399151-65ea69478674?w=600&q=80', alt: 'Meteorology lab', tag: 'Meteorology', caption: 'Meteorology & weather station lab', alwaysShow: false },
+        { src: techImg5, alt: 'Meteorology lab', tag: 'Meteorology', caption: 'Drone and aerodynamic prototyping', alwaysShow: false },
         { src: 'https://images.unsplash.com/photo-1556388158-158ea5ccacbd?w=600&q=80', alt: 'ATC tower visit', tag: 'Industry', caption: 'ATC tower & DGCA interactions', alwaysShow: true, tagGold: true },
-        { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&q=80', alt: 'Navigation systems', tag: 'Navigation', caption: 'Navigation systems practical training', alwaysShow: false },
-        { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=600&q=80', alt: 'Science graduation', tag: 'Convocation', caption: 'Graduation ceremony 2024', alwaysShow: false },
+        { src: techImg4, alt: 'Navigation systems', tag: 'Navigation', caption: 'Space and aeronautical research', alwaysShow: false },
+        { src: techImg2, alt: 'Science graduation', tag: 'Guest Lecture', caption: 'Industry experts sharing insights', alwaysShow: false },
       ],
     },
     arts: {
