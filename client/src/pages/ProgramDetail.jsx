@@ -18,6 +18,8 @@ import avImg2 from '../assets/aviation/av_img2.jpg'
 import avImg3 from '../assets/aviation/av_img3.jpg'
 import avImg4 from '../assets/aviation/av_img4.jpg'
 
+import mbaImg1 from '../assets/management/mba_img1.jpg'
+
 const getRecruitersByCategory = (category) => {
   const airlines = [
     { name: 'IndiGo', logo: 'https://logo.clearbit.com/goindigo.in' },
@@ -122,14 +124,14 @@ const getStudentLifeByCategory = (category) => {
     management: {
       subtitle: 'Leadership summits, boardroom simulations, global case studies, and executive mentorships.',
       large: {
-        src: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800&q=80',
-        alt: 'MBA leadership session', tag: 'Leadership', caption: 'Executive leadership masterclass',
+        src: mbaImg1,
+        alt: 'MBA Aviation Industry Visit', tag: 'Industry Exposure', caption: 'MBA students at Rohini Heliport',
       },
       grid: [
-        { src: 'https://images.unsplash.com/photo-1556761175-4b46a572b786?w=600&q=80', alt: 'Group case study', tag: 'Case Studies', caption: 'Global business case study sessions', alwaysShow: false },
-        { src: 'https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?w=600&q=80', alt: 'Airport operations visit', tag: 'Industry', caption: 'Airport operations management visit', alwaysShow: true, tagGold: true },
-        { src: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600&q=80', alt: 'Boardroom simulation', tag: 'Boardroom', caption: 'Boardroom & negotiation simulations', alwaysShow: false },
-        { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=600&q=80', alt: 'MBA graduation', tag: 'Convocation', caption: 'MBA graduation ceremony 2024', alwaysShow: false },
+        { src: avImg2, alt: 'Group case study', tag: 'Case Studies', caption: 'Global business case study sessions', alwaysShow: false },
+        { src: avImg1, alt: 'Airport operations visit', tag: 'Industry', caption: 'Airport operations management visit', alwaysShow: true, tagGold: true },
+        { src: avImg3, alt: 'Boardroom simulation', tag: 'Boardroom', caption: 'Collaborative management learning', alwaysShow: false },
+        { src: avImg4, alt: 'MBA counseling', tag: 'Mentorship', caption: 'Executive mentorship and counseling', alwaysShow: false },
       ],
     },
     entrepreneurship: {
