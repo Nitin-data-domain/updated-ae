@@ -82,10 +82,10 @@ exports.downloadBrochure = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Brochure not found' });
     }
 
-    // Build a forced-download URL using Cloudinary's fl_attachment flag.
-    // This replaces /upload/ with /upload/fl_attachment/ in the URL.
-    const downloadUrl = brochure.fileUrl.replace('/upload/', '/upload/fl_attachment/');
-    res.redirect(downloadUrl);
+    // Redirect directly to the secure Cloudinary URL.
+    // We avoid fl_attachment for PDFs to prevent Cloudinary ERR_INVALID_RESPONSE
+    // when the PDF is treated as an image type. The browser will natively render it.
+    res.redirect(brochure.fileUrl);
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error' });
   }
