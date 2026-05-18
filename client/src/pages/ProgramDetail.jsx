@@ -34,6 +34,8 @@ import dataImg6 from '../assets/technology/data_img6.jpg'
 import artsImg1 from '../assets/arts/arts_img1.jpg'
 import artsImg2 from '../assets/arts/arts_img2.jpg'
 import artsImg3 from '../assets/arts/arts_img3.jpg'
+import artsImg4 from '../assets/arts/arts_img4.jpg'
+import artsImg5 from '../assets/arts/arts_img5.jpg'
 
 const getRecruitersByCategory = (category) => {
   const airlines = [
@@ -184,8 +186,8 @@ const getStudentLifeByCategory = (category) => {
       grid: [
         { src: artsImg2, alt: 'Textile shop visit', tag: 'Industry Visit', caption: 'Textile & fabric sourcing workshop', alwaysShow: false },
         { src: artsImg3, alt: 'Students studying in library', tag: 'Research', caption: 'Design history & arts research in library', alwaysShow: true, tagGold: true },
-        { src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80', alt: 'Design studio', tag: 'Design Studio', caption: 'Creative design & arts workshop', alwaysShow: false },
-        { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=600&q=80', alt: 'Graduation arts', tag: 'Convocation', caption: 'Graduation ceremony 2024', alwaysShow: false },
+        { src: artsImg4, alt: 'Packaging design class', tag: 'Design Studio', caption: 'Packaging and product design practicals', alwaysShow: false },
+        { src: artsImg5, alt: 'Fashion show on stage', tag: 'Fashion Show', caption: 'Annual student fashion showcase', alwaysShow: false },
       ],
     },
   }
