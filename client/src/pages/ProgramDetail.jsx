@@ -7,6 +7,12 @@ import { getProgramBySlug } from '../api'
 import BrochureButton from '../components/BrochureButton'
 import './ProgramDetail.css'
 
+import techImg1 from '../assets/technology/tech_img1.png'
+import techImg2 from '../assets/technology/tech_img2.jpg'
+import techImg3 from '../assets/technology/tech_img3.jpg'
+import techImg4 from '../assets/technology/tech_img4.jpg'
+import techImg5 from '../assets/technology/tech_img5.png'
+
 const getRecruitersByCategory = (category) => {
   const airlines = [
     { name: 'IndiGo', logo: 'https://logo.clearbit.com/goindigo.in' },
@@ -98,14 +104,14 @@ const getStudentLifeByCategory = (category) => {
     technology: {
       subtitle: 'Data labs, AI hackathons, tech company visits, and innovation-driven student projects.',
       large: {
-        src: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&q=80',
-        alt: 'Tech students working', tag: 'Innovation Lab', caption: 'Students building AI solutions',
+        src: techImg1,
+        alt: 'Tech students with drones', tag: 'Innovation Lab', caption: 'Students building advanced prototypes',
       },
       grid: [
-        { src: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&q=80', alt: 'Data science workshop', tag: 'Data Science', caption: 'Python & machine learning workshops', alwaysShow: false },
-        { src: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&q=80', alt: 'Tech company visit', tag: 'Industry', caption: 'Tech giant campus visits', alwaysShow: true, tagGold: true },
-        { src: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=600&q=80', alt: 'AI hackathon', tag: 'Hackathon', caption: 'AI innovation hackathon 2024', alwaysShow: false },
-        { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=600&q=80', alt: 'Graduation tech', tag: 'Convocation', caption: 'Graduation ceremony 2024', alwaysShow: false },
+        { src: techImg5, alt: 'Aerospace tech workshop', tag: 'Tech Lab', caption: 'Advanced technology practical training', alwaysShow: false },
+        { src: techImg3, alt: 'Tech company visit', tag: 'Industry', caption: 'Aviation technology campus visits', alwaysShow: true, tagGold: true },
+        { src: techImg4, alt: 'Asteroid research', tag: 'Research', caption: 'Space and technology research center', alwaysShow: false },
+        { src: techImg2, alt: 'Tech presentation', tag: 'Guest Lecture', caption: 'Industry leaders sharing insights', alwaysShow: false },
       ],
     },
     management: {
