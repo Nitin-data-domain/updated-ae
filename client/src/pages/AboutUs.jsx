@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FiTarget, FiEye, FiAward, FiBookOpen, FiArrowRight } from 'react-icons/fi'

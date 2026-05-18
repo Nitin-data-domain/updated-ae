@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FiAward, FiBook, FiBriefcase, FiUsers, FiArrowRight } from 'react-icons/fi'

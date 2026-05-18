@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import { useState, useEffect, useMemo } from 'react'
 import toast from 'react-hot-toast'
 import { FiSend, FiCheck, FiCheckCircle } from 'react-icons/fi'
