@@ -31,6 +31,10 @@ import dataImg3 from '../assets/technology/data_img3.jpg'
 import dataImg4 from '../assets/technology/data_img4.png'
 import dataImg6 from '../assets/technology/data_img6.jpg'
 
+import artsImg1 from '../assets/arts/arts_img1.jpg'
+import artsImg2 from '../assets/arts/arts_img2.jpg'
+import artsImg3 from '../assets/arts/arts_img3.jpg'
+
 const getRecruitersByCategory = (category) => {
   const airlines = [
     { name: 'IndiGo', logo: 'https://logo.clearbit.com/goindigo.in' },
@@ -174,13 +178,13 @@ const getStudentLifeByCategory = (category) => {
     arts: {
       subtitle: 'Design studios, fashion shows, brand collaborations, and creative industry immersions.',
       large: {
-        src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
-        alt: 'Design studio session', tag: 'Design Studio', caption: 'Creative design & arts workshop',
+        src: artsImg1,
+        alt: 'Cultural heritage visit', tag: 'Cultural Visit', caption: 'Heritage and architectural studies at Red Fort',
       },
       grid: [
-        { src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&q=80', alt: 'Fashion studio', tag: 'Fashion', caption: 'Fashion & styling masterclass', alwaysShow: false },
-        { src: 'https://images.unsplash.com/photo-1493863641943-9b68992a8d07?w=600&q=80', alt: 'Brand visit', tag: 'Industry', caption: 'Brand & retail industry visits', alwaysShow: true, tagGold: true },
-        { src: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&q=80', alt: 'Creative workshop', tag: 'Workshop', caption: 'Creative thinking workshops', alwaysShow: false },
+        { src: artsImg2, alt: 'Textile shop visit', tag: 'Industry Visit', caption: 'Textile & fabric sourcing workshop', alwaysShow: false },
+        { src: artsImg3, alt: 'Students studying in library', tag: 'Research', caption: 'Design history & arts research in library', alwaysShow: true, tagGold: true },
+        { src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80', alt: 'Design studio', tag: 'Design Studio', caption: 'Creative design & arts workshop', alwaysShow: false },
         { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=600&q=80', alt: 'Graduation arts', tag: 'Convocation', caption: 'Graduation ceremony 2024', alwaysShow: false },
       ],
     },
