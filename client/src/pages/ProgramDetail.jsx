@@ -25,6 +25,11 @@ import entImg2 from '../assets/entrepreneurship/ent_img2.jpg'
 import entImg3 from '../assets/entrepreneurship/ent_img3.jpg'
 import entImg4 from '../assets/entrepreneurship/ent_img4.jpg'
 
+import dataImg1 from '../assets/technology/data_img1.jpg'
+import dataImg2 from '../assets/technology/data_img2.jpg'
+import dataImg3 from '../assets/technology/data_img3.jpg'
+import dataImg4 from '../assets/technology/data_img4.png'
+
 const getRecruitersByCategory = (category) => {
   const airlines = [
     { name: 'IndiGo', logo: 'https://logo.clearbit.com/goindigo.in' },
@@ -116,14 +121,14 @@ const getStudentLifeByCategory = (category) => {
     technology: {
       subtitle: 'Data labs, AI hackathons, tech company visits, and innovation-driven student projects.',
       large: {
-        src: techImg1,
-        alt: 'Tech students with drones', tag: 'Innovation Lab', caption: 'Students building advanced prototypes',
+        src: dataImg3,
+        alt: 'Computer lab learning session', tag: 'Data Science Lab', caption: 'Hands-on training in Data Analytics & AI',
       },
       grid: [
-        { src: techImg5, alt: 'Aerospace tech workshop', tag: 'Tech Lab', caption: 'Advanced technology practical training', alwaysShow: false },
-        { src: techImg3, alt: 'Tech company visit', tag: 'Industry', caption: 'Aviation technology campus visits', alwaysShow: true, tagGold: true },
-        { src: techImg4, alt: 'Asteroid research', tag: 'Research', caption: 'Space and technology research center', alwaysShow: false },
-        { src: techImg2, alt: 'Tech presentation', tag: 'Guest Lecture', caption: 'Industry leaders sharing insights', alwaysShow: false },
+        { src: dataImg1, alt: 'Students in computer lab', tag: 'Tech Lab', caption: 'Advanced technology practical training', alwaysShow: false },
+        { src: dataImg2, alt: 'Auditorium lecture', tag: 'Guest Lecture', caption: 'Industry experts sharing insights on AI', alwaysShow: true, tagGold: true },
+        { src: dataImg4, alt: 'Group discussion', tag: 'Collaborative Learning', caption: 'Group project discussions', alwaysShow: false },
+        { src: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&q=80', alt: 'Data science workshop', tag: 'Data Science', caption: 'Python & machine learning workshops', alwaysShow: false },
       ],
     },
     management: {
