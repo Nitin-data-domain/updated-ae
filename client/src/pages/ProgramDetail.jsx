@@ -37,13 +37,18 @@ import artsImg3 from '../assets/arts/arts_img3.jpg'
 import artsImg4 from '../assets/arts/arts_img4.jpg'
 import artsImg5 from '../assets/arts/arts_img5.jpg'
 
+import logoIndigo from '../assets/logos/logo-indigo.png'
+import logoAirIndia from '../assets/logos/logo-airindia.png'
+import logoSpiceJet from '../assets/logos/logo-spicejet.png'
+import logoVistara from '../assets/logos/logo-vistara.png'
+
 const getRecruitersByCategory = (category) => {
   const airlines = [
-    { name: 'IndiGo', logo: 'https://logo.clearbit.com/goindigo.in' },
-    { name: 'Air India', logo: 'https://logo.clearbit.com/airindia.com' },
-    { name: 'SpiceJet', logo: 'https://logo.clearbit.com/spicejet.com' },
+    { name: 'IndiGo', logo: logoIndigo },
+    { name: 'Air India', logo: logoAirIndia },
+    { name: 'SpiceJet', logo: logoSpiceJet },
     { name: 'Emirates', logo: 'https://logo.clearbit.com/emirates.com' },
-    { name: 'Vistara', logo: 'https://logo.clearbit.com/airvistara.com' },
+    { name: 'Vistara', logo: logoVistara },
     { name: 'Lufthansa', logo: 'https://logo.clearbit.com/lufthansa.com' },
   ];
 
@@ -355,8 +360,19 @@ export default function ProgramDetail() {
                         alt={company.name}
                         style={{ maxWidth: '90%', height: '44px', objectFit: 'contain' }}
                         onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'block';
+                          if (!e.target.dataset.retried) {
+                            e.target.dataset.retried = true;
+                            try {
+                              const url = new URL(company.logo, window.location.origin);
+                              e.target.src = `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=128`;
+                            } catch (err) {
+                              e.target.style.display = 'none';
+                              e.target.nextSibling.style.display = 'block';
+                            }
+                          } else {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'block';
+                          }
                         }}
                       />
                       <strong style={{ fontSize: '0.82rem', color: 'var(--navy)', display: 'none' }}>{company.name}</strong>

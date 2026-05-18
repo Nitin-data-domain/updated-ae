@@ -13,6 +13,14 @@ import aviationBg from '../assets/aviation-program.png'
 import campusAircraft from '../assets/campus-aircraft.jpg'
 import campusStpi from '../assets/campus-stpi.jpg'
 import campusHeliport from '../assets/campus-heliport.jpg'
+import logoIndigo from '../assets/logos/logo-indigo.png'
+import logoAirIndia from '../assets/logos/logo-airindia.png'
+import logoSpiceJet from '../assets/logos/logo-spicejet.png'
+import logoVistara from '../assets/logos/logo-vistara.png'
+import logoAkasa from '../assets/logos/logo-akasaair.png'
+import logoGoFirst from '../assets/logos/logo-gofirst.png'
+import logoAirAsia from '../assets/logos/logo-airasia.png'
+import logoAlliance from '../assets/logos/logo-allianceair.png'
 import './Programs.css'
 
 const categoryIcons = {
@@ -40,18 +48,18 @@ const programImages = [campusAircraft, campusStpi, campusHeliport, aviationBg]
 
 // Company hiring partners
 const hiringCompanies = [
-  { name: 'IndiGo Airlines', color: '#1A5276', tag: 'Airline' },
-  { name: 'Air India', color: '#941F27', tag: 'Airline' },
-  { name: 'SpiceJet', color: '#CC2229', tag: 'Airline' },
-  { name: 'Vistara', color: '#4B0082', tag: 'Airline' },
-  { name: 'Akasa Air', color: '#E88A2E', tag: 'Airline' },
-  { name: 'Go First', color: '#F47920', tag: 'Airline' },
-  { name: 'Delhi Airport (DIAL)', color: '#1A5276', tag: 'Airport' },
-  { name: 'Mumbai Airport (CSIA)', color: '#2C3E50', tag: 'Airport' },
-  { name: 'GMR Group', color: '#27856A', tag: 'Airport Ops' },
-  { name: 'IndiGo Ground', color: '#1A5276', tag: 'Ground Staff' },
-  { name: 'Air Asia India', color: '#D93025', tag: 'Airline' },
-  { name: 'Alliance Air', color: '#154360', tag: 'Airline' },
+  { name: 'IndiGo Airlines', color: '#1A5276', tag: 'Airline', logo: logoIndigo },
+  { name: 'Air India', color: '#941F27', tag: 'Airline', logo: logoAirIndia },
+  { name: 'SpiceJet', color: '#CC2229', tag: 'Airline', logo: logoSpiceJet },
+  { name: 'Vistara', color: '#4B0082', tag: 'Airline', logo: logoVistara },
+  { name: 'Akasa Air', color: '#E88A2E', tag: 'Airline', logo: logoAkasa },
+  { name: 'Go First', color: '#F47920', tag: 'Airline', logo: logoGoFirst },
+  { name: 'Delhi Airport (DIAL)', color: '#1A5276', tag: 'Airport', logo: 'https://logo.clearbit.com/newdelhiairport.in' },
+  { name: 'Mumbai Airport (CSIA)', color: '#2C3E50', tag: 'Airport', logo: 'https://logo.clearbit.com/csmia.adaniairports.com' },
+  { name: 'GMR Group', color: '#27856A', tag: 'Airport Ops', logo: 'https://logo.clearbit.com/gmrgroup.in' },
+  { name: 'IndiGo Ground', color: '#1A5276', tag: 'Ground Staff', logo: logoIndigo },
+  { name: 'Air Asia India', color: '#D93025', tag: 'Airline', logo: logoAirAsia },
+  { name: 'Alliance Air', color: '#154360', tag: 'Airline', logo: logoAlliance },
 ]
 
 const programHighlights = [
@@ -298,9 +306,33 @@ export default function Programs() {
               >
                 <div
                   className="partners-company-icon"
-                  style={{ background: company.color + '18', border: `1.5px solid ${company.color}30` }}
+                  style={{ background: 'var(--white)', border: '1px solid var(--gray-100)', padding: '0', overflow: 'hidden' }}
                 >
-                  <HiOutlineOfficeBuilding size={30} style={{ color: company.color }} />
+                  {company.logo ? (
+                    <img 
+                      src={company.logo} 
+                      alt={company.name} 
+                      style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '10px' }}
+                      onError={(e) => {
+                        if (!e.target.dataset.retried) {
+                          e.target.dataset.retried = true;
+                          try {
+                            const url = new URL(company.logo, window.location.origin);
+                            e.target.src = `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=128`;
+                          } catch(err) {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'block';
+                          }
+                        } else {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'block';
+                        }
+                      }}
+                    />
+                  ) : (
+                    <HiOutlineOfficeBuilding size={30} style={{ color: company.color }} />
+                  )}
+                  <HiOutlineOfficeBuilding size={30} style={{ color: company.color, display: 'none', margin: 'auto' }} />
                 </div>
                 <span className="partners-company-name">{company.name}</span>
                 <span className="partners-company-tag" style={{ background: company.color + '14', color: company.color }}>
