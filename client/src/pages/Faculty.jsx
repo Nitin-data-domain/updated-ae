@@ -34,11 +34,11 @@ export default function Faculty() {
               Learn from industry veterans, retired airline captains, aerospace scientists, 
               and seasoned business professionals.
             </p>
-            <BrochureButton page="faculty" />
             <div className="hero-cta-row">
               <Link to="/admissions" className="btn btn-gold btn-lg" id="faculty-apply-btn">
                 Apply Now <FiArrowRight />
               </Link>
+              <BrochureButton page="faculty" className="btn-lg" />
             </div>
           </motion.div>
         </div>

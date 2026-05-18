@@ -44,11 +44,11 @@ export default function Contact() {
             <p className="page-hero-subtitle">
               Have questions? We'd love to hear from you. Reach out to our team.
             </p>
-            <BrochureButton page="contact" />
             <div className="hero-cta-row">
               <Link to="/admissions" className="btn btn-gold btn-lg" id="contact-apply-btn">
                 Apply Now <FiArrowRight />
               </Link>
+              <BrochureButton page="contact" className="btn-lg" />
             </div>
           </motion.div>
         </div>

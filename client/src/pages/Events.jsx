@@ -58,11 +58,11 @@ export default function Events() {
             <p className="page-hero-subtitle">
               Stay updated with our seminars, workshops, placement drives, and cultural events.
             </p>
-            <BrochureButton page="events" />
             <div className="hero-cta-row">
               <Link to="/admissions" className="btn btn-gold btn-lg" id="events-apply-btn">
                 Apply Now <FiArrowRight />
               </Link>
+              <BrochureButton page="events" className="btn-lg" />
             </div>
           </motion.div>
         </div>

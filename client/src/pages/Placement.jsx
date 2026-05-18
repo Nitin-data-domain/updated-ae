@@ -44,11 +44,11 @@ export default function Placement() {
               Empowering students to achieve their dreams with leading global companies.
               Our placement cell ensures a brilliant start to your career.
             </p>
-            <BrochureButton page="placement" />
             <div className="hero-cta-row">
               <Link to="/admissions" className="btn btn-gold btn-lg" id="placement-apply-btn">
                 Apply Now <FiArrowRight />
               </Link>
+              <BrochureButton page="general" className="btn-lg" />
             </div>
           </motion.div>
         </div>

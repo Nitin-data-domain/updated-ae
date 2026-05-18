@@ -119,7 +119,12 @@ export default function Programs() {
                 </div>
               ))}
             </div>
-            <BrochureButton page="programs" />
+            <div className="hero-cta-row" style={{ marginTop: '30px' }}>
+              <Link to="/admissions" className="btn btn-gold btn-lg" id="programs-apply-btn">
+                Apply Now <FiArrowRight />
+              </Link>
+              <BrochureButton page="programs" className="btn-lg" />
+            </div>
           </motion.div>
         </div>
       </section>
