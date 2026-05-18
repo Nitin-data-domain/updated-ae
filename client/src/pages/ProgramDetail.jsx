@@ -20,6 +20,11 @@ import avImg4 from '../assets/aviation/av_img4.jpg'
 
 import mbaImg1 from '../assets/management/mba_img1.jpg'
 
+import entImg1 from '../assets/entrepreneurship/ent_img1.jpg'
+import entImg2 from '../assets/entrepreneurship/ent_img2.jpg'
+import entImg3 from '../assets/entrepreneurship/ent_img3.jpg'
+import entImg4 from '../assets/entrepreneurship/ent_img4.jpg'
+
 const getRecruitersByCategory = (category) => {
   const airlines = [
     { name: 'IndiGo', logo: 'https://logo.clearbit.com/goindigo.in' },
@@ -137,13 +142,13 @@ const getStudentLifeByCategory = (category) => {
     entrepreneurship: {
       subtitle: 'Pitch days, startup incubators, investor meets, and innovation workshops that shape founders.',
       large: {
-        src: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&q=80',
-        alt: 'Startup pitch day', tag: 'Startup Pitch', caption: 'Students pitching to investors',
+        src: entImg4,
+        alt: 'Startup team meeting', tag: 'Startup Pitch', caption: 'Students collaborating in the incubation center',
       },
       grid: [
-        { src: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=600&q=80', alt: 'Ideathon hackathon', tag: 'Hackathon', caption: 'Innovation ideathon & hackathon', alwaysShow: false },
-        { src: 'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=600&q=80', alt: 'Investor meet', tag: 'Investors', caption: 'Angel investor connect program', alwaysShow: true, tagGold: true },
-        { src: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&q=80', alt: 'Startup team', tag: 'Incubation', caption: 'In-house startup incubation center', alwaysShow: false },
+        { src: entImg3, alt: 'Group ideation session', tag: 'Hackathon', caption: 'Innovation ideathon & hackathon', alwaysShow: false },
+        { src: entImg2, alt: 'Guest speaker meeting', tag: 'Investors', caption: 'Angel investor and mentor connect', alwaysShow: true, tagGold: true },
+        { src: entImg1, alt: 'Students in library', tag: 'Research', caption: 'Market research in library', alwaysShow: false },
         { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=600&q=80', alt: 'Graduation', tag: 'Convocation', caption: 'Graduation ceremony 2024', alwaysShow: false },
       ],
     },
