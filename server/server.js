@@ -3,6 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const path = require('path');
+const https = require('https');
 require('dotenv').config();
 
 const connectDB = require('./config/db');
@@ -67,4 +68,23 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Aharada Education Server running on port ${PORT}`);
+
+  // ── Keep-Alive Self-Ping ────────────────────────────────────────────────────
+  // Render's free tier shuts down after ~15 min of inactivity.
+  // This pings /api/health every 14 minutes in production to keep the server awake.
+  if (process.env.NODE_ENV === 'production' && process.env.RENDER_EXTERNAL_URL) {
+    const PING_INTERVAL_MS = 14 * 60 * 1000; // 14 minutes
+    const healthUrl = `${process.env.RENDER_EXTERNAL_URL}/api/health`;
+
+    setInterval(() => {
+      https.get(healthUrl, (res) => {
+        console.log(`[Keep-Alive] ✅ Self-ping OK — status ${res.statusCode} at ${new Date().toISOString()}`);
+      }).on('error', (err) => {
+        console.error(`[Keep-Alive] ❌ Self-ping failed: ${err.message}`);
+      });
+    }, PING_INTERVAL_MS);
+
+    console.log(`[Keep-Alive] 🔔 Self-ping active every 14 min → ${healthUrl}`);
+  }
+  // ──────────────────────────────────────────────────────────────────────────
 });
