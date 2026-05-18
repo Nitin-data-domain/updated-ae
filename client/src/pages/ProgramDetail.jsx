@@ -29,6 +29,7 @@ import dataImg1 from '../assets/technology/data_img1.jpg'
 import dataImg2 from '../assets/technology/data_img2.jpg'
 import dataImg3 from '../assets/technology/data_img3.jpg'
 import dataImg4 from '../assets/technology/data_img4.png'
+import dataImg6 from '../assets/technology/data_img6.jpg'
 
 const getRecruitersByCategory = (category) => {
   const airlines = [
@@ -128,7 +129,7 @@ const getStudentLifeByCategory = (category) => {
         { src: dataImg1, alt: 'Students in computer lab', tag: 'Tech Lab', caption: 'Advanced technology practical training', alwaysShow: false },
         { src: dataImg2, alt: 'Auditorium lecture', tag: 'Guest Lecture', caption: 'Industry experts sharing insights on AI', alwaysShow: true, tagGold: true },
         { src: dataImg4, alt: 'Group discussion', tag: 'Collaborative Learning', caption: 'Group project discussions', alwaysShow: false },
-        { src: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&q=80', alt: 'Data science workshop', tag: 'Data Science', caption: 'Python & machine learning workshops', alwaysShow: false },
+        { src: dataImg6, alt: 'Students studying in library', tag: 'Research', caption: 'Comprehensive learning in library', alwaysShow: false },
       ],
     },
     management: {
