@@ -72,7 +72,7 @@ const programHighlights = [
 export default function Programs() {
   const [programs, setPrograms] = useState([])
   const [loading, setLoading] = useState(true)
-  const [activeFilter, setActiveFilter] = useState('all')
+  const [activeFilters, setActiveFilters] = useState(new Set())
   const [activeUni, setActiveUni] = useState('all')
 
   useEffect(() => {
@@ -83,8 +83,17 @@ export default function Programs() {
       .finally(() => setLoading(false))
   }, [])
 
+  const toggleCategory = (cat) => {
+    setActiveFilters(prev => {
+      const next = new Set(prev)
+      if (next.has(cat)) next.delete(cat)
+      else next.add(cat)
+      return next
+    })
+  }
+
   const filteredPrograms = programs.filter(p => {
-    const catMatch = activeFilter === 'all' || p.category === activeFilter
+    const catMatch = activeFilters.size === 0 || activeFilters.has(p.category)
     const uniMatch = activeUni === 'all' || (p.universities || []).some(u => u.slug === activeUni)
     return catMatch && uniMatch
   })
@@ -152,13 +161,29 @@ export default function Programs() {
             </div>
           </div>
 
-          {/* Category Filter */}
+          {/* Category Filter – multi-select */}
           <div className="filter-section">
-            <h3 className="filter-label">Filter by Category</h3>
+            <h3 className="filter-label">
+              Filter by Category
+              {activeFilters.size > 0 && (
+                <span style={{ fontSize: '0.8rem', fontWeight: 400, color: 'var(--gray-500)', marginLeft: '8px' }}>
+                  ({activeFilters.size} selected)
+                </span>
+              )}
+            </h3>
             <div className="filter-bar">
-              <button className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`} onClick={() => setActiveFilter('all')}>All Categories</button>
+              <button
+                className={`filter-btn ${activeFilters.size === 0 ? 'active' : ''}`}
+                onClick={() => setActiveFilters(new Set())}
+              >
+                All Categories
+              </button>
               {categories.map(cat => (
-                <button key={cat} className={`filter-btn ${activeFilter === cat ? 'active' : ''}`} onClick={() => setActiveFilter(cat)}>
+                <button
+                  key={cat}
+                  className={`filter-btn ${activeFilters.has(cat) ? 'active' : ''}`}
+                  onClick={() => toggleCategory(cat)}
+                >
                   {categoryLabels[cat] || cat}
                 </button>
               ))}

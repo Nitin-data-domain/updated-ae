@@ -28,9 +28,9 @@ import sageLogo from '../assets/sage-logo.jpg'
 import './Home.css'
 
 const stats = [
-  { icon: <FiUsers size={22} />, value: '2500+', label: 'Students Placed' },
+  { icon: <FiUsers size={22} />, value: '1000+', label: 'Students Placed' },
   { icon: <FiAward size={22} />, value: '6+', label: 'Years of Excellence' },
-  { icon: <FiBriefcase size={22} />, value: '200+', label: 'Industry Partners' },
+  { icon: <FiBriefcase size={22} />, value: '25+', label: 'Industry Partners' },
   { icon: <FiGlobe size={22} />, value: '4', label: 'Partner Universities' },
 ]
 
@@ -204,7 +204,7 @@ export default function Home() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3, duration: 0.5 }}
             >
-              <FiNavigation size={14} /> India's Leading Aviation Education Platform
+              <FiNavigation size={14} /> India's Premier Multi-Discipline Education Platform
             </motion.span>
             <h1 className="hero-title">
               Get Your Wings<br />
@@ -236,7 +236,7 @@ export default function Home() {
             <div className="hero-trust-badges">
               <div className="trust-badge"><FiShield size={14} /> NAAC Accredited</div>
               <div className="trust-badge"><FiZap size={14} /> 100% Placement</div>
-              <div className="trust-badge"><FiHeart size={14} /> 2500+ Alumni</div>
+              <div className="trust-badge"><FiHeart size={14} /> 1000+ Alumni</div>
             </div>
           </motion.div>
 

@@ -65,7 +65,7 @@ export default function AboutUs() {
                 <p>Years of Excellence</p>
               </div>
               <div className="stat-card">
-                <h3>50+</h3>
+                <h3>25+</h3>
                 <p>Industry Partners</p>
               </div>
               <div className="stat-card">
@@ -73,7 +73,7 @@ export default function AboutUs() {
                 <p>Placement Assistance</p>
               </div>
               <div className="stat-card">
-                <h3>2.5k+</h3>
+                <h3>1000+</h3>
                 <p>Alumni Network</p>
               </div>
             </motion.div>

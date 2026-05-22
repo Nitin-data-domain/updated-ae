@@ -25,12 +25,14 @@ export default function Admissions() {
     getPrograms().then(res => setAllPrograms(res.data.data)).catch(() => {})
   }, [])
 
-  // Derive unique universities from all programs in the DB
+  // Derive unique universities from all programs in the DB (excluding Sage University)
   const universities = useMemo(() => {
     const uniSet = new Map()
     allPrograms.forEach(p => {
       (p.universities || []).forEach(u => {
-        if (u.name && !uniSet.has(u.name)) uniSet.set(u.name, u.name)
+        if (u.name && !uniSet.has(u.name) && u.name.toLowerCase() !== 'sage university') {
+          uniSet.set(u.name, u.name)
+        }
       })
     })
     return Array.from(uniSet.values())
