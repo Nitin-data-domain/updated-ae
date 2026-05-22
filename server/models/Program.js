@@ -42,11 +42,10 @@ const programSchema = new mongoose.Schema({
     name: { type: String, required: true },
     slug: { type: String }
   }],
-  category: {
+  category: [{
     type: String,
-    enum: ['aviation', 'engineering', 'management', 'entrepreneurship', 'technology', 'arts', 'science'],
-    default: 'aviation'
-  },
+    enum: ['aviation', 'engineering', 'management', 'entrepreneurship', 'technology', 'arts', 'science']
+  }],
   image: {
     type: String,
     default: ''
