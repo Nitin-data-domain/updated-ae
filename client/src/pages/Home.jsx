@@ -317,19 +317,19 @@ export default function Home() {
               {[...companyPartners, ...companyPartners].map((company, i) => (
                 <div key={i} style={{
                   background: 'var(--white)',
-                  padding: '10px 24px',
+                  padding: '12px 28px',
                   borderRadius: '8px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  minWidth: '160px',
-                  height: '64px',
+                  minWidth: '180px',
+                  height: '80px',
                   boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
                 }}>
                   <img
                     src={company.logo}
                     alt={company.name}
-                    style={{ height: '40px', width: 'auto', maxWidth: '140px', objectFit: 'contain' }}
+                    style={{ height: '56px', width: 'auto', maxWidth: '160px', objectFit: 'contain' }}
                   />
                 </div>
               ))}
@@ -718,7 +718,7 @@ export default function Home() {
                 whileHover={{ y: -6, boxShadow: 'var(--shadow-lg)' }}
               >
                 <div className="company-logo-icon" style={{ background: 'var(--white)', border: '1px solid var(--gray-100)', padding: '0', overflow: 'hidden' }}>
-                  <img src={company.logo} alt={company.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '10px' }} />
+                  <img src={company.logo} alt={company.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '6px' }} />
                 </div>
                 <span className="company-logo-name">{company.name}</span>
                 <span className="company-logo-tag">Hiring Partner</span>
