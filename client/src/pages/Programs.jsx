@@ -93,12 +93,16 @@ export default function Programs() {
   }
 
   const filteredPrograms = programs.filter(p => {
-    const catMatch = activeFilters.size === 0 || activeFilters.has(p.category)
+    // Support both legacy string category and new array category
+    const programCats = Array.isArray(p.category) ? p.category : (p.category ? [p.category] : [])
+    const catMatch = activeFilters.size === 0 || programCats.some(c => activeFilters.has(c))
     const uniMatch = activeUni === 'all' || (p.universities || []).some(u => u.slug === activeUni)
     return catMatch && uniMatch
   })
 
-  const categories = [...new Set(programs.map(p => p.category))].filter(Boolean)
+  const categories = [...new Set(programs.flatMap(p =>
+    Array.isArray(p.category) ? p.category : (p.category ? [p.category] : [])
+  ))].filter(Boolean)
   const uniList = [
     { slug: 'iimt', name: 'IIMT University' },
     { slug: 'future', name: 'Future University' },

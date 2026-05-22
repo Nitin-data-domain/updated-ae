@@ -3,9 +3,19 @@ import toast from 'react-hot-toast'
 import { FiPlus, FiEdit2, FiTrash2, FiUpload, FiX } from 'react-icons/fi'
 import { getPrograms, createProgram, updateProgram, deleteProgram, uploadProgramImage, fetchProgramImage } from '../../api'
 
+const ALL_CATEGORIES = [
+  { value: 'aviation', label: 'Aviation' },
+  { value: 'engineering', label: 'Engineering' },
+  { value: 'science', label: 'Science' },
+  { value: 'management', label: 'Management' },
+  { value: 'entrepreneurship', label: 'Entrepreneurship' },
+  { value: 'technology', label: 'Technology' },
+  { value: 'arts', label: 'Arts & Design' },
+]
+
 const emptyProgram = {
   title: '', slug: '', shortDescription: '', overview: '', eligibility: '',
-  duration: '', category: 'aviation', order: 0,
+  duration: '', category: ['aviation'], order: 0,
   careerOpportunities: '', industryExposure: '', highlights: '',
   universities: '', image: ''
 }
@@ -44,8 +54,13 @@ export default function AdminPrograms() {
 
   const openEdit = (p) => {
     setEditing(p._id)
+    // Normalise category: support both legacy string and new array
+    const cats = Array.isArray(p.category)
+      ? p.category
+      : p.category ? [p.category] : ['aviation']
     setForm({
       ...p,
+      category: cats,
       careerOpportunities: (p.careerOpportunities || []).join('\n'),
       industryExposure: (p.industryExposure || []).join('\n'),
       highlights: (p.highlights || []).join('\n'),
@@ -55,6 +70,18 @@ export default function AdminPrograms() {
     setPreview(p.image || '')
     setUrlInput(p.image || '')
     setShowModal(true)
+  }
+
+  const toggleCategory = (val) => {
+    setForm(prev => {
+      const cats = Array.isArray(prev.category) ? prev.category : [prev.category]
+      return {
+        ...prev,
+        category: cats.includes(val)
+          ? cats.filter(c => c !== val)   // deselect
+          : [...cats, val]                // select
+      }
+    })
   }
 
   const handleFileChange = async (e) => {
@@ -106,10 +133,13 @@ export default function AdminPrograms() {
   const handleSave = async (e) => {
     e.preventDefault()
     if (!form.title || !form.overview) { toast.error('Title and overview are required'); return }
+    const cats = Array.isArray(form.category) ? form.category : [form.category]
+    if (cats.length === 0) { toast.error('Please select at least one category'); return }
     setSaving(true)
     try {
       const payload = {
         ...form,
+        category: cats,
         slug: form.slug || form.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
         careerOpportunities: form.careerOpportunities.split('\n').filter(Boolean),
         industryExposure: form.industryExposure.split('\n').filter(Boolean),
@@ -175,7 +205,11 @@ export default function AdminPrograms() {
                   }
                 </td>
                 <td><strong>{p.title}</strong></td>
-                <td><span className="status-badge status-new" style={{ textTransform: 'capitalize' }}>{p.category}</span></td>
+                <td style={{ display: 'flex', flexWrap: 'wrap', gap: 4, padding: '10px 8px' }}>
+                  {(Array.isArray(p.category) ? p.category : [p.category]).map(c => (
+                    <span key={c} className="status-badge status-new" style={{ textTransform: 'capitalize' }}>{c}</span>
+                  ))}
+                </td>
                 <td>{p.duration}</td>
                 <td style={{ fontSize: '0.82rem' }}>{(p.universities || []).map(u => u.name).join(', ') || '-'}</td>
                 <td>
@@ -207,17 +241,42 @@ export default function AdminPrograms() {
                 <input className="form-input" value={form.slug} onChange={e => setForm({...form, slug: e.target.value})} placeholder="Auto-generated from title" />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
-                <div className="form-group">
-                  <label className="form-label">Category</label>
-                  <select className="form-select" value={form.category} onChange={e => setForm({...form, category: e.target.value})}>
-                    <option value="aviation">Aviation</option>
-                    <option value="engineering">Engineering</option>
-                    <option value="science">Science</option>
-                    <option value="management">Management</option>
-                    <option value="entrepreneurship">Entrepreneurship</option>
-                    <option value="technology">Technology</option>
-                    <option value="arts">Arts & Design</option>
-                  </select>
+                <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                  <label className="form-label">
+                    Category
+                    <span style={{ fontWeight: 400, fontSize: '0.78rem', color: 'var(--gray-500)', marginLeft: 6 }}>
+                      (select one or more)
+                    </span>
+                  </label>
+                  <div style={{
+                    display: 'flex', flexWrap: 'wrap', gap: '8px',
+                    padding: '10px 12px', border: '1.5px solid var(--gray-200)',
+                    borderRadius: '8px', background: 'var(--gray-50, #f9fafb)'
+                  }}>
+                    {ALL_CATEGORIES.map(cat => {
+                      const selected = (Array.isArray(form.category) ? form.category : [form.category]).includes(cat.value)
+                      return (
+                        <button
+                          key={cat.value}
+                          type="button"
+                          onClick={() => toggleCategory(cat.value)}
+                          style={{
+                            padding: '5px 14px', borderRadius: '20px', fontSize: '0.82rem',
+                            border: '1.5px solid ' + (selected ? 'var(--primary, #012060)' : 'var(--gray-300)'),
+                            background: selected ? 'var(--primary, #012060)' : 'var(--white)',
+                            color: selected ? '#fff' : 'var(--gray-600)',
+                            cursor: 'pointer', fontWeight: selected ? 600 : 400,
+                            transition: 'all 0.15s'
+                          }}
+                        >
+                          {selected ? '✓ ' : ''}{cat.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                  {(Array.isArray(form.category) ? form.category : [form.category]).length === 0 && (
+                    <p style={{ fontSize: '0.78rem', color: '#ef4444', marginTop: 4 }}>Please select at least one category.</p>
+                  )}
                 </div>
                 <div className="form-group">
                   <label className="form-label">Duration *</label>
