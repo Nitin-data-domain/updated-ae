@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { FiPhone, FiMail, FiMapPin } from 'react-icons/fi'
 import { FaFacebookF, FaInstagram, FaLinkedinIn } from 'react-icons/fa'
-import Logo from './Logo'
+import aeLogoWhite from '../assets/ae-logo-white.png'
 import './Footer.css'
 
 export default function Footer() {
@@ -18,7 +18,18 @@ export default function Footer() {
           <div className="footer-grid">
             <div className="footer-brand-col">
               <Link to="/" className="footer-brand">
-                <Logo size="default" />
+                <img
+                  src={aeLogoWhite}
+                  alt="Aharada Education"
+                  style={{
+                    height: '80px',
+                    width: 'auto',
+                    maxWidth: '240px',
+                    objectFit: 'contain',
+                    objectPosition: 'left center',
+                    display: 'block',
+                  }}
+                />
               </Link>
               <p className="footer-desc">
                 Empowering the next generation of aviation professionals, aerospace engineers, and innovative entrepreneurs through industry-integrated education across partner universities.
