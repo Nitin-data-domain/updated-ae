@@ -1,7 +1,7 @@
 import aeLogoIcon from '../assets/ae-logo-icon.png'
 
 export default function Logo({ className = '', size = 'default' }) {
-  const heights = { small: 36, default: 60, large: 60, hero: 80 }
+  const heights = { small: 48, default: 80, large: 80, hero: 100 }
   const h = heights[size] || heights.default
 
   return (
