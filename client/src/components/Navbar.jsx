@@ -56,6 +56,10 @@ export default function Navbar() {
         <div className="container navbar-inner">
           <Link to="/" className="navbar-brand" id="navbar-brand">
             <Logo size="default" />
+            <div className="navbar-brand-text">
+              <span className="navbar-brand-name">Aharada Education</span>
+              <span className="navbar-brand-tagline">Educate · Empower · Excel</span>
+            </div>
           </Link>
 
           <div className={`navbar-links ${isMobileOpen ? 'active' : ''}`}>
