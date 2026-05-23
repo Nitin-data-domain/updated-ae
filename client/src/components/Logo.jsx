@@ -1,36 +1,22 @@
-import aeLogoIcon from '../assets/ae-logo-icon.png'
+import aeLogo from '../assets/aharada-education-logo.png'
 
 export default function Logo({ className = '', size = 'default' }) {
-  const sizes = { small: 40, default: 52, large: 52, hero: 64 }
-  const s = sizes[size] || sizes.default
+  const heights = { small: 48, default: 72, large: 72, hero: 90 }
+  const h = heights[size] || heights.default
 
   return (
-    <div
-      className={`logo-icon-wrap ${className}`}
+    <img
+      src={aeLogo}
+      alt="Aharada Education"
       style={{
-        width: `${s}px`,
-        height: `${s}px`,
-        borderRadius: '12px',
-        overflow: 'hidden',
-        flexShrink: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#1a3a5c',
+        height: `${h}px`,
+        width: 'auto',
+        maxWidth: '240px',
+        objectFit: 'contain',
+        objectPosition: 'left center',
+        display: 'block',
       }}
-    >
-      <img
-        src={aeLogoIcon}
-        alt="Aharada Education"
-        style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          objectPosition: 'center',
-          display: 'block',
-        }}
-      />
-    </div>
+      className={className}
+    />
   )
 }
-
