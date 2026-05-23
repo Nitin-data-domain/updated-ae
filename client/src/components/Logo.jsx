@@ -1,17 +1,16 @@
-import aeLogo from '../assets/ae-logo.png'
+import aeLogoIcon from '../assets/ae-logo-icon.png'
 
 export default function Logo({ className = '', size = 'default' }) {
-  const heights = { small: 40, default: 72, large: 72, hero: 90 }
+  const heights = { small: 36, default: 60, large: 60, hero: 80 }
   const h = heights[size] || heights.default
 
   return (
     <img
-      src={aeLogo}
+      src={aeLogoIcon}
       alt="Aharada Education"
       style={{
         height: `${h}px`,
         width: 'auto',
-        maxWidth: '220px',
         objectFit: 'contain',
         objectPosition: 'left center',
         display: 'block',
