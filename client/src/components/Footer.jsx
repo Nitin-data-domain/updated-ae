@@ -22,9 +22,9 @@ export default function Footer() {
                   src={aeLogoWhite}
                   alt="Aharada Education"
                   style={{
-                    height: '220px',
+                    height: '300px',
                     width: 'auto',
-                    maxWidth: '400px',
+                    maxWidth: '480px',
                     objectFit: 'contain',
                     objectPosition: 'left center',
                     display: 'block',
