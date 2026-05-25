@@ -42,61 +42,96 @@ import logoAirIndia from '../assets/logos/logo-airindia.png'
 import logoSpiceJet from '../assets/logos/logo-spicejet.png'
 import logoVistara from '../assets/logos/logo-vistara.png'
 
-const getRecruitersByCategory = (category) => {
-  const airlines = [
-    { name: 'IndiGo', logo: logoIndigo },
-    { name: 'Air India', logo: logoAirIndia },
-    { name: 'SpiceJet', logo: logoSpiceJet },
-    { name: 'Emirates', logo: 'https://logo.clearbit.com/emirates.com' },
-    { name: 'Vistara', logo: logoVistara },
-    { name: 'Lufthansa', logo: 'https://logo.clearbit.com/lufthansa.com' },
+const getRecruitersByCategory = (categoryArr) => {
+  // category is stored as an array in DB — take the first element
+  const category = Array.isArray(categoryArr) ? categoryArr[0] : categoryArr;
+
+  const aviation = [
+    { name: 'IndiGo',      logo: logoIndigo },
+    { name: 'Air India',   logo: logoAirIndia },
+    { name: 'SpiceJet',    logo: logoSpiceJet },
+    { name: 'Vistara',     logo: logoVistara },
+    { name: 'Emirates',    logo: 'https://logo.clearbit.com/emirates.com' },
+    { name: 'Lufthansa',   logo: 'https://logo.clearbit.com/lufthansa.com' },
+    { name: 'Qatar Airways', logo: 'https://logo.clearbit.com/qatarairways.com' },
+    { name: 'Air Arabia',  logo: 'https://logo.clearbit.com/airarabia.com' },
   ];
 
   const engineering = [
-    { name: 'HAL India', logo: 'https://logo.clearbit.com/hal-india.co.in' },
-    { name: 'ISRO', logo: 'https://logo.clearbit.com/isro.gov.in' },
-    { name: 'Boeing', logo: 'https://logo.clearbit.com/boeing.com' },
-    { name: 'Airbus', logo: 'https://logo.clearbit.com/airbus.com' },
+    { name: 'HAL India',   logo: 'https://logo.clearbit.com/hal-india.co.in' },
+    { name: 'ISRO',        logo: 'https://logo.clearbit.com/isro.gov.in' },
+    { name: 'Boeing',      logo: 'https://logo.clearbit.com/boeing.com' },
+    { name: 'Airbus',      logo: 'https://logo.clearbit.com/airbus.com' },
     { name: 'GE Aviation', logo: 'https://logo.clearbit.com/ge.com' },
-    { name: 'L&T', logo: 'https://logo.clearbit.com/larsentoubro.com' },
+    { name: 'L&T',         logo: 'https://logo.clearbit.com/larsentoubro.com' },
+    { name: 'DRDO',        logo: 'https://logo.clearbit.com/drdo.gov.in' },
+    { name: 'Rolls-Royce', logo: 'https://logo.clearbit.com/rolls-royce.com' },
   ];
 
-  const tech = [
-    { name: 'Google', logo: 'https://logo.clearbit.com/google.com' },
-    { name: 'Microsoft', logo: 'https://logo.clearbit.com/microsoft.com' },
-    { name: 'Amazon', logo: 'https://logo.clearbit.com/amazon.com' },
-    { name: 'IBM', logo: 'https://logo.clearbit.com/ibm.com' },
-    { name: 'Meta', logo: 'https://logo.clearbit.com/meta.com' },
-    { name: 'Oracle', logo: 'https://logo.clearbit.com/oracle.com' },
+  const technology = [
+    { name: 'Google',      logo: 'https://logo.clearbit.com/google.com' },
+    { name: 'Microsoft',   logo: 'https://logo.clearbit.com/microsoft.com' },
+    { name: 'Amazon',      logo: 'https://logo.clearbit.com/amazon.com' },
+    { name: 'TCS',         logo: 'https://logo.clearbit.com/tcs.com' },
+    { name: 'Infosys',     logo: 'https://logo.clearbit.com/infosys.com' },
+    { name: 'Wipro',       logo: 'https://logo.clearbit.com/wipro.com' },
+    { name: 'IBM',         logo: 'https://logo.clearbit.com/ibm.com' },
+    { name: 'Accenture',   logo: 'https://logo.clearbit.com/accenture.com' },
   ];
 
-  const business = [
-    { name: 'Deloitte', logo: 'https://logo.clearbit.com/deloitte.com' },
-    { name: 'KPMG', logo: 'https://logo.clearbit.com/kpmg.com' },
-    { name: 'EY', logo: 'https://logo.clearbit.com/ey.com' },
-    { name: 'PwC', logo: 'https://logo.clearbit.com/pwc.com' },
-    { name: 'HDFC Bank', logo: 'https://logo.clearbit.com/hdfcbank.com' },
-    { name: 'ICICI Bank', logo: 'https://logo.clearbit.com/icicibank.com' },
+  const management = [
+    { name: 'Deloitte',    logo: 'https://logo.clearbit.com/deloitte.com' },
+    { name: 'KPMG',        logo: 'https://logo.clearbit.com/kpmg.com' },
+    { name: 'EY',          logo: 'https://logo.clearbit.com/ey.com' },
+    { name: 'PwC',         logo: 'https://logo.clearbit.com/pwc.com' },
+    { name: 'McKinsey',    logo: 'https://logo.clearbit.com/mckinsey.com' },
+    { name: 'HDFC Bank',   logo: 'https://logo.clearbit.com/hdfcbank.com' },
+    { name: 'ICICI Bank',  logo: 'https://logo.clearbit.com/icicibank.com' },
+    { name: 'Axis Bank',   logo: 'https://logo.clearbit.com/axisbank.com' },
+  ];
+
+  const entrepreneurship = [
+    { name: 'Razorpay',    logo: 'https://logo.clearbit.com/razorpay.com' },
+    { name: 'Zepto',       logo: 'https://logo.clearbit.com/zeptonow.com' },
+    { name: 'CRED',        logo: 'https://logo.clearbit.com/cred.club' },
+    { name: 'Meesho',      logo: 'https://logo.clearbit.com/meesho.com' },
+    { name: 'Groww',       logo: 'https://logo.clearbit.com/groww.in' },
+    { name: 'Swiggy',      logo: 'https://logo.clearbit.com/swiggy.com' },
+    { name: 'PhonePe',     logo: 'https://logo.clearbit.com/phonepe.com' },
+    { name: 'upGrad',      logo: 'https://logo.clearbit.com/upgrad.com' },
   ];
 
   const arts = [
-    { name: 'Aditya Birla', logo: 'https://logo.clearbit.com/adityabirla.com' },
-    { name: 'Reliance', logo: 'https://logo.clearbit.com/ril.com' },
-    { name: 'Myntra', logo: 'https://logo.clearbit.com/myntra.com' },
-    { name: 'FabIndia', logo: 'https://logo.clearbit.com/fabindia.com' },
+    { name: 'Zara',        logo: 'https://logo.clearbit.com/zara.com' },
+    { name: 'H&M',         logo: 'https://logo.clearbit.com/hm.com' },
+    { name: 'Nykaa',       logo: 'https://logo.clearbit.com/nykaa.com' },
+    { name: 'Myntra',      logo: 'https://logo.clearbit.com/myntra.com' },
+    { name: 'FabIndia',    logo: 'https://logo.clearbit.com/fabindia.com' },
+    { name: 'Mango',       logo: 'https://logo.clearbit.com/mango.com' },
+    { name: 'Raymond',     logo: 'https://logo.clearbit.com/raymond.in' },
     { name: 'Shoppers Stop', logo: 'https://logo.clearbit.com/shoppersstop.com' },
-    { name: 'Pantaloons', logo: 'https://logo.clearbit.com/pantaloons.com' },
+  ];
+
+  const science = [
+    { name: 'IndiGo',      logo: logoIndigo },
+    { name: 'Air India',   logo: logoAirIndia },
+    { name: 'DGCA',        logo: 'https://logo.clearbit.com/dgca.gov.in' },
+    { name: 'AAI',         logo: 'https://logo.clearbit.com/aai.aero' },
+    { name: 'Boeing',      logo: 'https://logo.clearbit.com/boeing.com' },
+    { name: 'Airbus',      logo: 'https://logo.clearbit.com/airbus.com' },
+    { name: 'ISRO',        logo: 'https://logo.clearbit.com/isro.gov.in' },
+    { name: 'GE Aviation', logo: 'https://logo.clearbit.com/ge.com' },
   ];
 
   switch (category) {
-    case 'engineering': return engineering;
-    case 'technology': return tech;
-    case 'management':
-    case 'entrepreneurship': return business;
-    case 'arts': return arts;
-    case 'aviation':
-    case 'science':
-    default: return airlines;
+    case 'aviation':        return aviation;
+    case 'engineering':     return engineering;
+    case 'technology':      return technology;
+    case 'management':      return management;
+    case 'entrepreneurship':return entrepreneurship;
+    case 'arts':            return arts;
+    case 'science':         return science;
+    default:                return aviation;
   }
 };
 

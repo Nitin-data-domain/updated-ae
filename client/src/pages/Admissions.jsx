@@ -16,29 +16,25 @@ export default function Admissions() {
     program: '',
     message: ''
   })
-  const [errors, setErrors] = useState({})
+  const [errors, setErrors]   = useState({})
   const [submitting, setSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
+  const [submitted, setSubmitted]   = useState(false)
 
   useEffect(() => {
     document.title = 'Admission Enquiry | Aharada Education'
     getPrograms().then(res => setAllPrograms(res.data.data)).catch(() => {})
   }, [])
 
-  // Derive unique universities from all programs in the DB (excluding Sage University)
+  // Universities list (excluding Sage)
   const universities = useMemo(() => {
-    const uniSet = new Map()
-    allPrograms.forEach(p => {
-      (p.universities || []).forEach(u => {
-        if (u.name && !uniSet.has(u.name) && u.name.toLowerCase() !== 'sage university') {
-          uniSet.set(u.name, u.name)
-        }
-      })
-    })
-    return Array.from(uniSet.values())
+    const s = new Set()
+    allPrograms.forEach(p => (p.universities || []).forEach(u => {
+      if (u.name && u.name.toLowerCase() !== 'sage university') s.add(u.name)
+    }))
+    return [...s]
   }, [allPrograms])
 
-  // Filter programs that are offered at the selected university
+  // Programs filtered by selected university
   const filteredPrograms = useMemo(() => {
     if (!formData.university) return []
     return allPrograms.filter(p =>
@@ -65,7 +61,11 @@ export default function Admissions() {
 
     setSubmitting(true)
     try {
-      await submitEnquiry({ ...formData, type: 'admission_lead' })
+      await submitEnquiry({
+        ...formData,
+        university: formData.university,
+        type: 'admission_lead',
+      })
       toast.success('Enquiry submitted successfully! We will contact you soon.')
       setSubmitted(true)
       setFormData({ name: '', email: '', phone: '', university: '', program: '', message: '' })
@@ -78,12 +78,11 @@ export default function Admissions() {
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    // Reset program if university changes
-    if (name === 'university') {
-      setFormData(prev => ({ ...prev, university: value, program: '' }))
-    } else {
-      setFormData(prev => ({ ...prev, [name]: value }))
-    }
+    setFormData(prev => {
+      const next = { ...prev, [name]: value }
+      if (name === 'university') next.program = '' // reset program when university changes
+      return next
+    })
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }))
   }
 
@@ -113,7 +112,7 @@ export default function Admissions() {
               <div className="admission-benefits">
                 {[
                   'Industry-integrated curriculum designed with aviation leaders',
-                  '100% placement assistance with 200+ partner companies',
+                  '100% placement assistance with 25+ industry partners',
                   'Expert faculty including retired airline captains',
                   'Hands-on training at airports and aerospace facilities',
                   'Modern infrastructure with flight simulators',
@@ -188,20 +187,26 @@ export default function Admissions() {
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label" htmlFor="phone">Phone Number *</label>
+                    <label className="form-label" htmlFor="apply-phone">Phone Number *</label>
                     <input
                       type="tel"
-                      id="phone"
+                      id="apply-phone"
                       name="phone"
+                      inputMode="numeric"
+                      maxLength={10}
                       className={`form-input ${errors.phone ? 'input-error' : ''}`}
-                      placeholder="Enter your phone number"
+                      placeholder="Enter your 10-digit mobile number"
                       value={formData.phone}
-                      onChange={handleChange}
+                      onChange={e => {
+                        const val = e.target.value.replace(/\D/g, '').slice(0, 10)
+                        setFormData(prev => ({ ...prev, phone: val }))
+                        if (errors.phone) setErrors(prev => ({ ...prev, phone: '' }))
+                      }}
                     />
                     {errors.phone && <div className="form-error">{errors.phone}</div>}
                   </div>
 
-                  {/* Step 1: Select University */}
+                  {/* University & Program side by side */}
                   <div className="form-group">
                     <label className="form-label" htmlFor="university">Preferred University *</label>
                     <select
@@ -219,16 +224,8 @@ export default function Admissions() {
                     {errors.university && <div className="form-error">{errors.university}</div>}
                   </div>
 
-                  {/* Step 2: Select Program (filtered by university) */}
                   <div className="form-group">
-                    <label className="form-label" htmlFor="program">
-                      Select Program *
-                      {formData.university && filteredPrograms.length > 0 && (
-                        <span style={{ fontWeight: 400, color: 'var(--gray-500)', fontSize: '0.8rem', marginLeft: 6 }}>
-                          ({filteredPrograms.length} available at {formData.university})
-                        </span>
-                      )}
-                    </label>
+                    <label className="form-label" htmlFor="program">Select Program *</label>
                     <select
                       id="program"
                       name="program"
@@ -238,11 +235,7 @@ export default function Admissions() {
                       disabled={!formData.university}
                     >
                       <option value="">
-                        {formData.university
-                          ? filteredPrograms.length === 0
-                            ? 'No programs available for this university'
-                            : 'Choose a program'
-                          : 'Select a university first'}
+                        {formData.university ? 'Choose a program' : 'Select a university first'}
                       </option>
                       {filteredPrograms.map(p => (
                         <option key={p._id} value={p.title}>{p.title}</option>

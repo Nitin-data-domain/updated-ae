@@ -82,6 +82,11 @@ export const getProgramLeadStats = () => api.get('/enquiries/program-stats');
 export const updateEnquiry = (id, data) => api.put(`/enquiries/${id}`, data);
 export const deleteEnquiry = (id) => api.delete(`/enquiries/${id}`);
 
+// OTP
+export const sendOTP   = (phone) => api.post('/otp/send',   { phone });
+export const verifyOTP = (phone, otp) => api.post('/otp/verify', { phone, otp });
+
+
 // Brochures
 export const getBrochures = (params) => api.get('/brochures', { params });
 export const uploadBrochure = (data) => api.post('/brochures', data);

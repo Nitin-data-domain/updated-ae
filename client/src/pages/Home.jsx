@@ -4,14 +4,16 @@ import { Link } from 'react-router-dom'
 import {
   FiArrowRight, FiCheckCircle, FiUsers, FiAward, FiBriefcase, FiGlobe,
   FiBookOpen, FiTarget, FiTrendingUp, FiLayers, FiCpu, FiNavigation,
-  FiStar, FiMapPin, FiPhone, FiMail, FiChevronRight, FiPlay,
+  FiStar, FiMapPin, FiPhone, FiMail, FiChevronRight,
   FiShield, FiZap, FiHeart
 } from 'react-icons/fi'
 import { HiDownload, HiAcademicCap, HiOutlineOfficeBuilding } from 'react-icons/hi'
 import { getPrograms } from '../api'
 import BrochureButton from '../components/BrochureButton'
-import campusIsro from '../assets/campus-isro.jpg'
+import ApplyNowSection from '../components/ApplyNowSection'
+
 import logoIndigo from '../assets/logos/logo-indigo.png'
+import campusIsro from '../assets/campus-isro.jpg'
 import logoAirIndia from '../assets/logos/logo-airindia.png'
 import logoSpiceJet from '../assets/logos/logo-spicejet.png'
 import logoVistara from '../assets/logos/logo-vistara.png'
@@ -241,49 +243,12 @@ export default function Home() {
           </motion.div>
 
           <motion.div
-            className="hero-visual hero-visual-floating-only"
+            className="hero-visual hero-apply-form-panel"
             initial={{ opacity: 0, x: 60 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="hero-floating-only-wrapper">
-              {/* Floating cards without background image */}
-              <motion.div
-                className="hero-float-card hfc-1"
-                animate={{ y: [0, -12, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                <div className="hfc-icon"><FiNavigation size={20} /></div>
-                <div>
-                  <strong>Aviation Programs</strong>
-                  <small>BBA, MBA</small>
-                </div>
-              </motion.div>
-
-              <motion.div
-                className="hero-float-card hfc-2"
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
-              >
-                <div className="hfc-icon"><FiAward size={20} /></div>
-                <div>
-                  <strong>100% Placement</strong>
-                  <small>Guaranteed Support</small>
-                </div>
-              </motion.div>
-
-              <motion.div
-                className="hero-float-card hfc-3"
-                animate={{ y: [0, -14, 0] }}
-                transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
-              >
-                <div className="hfc-icon"><FiGlobe size={20} /></div>
-                <div>
-                  <strong>4 Universities</strong>
-                  <small>Pan-India Network</small>
-                </div>
-              </motion.div>
-            </div>
+            <ApplyNowSection heroMode />
           </motion.div>        </div>
 
         <motion.div
