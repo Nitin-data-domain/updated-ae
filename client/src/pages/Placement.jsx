@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FiBriefcase, FiAward, FiStar, FiChevronLeft, FiChevronRight, FiArrowRight } from 'react-icons/fi'
+import { FiBriefcase, FiAward, FiChevronLeft, FiChevronRight, FiArrowRight } from 'react-icons/fi'
 import { getPlacements } from '../api'
 import BrochureButton from '../components/BrochureButton'
 import './Placement.css'
@@ -99,10 +99,7 @@ export default function Placement() {
                           <FiAward className="detail-icon" />
                           <span>{placement.program}</span>
                         </div>
-                        <div className="placement-detail highlight">
-                          <FiStar className="detail-icon" />
-                          <strong>Package: {placement.package} ({placement.year})</strong>
-                        </div>
+
                       </div>
                     </div>
                   </motion.div>

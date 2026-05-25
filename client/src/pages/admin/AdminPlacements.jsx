@@ -9,7 +9,7 @@ import {
 const currentYear = new Date().getFullYear()
 const emptyPlacement = {
   studentName: '', companyName: '', role: '', program: '',
-  package: '', year: currentYear, image: '', order: 0
+  year: currentYear, image: '', order: 0
 }
 
 export default function AdminPlacements() {
@@ -89,7 +89,7 @@ export default function AdminPlacements() {
 
   const handleSave = async (e) => {
     e.preventDefault()
-    if (!form.studentName || !form.companyName || !form.role || !form.program || !form.package || !form.year) {
+    if (!form.studentName || !form.companyName || !form.role || !form.program || !form.year) {
       toast.error('Please fill all required fields'); return
     }
     setSaving(true)
@@ -132,7 +132,6 @@ export default function AdminPlacements() {
               <th>Student</th>
               <th>Company</th>
               <th>Role</th>
-              <th>Package</th>
               <th>Year</th>
               <th>Program</th>
               <th>Actions</th>
@@ -150,7 +149,6 @@ export default function AdminPlacements() {
                 <td><strong>{p.studentName}</strong></td>
                 <td style={{ color: 'var(--primary)', fontWeight: 600 }}>{p.companyName}</td>
                 <td style={{ fontSize: '0.85rem' }}>{p.role}</td>
-                <td><span style={{ background: 'rgba(40,167,69,0.1)', color: '#1a7a35', padding: '3px 10px', borderRadius: 50, fontSize: '0.82rem', fontWeight: 600 }}>{p.package}</span></td>
                 <td style={{ fontSize: '0.85rem' }}>{p.year}</td>
                 <td style={{ fontSize: '0.82rem', color: 'var(--gray-500)' }}>{p.program}</td>
                 <td>
@@ -162,7 +160,7 @@ export default function AdminPlacements() {
               </tr>
             ))}
             {placements.length === 0 && (
-              <tr><td colSpan="8" style={{ textAlign: 'center', padding: '40px', color: 'var(--gray-400)' }}>No placements yet. Click "+ Add Placement" to start.</td></tr>
+              <tr><td colSpan="7" style={{ textAlign: 'center', padding: '40px', color: 'var(--gray-400)' }}>No placements yet. Click "+ Add Placement" to start.</td></tr>
             )}
           </tbody>
         </table>
@@ -198,12 +196,8 @@ export default function AdminPlacements() {
                 </div>
               </div>
 
-              {/* Package, Year, Order */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
-                <div className="form-group">
-                  <label className="form-label">Package *</label>
-                  <input className="form-input" value={form.package} onChange={e => setForm({ ...form, package: e.target.value })} placeholder="6.5 LPA" />
-                </div>
+              {/* Year & Order */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                 <div className="form-group">
                   <label className="form-label">Year *</label>
                   <input className="form-input" type="number" value={form.year} onChange={e => setForm({ ...form, year: parseInt(e.target.value) || currentYear })} />
