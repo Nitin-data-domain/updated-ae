@@ -45,6 +45,14 @@ import logoEmirates from '../assets/logos/logo-emirates.png'
 import logoLufthansa from '../assets/logos/logo-lufthansa.png'
 import logoQatarAirways from '../assets/logos/logo-qatar-airways.png'
 import logoAirCanada from '../assets/logos/logo-air-canada.png'
+import logoGoogle from '../assets/logos/logo-google.png'
+import logoAmazon from '../assets/logos/logo-amazon.png'
+import logoMicrosoft from '../assets/logos/logo-microsoft-proper.png'
+import logoTCS from '../assets/logos/logo-tcs.png'
+import logoInfosys from '../assets/logos/logo-infosys-proper.png'
+import logoWipro from '../assets/logos/logo-wipro.png'
+import logoIBM from '../assets/logos/logo-ibm-proper.png'
+import logoAccenture from '../assets/logos/logo-accenture.png'
 
 const getRecruitersByCategory = (categoryArr) => {
   // category is stored as an array in DB — take the first element
@@ -73,14 +81,14 @@ const getRecruitersByCategory = (categoryArr) => {
   ];
 
   const technology = [
-    { name: 'Google',      logo: 'https://logo.clearbit.com/google.com' },
-    { name: 'Microsoft',   logo: 'https://logo.clearbit.com/microsoft.com' },
-    { name: 'Amazon',      logo: 'https://logo.clearbit.com/amazon.com' },
-    { name: 'TCS',         logo: 'https://logo.clearbit.com/tcs.com' },
-    { name: 'Infosys',     logo: 'https://logo.clearbit.com/infosys.com' },
-    { name: 'Wipro',       logo: 'https://logo.clearbit.com/wipro.com' },
-    { name: 'IBM',         logo: 'https://logo.clearbit.com/ibm.com' },
-    { name: 'Accenture',   logo: 'https://logo.clearbit.com/accenture.com' },
+    { name: 'Google',      logo: logoGoogle },
+    { name: 'Microsoft',   logo: logoMicrosoft },
+    { name: 'Amazon',      logo: logoAmazon },
+    { name: 'TCS',         logo: logoTCS },
+    { name: 'Infosys',     logo: logoInfosys },
+    { name: 'Wipro',       logo: logoWipro },
+    { name: 'IBM',         logo: logoIBM },
+    { name: 'Accenture',   logo: logoAccenture },
   ];
 
   const management = [
@@ -399,19 +407,8 @@ export default function ProgramDetail() {
                         alt={company.name}
                         style={{ maxWidth: '90%', height: '44px', objectFit: 'contain' }}
                         onError={(e) => {
-                          if (!e.target.dataset.retried) {
-                            e.target.dataset.retried = true;
-                            try {
-                              const url = new URL(company.logo, window.location.origin);
-                              e.target.src = `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=128`;
-                            } catch {
-                              e.target.style.display = 'none';
-                              e.target.nextSibling.style.display = 'block';
-                            }
-                          } else {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'block';
-                          }
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'block';
                         }}
                       />
                       <strong style={{ fontSize: '0.82rem', color: 'var(--navy)', display: 'none' }}>{company.name}</strong>
