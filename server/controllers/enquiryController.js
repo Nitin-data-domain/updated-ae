@@ -18,28 +18,43 @@ const UNIVERSITY_CONFIG = {
 
 // Default fallback (IIMT) if university not matched
 const DEFAULT_CONFIG = UNIVERSITY_CONFIG['IIMT University'];
+
+// Case-insensitive partial university name match
+function resolveUniConfig(universityName) {
+  if (!universityName) return DEFAULT_CONFIG;
+  const key = Object.keys(UNIVERSITY_CONFIG).find(
+    k => k.toLowerCase() === universityName.trim().toLowerCase()
+  );
+  if (!key) {
+    console.warn(`⚠️  TeleCRM: No config for university "${universityName}", using default (IIMT)`);
+    return DEFAULT_CONFIG;
+  }
+  return UNIVERSITY_CONFIG[key];
+}
 // ───────────────────────────────────────────────────────────────────────────
 
 async function pushToTeleCRM(data) {
   try {
-    // Pick token & campaign based on selected university
-    const uniConfig = UNIVERSITY_CONFIG[data.university] || DEFAULT_CONFIG;
+    const uniConfig = resolveUniConfig(data.university);
 
-    // Phone must include country code (91 for India)
-    const phone = data.phone.replace(/\D/g, '');
-    const phoneWithCC = phone.startsWith('91') ? phone : `91${phone}`;
+    // Normalise phone: strip non-digits, ensure 91 country code
+    let phone = String(data.phone || '').replace(/\D/g, '');
+    if (phone.length === 10) phone = `91${phone}`;
+    else if (phone.length > 10 && !phone.startsWith('91')) phone = `91${phone}`;
 
     const payload = {
       fields: {
-        name: data.name,
-        phone: phoneWithCC,
-        email: data.email,
-        stream: data.program || '',              // "Stream" field in TeleCRM
-        preferred_colleges: data.university || '', // "Preferred Colleges" field in TeleCRM
-        message: data.message || '',             // "Message" field
+        name:               data.name        || '',
+        phone,
+        email:              data.email       || '',
+        stream:             data.program     || '', // "Stream" field in TeleCRM
+        preferred_colleges: data.university  || '', // "Preferred Colleges" field
+        message:            data.message     || '', // "Message" field
       },
       campaign: uniConfig.campaign,
     };
+
+    console.log(`📤 Pushing to TeleCRM [${data.university || 'default'}] campaign: ${uniConfig.campaign}`);
 
     const res = await fetch(TELECRM_BASE_URL, {
       method: 'POST',
@@ -60,6 +75,7 @@ async function pushToTeleCRM(data) {
     console.error('❌ TeleCRM push exception:', err.message);
   }
 }
+
 
 // @desc    Create enquiry (public)
 // @route   POST /api/enquiries

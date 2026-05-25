@@ -117,7 +117,7 @@ export default function ApplyNowSection({ heroMode = false }) {
     try {
       await submitEnquiry({
         name: form.name, email: form.email,
-        phone: `91${form.phone.replace(/\D/g,'')}`,
+        phone: form.phone.replace(/\D/g, ''),
         program: form.program,
         university: form.university,
         message: `State: ${form.state}, City: ${form.city}. ${form.message}`.trim(),
