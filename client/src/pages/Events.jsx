@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FiCalendar, FiMapPin, FiTag, FiArrowRight } from 'react-icons/fi'
+import { FiCalendar, FiMapPin, FiTag, FiArrowRight, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import { getEvents } from '../api'
 import BrochureButton from '../components/BrochureButton'
 import './Events.css'
@@ -24,10 +24,13 @@ const categoryColors = {
   other: '#6C757D'
 }
 
+const EVENTS_PER_PAGE = 20
+
 export default function Events() {
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
+  const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
     document.title = 'Events | Aharada Education'
@@ -43,6 +46,26 @@ export default function Events() {
       ? events.filter(e => e.isUpcoming)
       : events.filter(e => e.category === filter)
 
+  const totalPages = Math.ceil(filtered.length / EVENTS_PER_PAGE)
+  const paginated = filtered.slice(
+    (currentPage - 1) * EVENTS_PER_PAGE,
+    currentPage * EVENTS_PER_PAGE
+  )
+
+  const handleFilterChange = (f) => {
+    setFilter(f)
+    setCurrentPage(1)
+  }
+
+  const scrollToGrid = () => {
+    document.querySelector('.events-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  const goToPage = (page) => {
+    setCurrentPage(page)
+    scrollToGrid()
+  }
+
   if (loading) {
     return <div className="loading-container"><div className="spinner" /></div>
   }
@@ -54,7 +77,7 @@ export default function Events() {
         <div className="container page-hero-content">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
             <span className="hero-badge-page"><FiCalendar size={14} /> Campus Life</span>
-            <h1 className="page-hero-title">Events & Activities</h1>
+            <h1 className="page-hero-title">Events &amp; Activities</h1>
             <p className="page-hero-subtitle">
               Stay updated with our seminars, workshops, placement drives, and cultural events.
             </p>
@@ -75,22 +98,29 @@ export default function Events() {
               <button
                 key={f}
                 className={`filter-btn ${filter === f ? 'active' : ''}`}
-                onClick={() => setFilter(f)}
+                onClick={() => handleFilterChange(f)}
               >
                 {f === 'all' ? 'All Events' : f === 'upcoming' ? 'Upcoming' : categoryLabels[f] || f}
               </button>
             ))}
           </div>
 
+          {/* Results count */}
+          {filtered.length > 0 && (
+            <p className="events-count">
+              Showing {(currentPage - 1) * EVENTS_PER_PAGE + 1}–{Math.min(currentPage * EVENTS_PER_PAGE, filtered.length)} of {filtered.length} events
+            </p>
+          )}
+
           <div className="events-grid">
-            {filtered.map((event, i) => (
+            {paginated.map((event, i) => (
               <motion.div
                 key={event._id}
                 className="event-card"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
+                transition={{ delay: i * 0.05 }}
               >
                 {/* Event Photos (up to 2) */}
                 {event.images && event.images.length > 0 && (
@@ -139,8 +169,44 @@ export default function Events() {
               No events found for this filter.
             </div>
           )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="events-pagination">
+              <button
+                className="epag-btn epag-arrow"
+                onClick={() => goToPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                aria-label="Previous page"
+              >
+                <FiChevronLeft size={18} />
+              </button>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                <button
+                  key={page}
+                  className={`epag-btn ${page === currentPage ? 'epag-active' : ''}`}
+                  onClick={() => goToPage(page)}
+                  aria-label={`Page ${page}`}
+                >
+                  {page}
+                </button>
+              ))}
+
+              <button
+                className="epag-btn epag-arrow"
+                onClick={() => goToPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                aria-label="Next page"
+              >
+                <FiChevronRight size={18} />
+              </button>
+            </div>
+          )}
         </div>
       </section>
     </div>
   )
 }
+
+
