@@ -126,6 +126,41 @@
 
 .aform-err { font-size: .75rem; color: #e53e3e; }
 
+/* Phone field with +91 prefix */
+.otp-phone-row {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  transition: border-color .2s, box-shadow .2s;
+}
+.otp-phone-row:focus-within {
+  border-color: #1a3a6b;
+  box-shadow: 0 0 0 3px rgba(26,58,107,.1);
+}
+.otp-phone-row.has-error {
+  border-color: #e53e3e;
+}
+.otp-cc {
+  padding: 12px 12px 12px 14px;
+  font-size: .9rem;
+  font-weight: 600;
+  color: #1a3a6b;
+  background: #f0f4ff;
+  border-right: 1.5px solid #e2e8f0;
+  white-space: nowrap;
+  flex-shrink: 0;
+  user-select: none;
+}
+.otp-phone-row .otp-phone-input {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  flex: 1;
+}
+
 /* Consent */
 .aform-consent {
   display: flex;
