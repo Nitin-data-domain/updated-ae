@@ -205,10 +205,12 @@ export default function AdminPrograms() {
                   }
                 </td>
                 <td><strong>{p.title}</strong></td>
-                <td style={{ display: 'flex', flexWrap: 'wrap', gap: 4, padding: '10px 8px' }}>
-                  {(Array.isArray(p.category) ? p.category : [p.category]).map(c => (
-                    <span key={c} className="status-badge status-new" style={{ textTransform: 'capitalize' }}>{c}</span>
-                  ))}
+                <td>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                    {(Array.isArray(p.category) ? p.category : [p.category]).map(c => (
+                      <span key={c} className="status-badge status-new" style={{ textTransform: 'capitalize' }}>{c}</span>
+                    ))}
+                  </div>
                 </td>
                 <td>{p.duration}</td>
                 <td style={{ fontSize: '0.82rem' }}>{(p.universities || []).map(u => u.name).join(', ') || '-'}</td>

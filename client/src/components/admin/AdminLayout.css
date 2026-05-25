@@ -227,6 +227,7 @@
   font-size: 0.9rem;
   color: var(--gray-700);
   border-bottom: 1px solid var(--gray-50);
+  vertical-align: middle;
 }
 
 .admin-table tr:hover td {
