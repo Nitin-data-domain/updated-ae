@@ -5,31 +5,38 @@ const ENTERPRISE_ID = '69d0d3b277280f7160851462';
 const TELECRM_BASE_URL = `https://next-api.telecrm.in/enterprise/${ENTERPRISE_ID}/autoupdatelead`;
 
 // University → { token, campaign } routing
+// To add Future University: replace the placeholder with the real token from TeleCRM
 const UNIVERSITY_CONFIG = {
   'IIMT University': {
     token: 'c93ed921-a15f-4fad-96c3-fefcc628e70f1778584852812:f9eca84f-910f-4b75-a957-306c3c79868b',
     campaign: '@iimt-data',
   },
-  'Future University': {
-    token: 'FUTURE_UNIVERSITY_TOKEN_HERE', // ← paste Future University token
-    campaign: '@future-university-data',
-  },
+  // 'Future University': {
+  //   token: 'PASTE_REAL_FUTURE_UNIVERSITY_TOKEN_HERE',
+  //   campaign: '@future-university-data',
+  // },
 };
 
-// Default fallback (IIMT) if university not matched
+// Default fallback (IIMT) — used for any university not explicitly configured
 const DEFAULT_CONFIG = UNIVERSITY_CONFIG['IIMT University'];
 
-// Case-insensitive partial university name match
+// Case-insensitive university name match with placeholder-token guard
 function resolveUniConfig(universityName) {
   if (!universityName) return DEFAULT_CONFIG;
   const key = Object.keys(UNIVERSITY_CONFIG).find(
     k => k.toLowerCase() === universityName.trim().toLowerCase()
   );
   if (!key) {
-    console.warn(`⚠️  TeleCRM: No config for university "${universityName}", using default (IIMT)`);
+    console.warn(`⚠️  TeleCRM: No config for "${universityName}" → falling back to IIMT`);
     return DEFAULT_CONFIG;
   }
-  return UNIVERSITY_CONFIG[key];
+  const cfg = UNIVERSITY_CONFIG[key];
+  // Safety: if token is still a placeholder, fall back to default
+  if (!cfg.token || cfg.token.includes('PLACEHOLDER') || cfg.token.includes('TOKEN_HERE')) {
+    console.warn(`⚠️  TeleCRM: Placeholder token for "${universityName}" → falling back to IIMT`);
+    return DEFAULT_CONFIG;
+  }
+  return cfg;
 }
 // ───────────────────────────────────────────────────────────────────────────
 
