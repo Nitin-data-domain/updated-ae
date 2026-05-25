@@ -63,10 +63,10 @@ const hiringCompanies = [
 ]
 
 const programHighlights = [
-  { icon: <FiUsers size={22} />, val: '2500+', label: 'Students Placed' },
-  { icon: <FiAward size={22} />, val: '200+', label: 'Hiring Partners' },
-  { icon: <HiAcademicCap size={22} />, val: '4', label: 'Partner Universities' },
-  { icon: <FiShield size={22} />, val: '100%', label: 'Placement Assist.' },
+  { icon: <FiUsers size={22} />, val: '1000+', label: 'Students Placed' },
+  { icon: <FiAward size={22} />, val: '6+', label: 'Years of Excellence' },
+  { icon: <HiAcademicCap size={22} />, val: '25+', label: 'Industry Partners' },
+  { icon: <FiShield size={22} />, val: '4', label: 'Partner Universities' },
 ]
 
 export default function Programs() {
@@ -381,7 +381,7 @@ export default function Programs() {
             <div className="programs-cta-banner-text">
               <FiShield size={24} style={{ color: '#f0c040', flexShrink: 0 }} />
               <div>
-                <strong>200+ Industry Partners · 100% Placement Assistance</strong>
+                <strong>25+ Industry Partners · 100% Placement Assistance</strong>
                 <span>Start your aviation career journey today — seats are filling fast!</span>
               </div>
             </div>

@@ -41,20 +41,24 @@ import logoIndigo from '../assets/logos/logo-indigo.png'
 import logoAirIndia from '../assets/logos/logo-airindia.png'
 import logoSpiceJet from '../assets/logos/logo-spicejet.png'
 import logoVistara from '../assets/logos/logo-vistara.png'
+import logoEmirates from '../assets/logos/logo-emirates.png'
+import logoLufthansa from '../assets/logos/logo-lufthansa.png'
+import logoQatarAirways from '../assets/logos/logo-qatar-airways.png'
+import logoAirCanada from '../assets/logos/logo-air-canada.png'
 
 const getRecruitersByCategory = (categoryArr) => {
   // category is stored as an array in DB — take the first element
   const category = Array.isArray(categoryArr) ? categoryArr[0] : categoryArr;
 
   const aviation = [
-    { name: 'IndiGo',      logo: logoIndigo },
-    { name: 'Air India',   logo: logoAirIndia },
-    { name: 'SpiceJet',    logo: logoSpiceJet },
-    { name: 'Vistara',     logo: logoVistara },
-    { name: 'Emirates',    logo: 'https://logo.clearbit.com/emirates.com' },
-    { name: 'Lufthansa',   logo: 'https://logo.clearbit.com/lufthansa.com' },
-    { name: 'Qatar Airways', logo: 'https://logo.clearbit.com/qatarairways.com' },
-    { name: 'Air Arabia',  logo: 'https://logo.clearbit.com/airarabia.com' },
+    { name: 'IndiGo',        logo: logoIndigo },
+    { name: 'Air India',     logo: logoAirIndia },
+    { name: 'SpiceJet',      logo: logoSpiceJet },
+    { name: 'Vistara',       logo: logoVistara },
+    { name: 'Emirates',      logo: logoEmirates },
+    { name: 'Lufthansa',     logo: logoLufthansa },
+    { name: 'Qatar Airways', logo: logoQatarAirways },
+    { name: 'Air Canada',    logo: logoAirCanada },
   ];
 
   const engineering = [
