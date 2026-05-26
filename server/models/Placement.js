@@ -15,7 +15,7 @@ const placementSchema = new mongoose.Schema({
   },
   package: {
     type: String,
-    required: [true, 'Please add the package (e.g., 12 LPA)']
+    required: false
   },
   year: {
     type: Number,

@@ -228,7 +228,8 @@ export default function AdminPlacements() {
                 </button>
 
                 <p style={{ fontSize: 12, color: 'var(--gray-400)', margin: '6px 0 4px' }}>— or fetch from Google Drive / URL —</p>
-                <p style={{ fontSize: 11, color: '#6366f1', margin: '0 0 6px' }}>📌 Drive: Right-click → Share → "Anyone with link" → Copy link → paste → Fetch</p>
+                <p style={{ fontSize: 11, color: '#6366f1', margin: '0 0 6px' }}>📌 Drive: Open folder → right-click FILE → Share → "Anyone with link" → Copy link → Fetch</p>
+                <p style={{ fontSize: 11, color: '#ef4444', margin: '0 0 6px' }}>⚠️ Must be a FILE link (/file/d/...), NOT a folder link (/drive/folders/...)</p>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <input className="form-input" value={urlInput} onChange={e => setUrlInput(e.target.value)}
                     placeholder="https://drive.google.com/file/d/..." style={{ flex: 1 }} />
