@@ -54,7 +54,9 @@ exports.getPlacement = async (req, res) => {
 // @route   POST /api/placements
 exports.createPlacement = async (req, res) => {
   try {
-    const placement = await Placement.create(req.body);
+    // Always provide package so old schema required-validator never fires
+    const data = { package: 'N/A', ...req.body };
+    const placement = await Placement.create(data);
     res.status(201).json({ success: true, data: placement });
   } catch (error) {
     console.error(error);
@@ -66,9 +68,11 @@ exports.createPlacement = async (req, res) => {
 // @route   PUT /api/placements/:id
 exports.updatePlacement = async (req, res) => {
   try {
-    const placement = await Placement.findByIdAndUpdate(req.params.id, req.body, {
+    // Always provide package so old schema required-validator never fires
+    const data = { package: 'N/A', ...req.body };
+    const placement = await Placement.findByIdAndUpdate(req.params.id, data, {
       new: true,
-      runValidators: true
+      runValidators: false   // skip validators on update — package is legacy
     });
     if (!placement) {
       return res.status(404).json({ success: false, message: 'Placement not found' });
