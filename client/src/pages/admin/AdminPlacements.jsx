@@ -9,7 +9,7 @@ import {
 const currentYear = new Date().getFullYear()
 const emptyPlacement = {
   studentName: '', companyName: '', role: '', program: '',
-  year: currentYear, image: '', order: 0
+  year: currentYear, image: '', order: 0, package: 'N/A'
 }
 
 export default function AdminPlacements() {
@@ -93,12 +93,14 @@ export default function AdminPlacements() {
       toast.error('Please fill all required fields'); return
     }
     setSaving(true)
+    // Always include package so old server schema validation doesn't reject it
+    const payload = { ...form, package: form.package || 'N/A' }
     try {
       if (editing) {
-        await updatePlacement(editing, form)
+        await updatePlacement(editing, payload)
         toast.success('Placement updated')
       } else {
-        await createPlacement(form)
+        await createPlacement(payload)
         toast.success('Placement added')
       }
       setShowModal(false)
