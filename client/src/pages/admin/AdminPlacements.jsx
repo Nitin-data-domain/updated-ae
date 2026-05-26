@@ -9,7 +9,7 @@ import {
 const currentYear = new Date().getFullYear()
 const emptyPlacement = {
   studentName: '', companyName: '', role: '', program: '',
-  year: currentYear, image: '', order: 0, package: 'N/A'
+  package: '', year: currentYear, image: '', order: 0
 }
 
 export default function AdminPlacements() {
@@ -93,7 +93,6 @@ export default function AdminPlacements() {
       toast.error('Please fill all required fields'); return
     }
     setSaving(true)
-    // Always include package so old server schema validation doesn't reject it
     const payload = { ...form, package: form.package || 'N/A' }
     try {
       if (editing) {
@@ -196,6 +195,12 @@ export default function AdminPlacements() {
                   <label className="form-label">Program *</label>
                   <input className="form-input" value={form.program} onChange={e => setForm({ ...form, program: e.target.value })} placeholder="BBA Aviation" />
                 </div>
+              </div>
+
+              {/* Package */}
+              <div className="form-group">
+                <label className="form-label">Package (e.g., 4.5 LPA)</label>
+                <input className="form-input" value={form.package} onChange={e => setForm({ ...form, package: e.target.value })} placeholder="e.g., 4.5 LPA" />
               </div>
 
               {/* Year & Order */}
