@@ -23,6 +23,8 @@ app.use(cors({
     const allowed = [
       /\.vercel\.app$/,
       /^http:\/\/localhost:\d+$/,
+      'https://www.aharadaedu.com',
+      'https://aharadaedu.com',
     ];
     // Also allow CLIENT_URL env var if set
     if (process.env.CLIENT_URL) allowed.push(process.env.CLIENT_URL);
