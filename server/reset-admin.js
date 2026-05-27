@@ -8,23 +8,23 @@ const resetAdmin = async () => {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('✅ Connected to MongoDB');
 
-    // Delete existing admin user if any
-    const deleted = await User.deleteOne({ email: 'admin@aharada.edu' });
+    // Delete existing admin users
+    const deleted = await User.deleteMany({ email: { $in: ['admin@aharada.edu', 'md@aharadaedu.in'] } });
     if (deleted.deletedCount > 0) {
-      console.log('🗑️  Removed existing admin user');
+      console.log(`🗑️  Removed ${deleted.deletedCount} existing admin user(s)`);
     }
 
     // Create fresh admin user
     const admin = await User.create({
       name: 'Admin',
-      email: 'admin@aharada.edu',
-      password: 'admin123',
+      email: 'md@aharadaedu.in',
+      password: 'Ahrada@Nitin',
       role: 'superadmin'
     });
 
     console.log('✅ Admin user created successfully!');
-    console.log('   Email   : admin@aharada.edu');
-    console.log('   Password: admin123');
+    console.log('   Email   : md@aharadaedu.in');
+    console.log('   Password: Ahrada@Nitin');
     console.log('   Role    : superadmin');
     console.log('   ID      :', admin._id.toString());
 

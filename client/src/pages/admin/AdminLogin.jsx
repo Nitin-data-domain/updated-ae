@@ -110,9 +110,6 @@ export default function AdminLogin() {
           </button>
         </form>
 
-        <p className="login-hint">
-          Default: admin@aharada.edu / admin123
-        </p>
       </div>
     </div>
   )
