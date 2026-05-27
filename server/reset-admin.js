@@ -18,13 +18,13 @@ const resetAdmin = async () => {
     const admin = await User.create({
       name: 'Admin',
       email: 'md@aharadaedu.in',
-      password: 'Ahrada@Nitin',
+      password: 'Aharada@Prabhu',
       role: 'superadmin'
     });
 
     console.log('✅ Admin user created successfully!');
     console.log('   Email   : md@aharadaedu.in');
-    console.log('   Password: Ahrada@Nitin');
+    console.log('   Password: Aharada@Prabhu');
     console.log('   Role    : superadmin');
     console.log('   ID      :', admin._id.toString());
 

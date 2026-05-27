@@ -40,7 +40,7 @@ const seedInMemory = async () => {
   await User.create({
     name: 'Admin',
     email: 'md@aharadaedu.in',
-    password: 'Ahrada@Nitin',
+    password: 'Aharada@Prabhu',
     role: 'superadmin'
   });
 
