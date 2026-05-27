@@ -25,6 +25,8 @@ app.use(cors({
       /^http:\/\/localhost:\d+$/,
       'https://www.aharadaedu.com',
       'https://aharadaedu.com',
+      'http://www.aharadaedu.com',
+      'http://aharadaedu.com',
     ];
     // Also allow CLIENT_URL env var if set
     if (process.env.CLIENT_URL) allowed.push(process.env.CLIENT_URL);
