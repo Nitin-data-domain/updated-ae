@@ -18,17 +18,35 @@ export default function AdminLogin() {
       return
     }
     setLoading(true)
-    try {
-      const res = await loginAdmin({ email, password })
-      localStorage.setItem('aharada_token', res.data.token)
-      localStorage.setItem('aharada_user', JSON.stringify(res.data.user))
-      toast.success('Welcome back!')
-      navigate('/admin')
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Login failed')
-    } finally {
-      setLoading(false)
+
+    const attemptLogin = async (retryCount = 0) => {
+      try {
+        const res = await loginAdmin({ email, password })
+        localStorage.setItem('aharada_token', res.data.token)
+        localStorage.setItem('aharada_user', JSON.stringify(res.data.user))
+        toast.success('Welcome back!')
+        navigate('/admin')
+      } catch (err) {
+        // Network error or timeout — likely Render cold start
+        const isNetworkError = !err.response || err.code === 'ECONNABORTED' || err.message === 'Network Error'
+        if (isNetworkError && retryCount < 1) {
+          toast('Server is waking up, retrying...', { icon: '⏳', duration: 4000 })
+          await new Promise(r => setTimeout(r, 3000))
+          return attemptLogin(retryCount + 1)
+        }
+        // Server responded with an error
+        if (err.response?.data?.message) {
+          toast.error(err.response.data.message)
+        } else if (isNetworkError) {
+          toast.error('Server is starting up. Please wait a moment and try again.')
+        } else {
+          toast.error('Login failed. Please try again.')
+        }
+      }
     }
+
+    await attemptLogin()
+    setLoading(false)
   }
 
   return (
