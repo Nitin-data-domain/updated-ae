@@ -59,8 +59,8 @@ export default function Placement() {
           <div className="section-head text-center">
             <h2 className="section-title">Our Recent Achievers</h2>
             <p className="section-subtitle">
-              Meet the students who have made us proud by securing top-tier packages
-              with India's leading airlines, airports, and aviation companies.
+              Meet the students who have made us proud by securing outstanding opportunities
+              with top companies across aviation, technology, management, and more.
             </p>
           </div>
 
