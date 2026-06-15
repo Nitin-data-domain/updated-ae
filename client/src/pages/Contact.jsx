@@ -74,7 +74,7 @@ export default function Contact() {
                   <div className="contact-card-icon"><FiMapPin /></div>
                   <div>
                     <h4>Visit Us</h4>
-                    <p>Aharada Education(Unit of Prabhu Heli Service)<br />Atrara, Hapur-Meerut, 245206</p>
+                    <p>Aharada Education (Unit of Prabhu Drone Research and Development LLP)<br />Atrara, Hapur-Meerut, 245206</p>
                   </div>
                 </div>
                 <div className="contact-card">

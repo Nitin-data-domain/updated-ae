@@ -75,7 +75,7 @@ export default function Footer() {
               <ul className="footer-contact">
                 <li>
                   <FiMapPin className="contact-icon" />
-                  <span>Aharada Education(Unit of Prabhu Heli Service), Atrara, Hapur-Meerut, 245206</span>
+                  <span>Aharada Education (Unit of Prabhu Drone Research and Development LLP), Atrara, Hapur-Meerut, 245206</span>
                 </li>
                 <li>
                   <FiPhone className="contact-icon" />
@@ -93,7 +93,7 @@ export default function Footer() {
 
       <div className="footer-bottom">
         <div className="container footer-bottom-inner">
-          <p>&copy; {new Date().getFullYear()} AHARADA EDUCATION (A UNIT OF PRABHU HELI SERVICES). All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} AHARADA EDUCATION (A UNIT OF PRABHU DRONE RESEARCH AND DEVELOPMENT LLP). All rights reserved.</p>
           <div className="footer-bottom-links">
             <a href="#">Privacy Policy</a>
             <a href="#">Terms of Service</a>
