@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FiShield, FiChevronRight, FiMail, FiPhone, FiMapPin } from 'react-icons/fi'
+import { FiShield, FiChevronRight, FiMail, FiPhone, FiMapPin, FiEye, FiEdit3, FiTrash2 } from 'react-icons/fi'
 import './PrivacyPolicy.css'
 
 const sections = [
@@ -74,21 +74,28 @@ export default function PrivacyPolicy() {
           {/* Sticky sidebar / TOC */}
           <aside className="pp-sidebar">
             <div className="pp-toc-card">
-              <h3 className="pp-toc-title">Table of Contents</h3>
-              <ul className="pp-toc-list">
-                {sections.map((s) => (
-                  <li key={s.id}>
-                    <button
-                      className="pp-toc-btn"
-                      onClick={() => scrollToSection(s.id)}
-                      aria-label={`Go to ${s.title}`}
-                    >
-                      <FiChevronRight className="pp-toc-arrow" />
-                      {s.title}
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              <div className="pp-toc-card-header">
+                <h3 className="pp-toc-title">
+                  <FiShield />
+                  Table of Contents
+                </h3>
+              </div>
+              <div className="pp-toc-body">
+                <ul className="pp-toc-list">
+                  {sections.map((s) => (
+                    <li key={s.id}>
+                      <button
+                        className="pp-toc-btn"
+                        onClick={() => scrollToSection(s.id)}
+                        aria-label={`Go to ${s.title}`}
+                      >
+                        <FiChevronRight className="pp-toc-arrow" />
+                        {s.title}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </aside>
 
@@ -301,14 +308,14 @@ export default function PrivacyPolicy() {
               </p>
               <div className="pp-rights-grid">
                 <div className="pp-right-card">
-                  <div className="pp-right-icon" aria-hidden="true">🔍</div>
+                  <div className="pp-right-icon"><FiEye /></div>
                   <h4>Right to Access</h4>
                   <p>
                     You can request a clear copy of the Personal Data we hold about you.
                   </p>
                 </div>
                 <div className="pp-right-card">
-                  <div className="pp-right-icon" aria-hidden="true">✏️</div>
+                  <div className="pp-right-icon"><FiEdit3 /></div>
                   <h4>Right to Correction</h4>
                   <p>
                     You may request updates or corrections to any inaccurate academic or personal
@@ -316,7 +323,7 @@ export default function PrivacyPolicy() {
                   </p>
                 </div>
                 <div className="pp-right-card">
-                  <div className="pp-right-icon" aria-hidden="true">🗑️</div>
+                  <div className="pp-right-icon"><FiTrash2 /></div>
                   <h4>Right to Erasure / Opt-Out</h4>
                   <p>
                     You may request deletion of your online portal account or unsubscribe from

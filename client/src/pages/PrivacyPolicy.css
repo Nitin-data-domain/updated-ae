@@ -21,7 +21,16 @@
 .pp-hero-gradient {
   position: absolute;
   inset: 0;
-  background: var(--gradient-primary);
+  background: linear-gradient(135deg, #060f1c 0%, #112138 40%, #1C3557 70%, #0f2237 100%);
+}
+
+/* Diagonal gold accent line across hero */
+.pp-hero-gradient::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 55%, rgba(201,150,12,0.08) 100%);
+  pointer-events: none;
 }
 
 /* floating particles */
@@ -169,20 +178,36 @@
   background: var(--white);
   border-radius: var(--radius-lg);
   border: 1px solid var(--gray-100);
-  box-shadow: var(--shadow-md);
-  padding: 28px 24px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.pp-toc-card-header {
+  background: var(--gradient-primary);
+  padding: 20px 24px;
 }
 
 .pp-toc-title {
   font-family: var(--font-primary);
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  color: var(--primary);
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid var(--gray-100);
+  letter-spacing: 2.5px;
+  color: rgba(255,255,255,0.9);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pp-toc-title svg {
+  color: var(--accent-light);
+  width: 15px;
+  height: 15px;
+}
+
+.pp-toc-body {
+  padding: 16px 16px 20px;
 }
 
 .pp-toc-list {
@@ -246,17 +271,28 @@
 .pp-section-header {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 22px;
+  gap: 18px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--gray-100);
 }
 
 .pp-section-num {
-  font-family: var(--font-display);
-  font-size: 2.6rem;
+  font-family: var(--font-primary);
+  font-size: 0.72rem;
   font-weight: 800;
-  color: var(--gray-100);
+  letter-spacing: 1.5px;
+  color: var(--white);
   line-height: 1;
-  min-width: 60px;
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--gradient-primary);
+  box-shadow: 0 4px 14px rgba(28,53,87,0.3);
+  flex-shrink: 0;
   user-select: none;
 }
 
@@ -345,91 +381,179 @@
   background: var(--white);
   border: 1px solid var(--gray-100);
   border-radius: var(--radius-md);
-  padding: 28px 22px;
+  padding: 30px 24px;
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.pp-right-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient-primary);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--transition-base);
+}
+
+.pp-right-card:hover::before {
+  transform: scaleX(1);
 }
 
 .pp-right-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--primary-ultralight);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--gray-200);
 }
 
 .pp-right-icon {
-  font-size: 2rem;
-  margin-bottom: 12px;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  background: var(--primary-ultralight);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  transition: all var(--transition-base);
+}
+
+.pp-right-icon svg {
+  width: 22px;
+  height: 22px;
+  color: var(--primary);
+  transition: color var(--transition-base);
+}
+
+.pp-right-card:hover .pp-right-icon {
+  background: var(--gradient-primary);
+}
+
+.pp-right-card:hover .pp-right-icon svg {
+  color: var(--white);
 }
 
 .pp-right-card h4 {
   font-family: var(--font-primary);
-  font-size: 0.97rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--navy);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .pp-right-card p {
   font-size: 0.9rem;
   color: var(--gray-500);
-  line-height: 1.7;
+  line-height: 1.75;
   margin-bottom: 0 !important;
 }
 
 /* ── Contact block ── */
 .pp-contact-block {
-  background: var(--off-white);
+  background: var(--gradient-primary);
   border-radius: var(--radius-lg);
   padding: 48px 40px !important;
   border-bottom: none !important;
   margin-top: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.pp-contact-block::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+  pointer-events: none;
+}
+
+.pp-contact-block .pp-section-header {
+  border-bottom-color: rgba(255,255,255,0.12);
+}
+
+.pp-contact-block .pp-section-num {
+  background: rgba(255,255,255,0.12);
+  box-shadow: none;
+  color: var(--accent-light);
+}
+
+.pp-contact-block .pp-section-heading {
+  color: var(--white);
+}
+
+.pp-contact-block > p {
+  color: rgba(255,255,255,0.75) !important;
 }
 
 .pp-contact-card {
-  margin-top: 24px;
-  background: var(--white);
+  margin-top: 28px;
+  background: rgba(255,255,255,0.07);
+  backdrop-filter: blur(12px);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(255,255,255,0.14);
   overflow: hidden;
-  border: 1px solid var(--gray-100);
 }
 
 .pp-contact-info {
   padding: 32px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
 }
 
 .pp-contact-row {
   display: flex;
   align-items: flex-start;
-  gap: 14px;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+}
+
+.pp-contact-row:hover {
+  background: rgba(255,255,255,0.06);
 }
 
 .pp-contact-label {
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  color: var(--primary);
+  color: var(--accent-light);
   white-space: nowrap;
   min-width: 110px;
   padding-top: 2px;
 }
 
 .pp-contact-icon {
-  color: var(--accent);
+  color: var(--accent-light);
   width: 18px;
   height: 18px;
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
 .pp-contact-value {
   font-size: 0.97rem;
-  color: var(--gray-600);
+  color: rgba(255,255,255,0.85);
   line-height: 1.6;
+}
+
+.pp-contact-value .pp-link {
+  color: var(--accent-light);
+}
+
+.pp-contact-value .pp-link:hover {
+  color: var(--white);
 }
 
 /* ── Responsive ── */
