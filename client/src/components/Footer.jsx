@@ -95,7 +95,7 @@ export default function Footer() {
         <div className="container footer-bottom-inner">
           <p>&copy; {new Date().getFullYear()} AHARADA EDUCATION (A UNIT OF PRABHU DRONE RESEARCH AND DEVELOPMENT LLP). All rights reserved.</p>
           <div className="footer-bottom-links">
-            <a href="#">Privacy Policy</a>
+            <Link to="/privacy-policy">Privacy Policy</Link>
             <a href="#">Terms of Service</a>
           </div>
         </div>

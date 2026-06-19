@@ -10,6 +10,7 @@ import Events from './pages/Events'
 import Contact from './pages/Contact'
 import AboutUs from './pages/AboutUs'
 import Placement from './pages/Placement'
+import PrivacyPolicy from './pages/PrivacyPolicy'
 import AdminLogin from './pages/admin/AdminLogin'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminPrograms from './pages/admin/AdminPrograms'
@@ -35,6 +36,7 @@ function App() {
         <Route path="contact" element={<Contact />} />
         <Route path="about" element={<AboutUs />} />
         <Route path="placement" element={<Placement />} />
+        <Route path="privacy-policy" element={<PrivacyPolicy />} />
       </Route>
 
       {/* Admin Routes */}
