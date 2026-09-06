@@ -15,7 +15,11 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  contentSecurityPolicy: false,
+  frameguard: false,
+}));
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (Postman, curl, server-to-server)
