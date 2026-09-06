@@ -52,4 +52,30 @@ const uploadImage = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
 });
 
-module.exports = { uploadBrochure, uploadImage, cloudinary };
+// ── Memory storage for books and study materials ───────────────────────────
+const bookStorage = multer.memoryStorage();
+
+const bookFilter = (req, file, cb) => {
+  const allowed = [
+    'application/pdf',
+    'application/epub+zip',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/zip',
+    'application/x-zip-compressed',
+  ];
+  if (allowed.includes(file.mimetype) || file.originalname.match(/\.(pdf|epub|doc|docx|zip)$/i)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Allowed formats for books: PDF, EPUB, DOC, DOCX, ZIP'), false);
+  }
+};
+
+const uploadBook = multer({
+  storage: bookStorage,
+  fileFilter: bookFilter,
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB
+});
+
+module.exports = { uploadBrochure, uploadImage, uploadBook, cloudinary };
+

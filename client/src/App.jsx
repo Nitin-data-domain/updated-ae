@@ -11,6 +11,8 @@ import Contact from './pages/Contact'
 import AboutUs from './pages/AboutUs'
 import Placement from './pages/Placement'
 import PrivacyPolicy from './pages/PrivacyPolicy'
+import Library from './pages/Library'
+import StudentFeedback from './pages/StudentFeedback'
 import AdminLogin from './pages/admin/AdminLogin'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminPrograms from './pages/admin/AdminPrograms'
@@ -20,6 +22,8 @@ import AdminEnquiries from './pages/admin/AdminEnquiries'
 import AdminAdmissionLeads from './pages/admin/AdminAdmissionLeads'
 import AdminBrochures from './pages/admin/AdminBrochures'
 import AdminPlacements from './pages/admin/AdminPlacements'
+import AdminBooks from './pages/admin/AdminBooks'
+import AdminFeedback from './pages/admin/AdminFeedback'
 import './App.css'
 
 function App() {
@@ -37,6 +41,8 @@ function App() {
         <Route path="about" element={<AboutUs />} />
         <Route path="placement" element={<Placement />} />
         <Route path="privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="library" element={<Library />} />
+        <Route path="feedback" element={<StudentFeedback />} />
       </Route>
 
       {/* Admin Routes */}
@@ -44,6 +50,8 @@ function App() {
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />
         <Route path="programs" element={<AdminPrograms />} />
+        <Route path="books" element={<AdminBooks />} />
+        <Route path="feedback" element={<AdminFeedback />} />
         <Route path="faculty" element={<AdminFaculty />} />
         <Route path="events" element={<AdminEvents />} />
         <Route path="admission-leads" element={<AdminAdmissionLeads />} />

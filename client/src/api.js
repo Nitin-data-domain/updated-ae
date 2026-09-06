@@ -126,5 +126,31 @@ export const uploadSiteImage = (formData) =>
   api.post('/site-content/upload-image', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
 export const fetchSiteImage = (url) => api.post('/site-content/fetch-image', { url });
 
+// Digital Library / Books
+export const getBooks = (params) => api.get('/books', { params });
+export const getBookOptions = (params) => api.get('/books/options', { params });
+export const recordBookDownload = (id) => api.get(`/books/download/${id}`);
+export const getAllBooksAdmin = () => api.get('/books/admin');
+export const createBook = (data) => {
+  if (data instanceof FormData) {
+    return api.post('/books', data, { headers: { 'Content-Type': 'multipart/form-data' } });
+  }
+  return api.post('/books', data);
+};
+export const updateBook = (id, data) => {
+  if (data instanceof FormData) {
+    return api.put(`/books/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } });
+  }
+  return api.put(`/books/${id}`, data);
+};
+export const deleteBook = (id) => api.delete(`/books/${id}`);
+
+// Student Feedback
+export const submitFeedback = (data) => api.post('/feedback', data);
+export const getFeedbacks = (params) => api.get('/feedback', { params });
+export const getFeedbackStats = () => api.get('/feedback/stats');
+export const updateFeedbackStatus = (id, status) => api.put(`/feedback/${id}/status`, { status });
+export const deleteFeedback = (id) => api.delete(`/feedback/${id}`);
+
 export default api;
 

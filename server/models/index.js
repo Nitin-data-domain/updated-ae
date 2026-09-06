@@ -7,6 +7,8 @@ const Placement = require('./Placement');
 const Enquiry = require('./Enquiry');
 const Brochure = require('./Brochure');
 const OTP = require('./OTP');
+const Book = require('./Book');
+const Feedback = require('./Feedback');
 const { CampusPhoto, CompanyPartner } = require('./SiteContent');
 
 // Define Associations
@@ -22,9 +24,8 @@ async function syncModels() {
 async function seedInitialData() {
   try {
     const userCount = await User.count();
-    if (userCount > 0) return;
-
-    console.log('🌱 Fresh database detected. Seeding initial data...');
+    if (userCount === 0) {
+      console.log('🌱 Fresh database detected. Seeding initial data...');
 
     // Admin Users
     await User.create({
@@ -214,8 +215,130 @@ async function seedInitialData() {
       { companyName: 'GMR Group', studentName: 'Vikram Singh', program: 'MBA Aviation Management', package: '10.5 LPA', year: 2026, role: 'Airport Manager', order: 5 }
     ];
     await Placement.bulkCreate(placements);
+    }
 
-    console.log('✅ Initial database seed completed successfully!');
+    // Seed sample books if empty
+    const bookCount = await Book.count();
+    if (bookCount === 0) {
+      const sampleBooks = [
+        {
+          title: 'Introduction to Aviation Management & Airline Business',
+          academicYear: '1st Year',
+          courseName: 'BBA Aviation & Travel',
+          subjectCode: 'AV-101',
+          subjectName: 'Introduction to Aviation Management',
+          author: 'Prof. Rajesh Kumar Singh',
+          description: 'Core foundational textbook covering civil aviation structure, ICAO & DGCA regulations, passenger journey flows, and airport systems.',
+          fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+          fileName: 'AV101_Aviation_Management.pdf',
+          fileSize: '4.2 MB',
+          downloadCount: 142,
+          order: 1,
+        },
+        {
+          title: 'Aviation Meteorology & Air Navigation Handbook',
+          academicYear: '1st Year',
+          courseName: 'BBA Aviation & Travel',
+          subjectCode: 'AV-102',
+          subjectName: 'Aviation Meteorology & Navigation',
+          author: 'Capt. Vikram Malhotra',
+          description: 'Standard handbook covering atmosphere dynamics, jet streams, METAR/TAF weather briefings, and dead-reckoning navigation basics.',
+          fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+          fileName: 'AV102_Meteorology_Navigation.pdf',
+          fileSize: '6.8 MB',
+          downloadCount: 98,
+          order: 2,
+        },
+        {
+          title: 'Airport Ground Handling & Cargo Logistics Guide',
+          academicYear: '2nd Year',
+          courseName: 'BBA Aviation & Travel',
+          subjectCode: 'AV-201',
+          subjectName: 'Airport Ground Handling & Cargo Operations',
+          author: 'Dr. Sneha Patel',
+          description: 'Operational guidelines for ramp safety, baggage management systems, air waybill procedures, and dangerous goods regulations.',
+          fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+          fileName: 'AV201_Ground_Handling_Cargo.pdf',
+          fileSize: '5.1 MB',
+          downloadCount: 76,
+          order: 3,
+        },
+        {
+          title: 'Fluid Mechanics & Aerospace Thermodynamics',
+          academicYear: '1st Year',
+          courseName: 'B.Tech Aerospace Engineering',
+          subjectCode: 'AERO-101',
+          subjectName: 'Fluid Mechanics & Thermodynamics',
+          author: 'Dr. Priya Sharma',
+          description: 'Comprehensive manual covering continuity, Navier-Stokes fundamentals, boundary layers, and thermodynamic cycles for aerospace craft.',
+          fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+          fileName: 'AERO101_Fluid_Mechanics.pdf',
+          fileSize: '8.4 MB',
+          downloadCount: 215,
+          order: 4,
+        },
+        {
+          title: 'Aerodynamics I: Subsonic Flow & Airfoil Theory',
+          academicYear: '2nd Year',
+          courseName: 'B.Tech Aerospace Engineering',
+          subjectCode: 'AERO-201',
+          subjectName: 'Aerodynamics I',
+          author: 'Dr. Priya Sharma',
+          description: 'Detailed analysis of lift generation, NACA cambered profiles, induced drag, and finite wing vortex distribution.',
+          fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+          fileName: 'AERO201_Aerodynamics_I.pdf',
+          fileSize: '7.9 MB',
+          downloadCount: 184,
+          order: 5,
+        },
+        {
+          title: 'Aircraft Propulsion & Gas Turbine Engineering',
+          academicYear: '3rd Year',
+          courseName: 'B.Tech Aerospace Engineering',
+          subjectCode: 'AERO-301',
+          subjectName: 'Aircraft Propulsion',
+          author: 'Prof. Mohammed Irfan',
+          description: 'Principles of turbojet, turbofan, ramjet cycles, afterburners, compressor aerodynamics, and rocket propulsion mechanics.',
+          fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+          fileName: 'AERO301_Propulsion_Systems.pdf',
+          fileSize: '9.2 MB',
+          downloadCount: 160,
+          order: 6,
+        },
+        {
+          title: 'Principles of Aeronautical Science & DGCA Protocols',
+          academicYear: '1st Year',
+          courseName: 'B.Sc Aeronautical Science',
+          subjectCode: 'AS-101',
+          subjectName: 'Aeronautical Science Fundamentals',
+          author: 'Capt. Vikram Malhotra',
+          description: 'Standard syllabus book covering aircraft stability, weight & balance, pitot-static instrumentation, and DGCA regulations.',
+          fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+          fileName: 'AS101_Aeronautical_Fundamentals.pdf',
+          fileSize: '4.8 MB',
+          downloadCount: 88,
+          order: 7,
+        },
+        {
+          title: 'Strategic Airline Economics & Yield Management',
+          academicYear: '1st Year',
+          courseName: 'MBA Aviation Management',
+          subjectCode: 'MBA-AV-101',
+          subjectName: 'Aviation Economics & Revenue Management',
+          author: 'Dr. Rajesh Kumar Singh',
+          description: 'Postgraduate textbook addressing dynamic airline pricing algorithms, slot allocation economics, and global fleet financing.',
+          fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+          fileName: 'MBA101_Airline_Economics.pdf',
+          fileSize: '5.6 MB',
+          downloadCount: 110,
+          order: 8,
+        }
+      ];
+      await Book.bulkCreate(sampleBooks);
+      console.log('   ✅ Seeded sample library books.');
+    }
+
+    console.log('✅ Initial database check & seed completed successfully!');
   } catch (error) {
     console.error('Initial database seed error:', error);
   }
@@ -230,8 +353,11 @@ module.exports = {
   Enquiry,
   Brochure,
   OTP,
+  Book,
+  Feedback,
   CampusPhoto,
   CompanyPartner,
   syncModels,
   seedInitialData,
 };
+

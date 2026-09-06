@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
-import { FiGrid, FiBook, FiUsers, FiCalendar, FiMail, FiFile, FiLogOut, FiMenu, FiX, FiAward, FiMessageSquare } from 'react-icons/fi'
+import { FiGrid, FiBook, FiUsers, FiCalendar, FiMail, FiFile, FiLogOut, FiMenu, FiX, FiAward, FiMessageSquare, FiBookOpen } from 'react-icons/fi'
 import { HiAcademicCap } from 'react-icons/hi'
 import Logo from '../Logo'
 import './AdminLayout.css'
@@ -8,11 +8,13 @@ import './AdminLayout.css'
 const sidebarLinks = [
   { path: '/admin', label: 'Dashboard', icon: <FiGrid />, exact: true },
   { path: '/admin/programs', label: 'Programs', icon: <FiBook /> },
+  { path: '/admin/books', label: 'Library Books', icon: <FiBookOpen /> },
+  { path: '/admin/feedback', label: 'Student Feedback', icon: <FiMessageSquare /> },
   { path: '/admin/faculty', label: 'Faculty', icon: <FiUsers /> },
   { path: '/admin/placements', label: 'Placements', icon: <FiAward /> },
   { path: '/admin/events', label: 'Events', icon: <FiCalendar /> },
   { path: '/admin/admission-leads', label: 'Admission Leads', icon: <HiAcademicCap /> },
-  { path: '/admin/enquiries', label: 'Enquiries (Contact)', icon: <FiMessageSquare /> },
+  { path: '/admin/enquiries', label: 'Enquiries (Contact)', icon: <FiMail /> },
   { path: '/admin/brochures', label: 'Brochures', icon: <FiFile /> },
 ]
 

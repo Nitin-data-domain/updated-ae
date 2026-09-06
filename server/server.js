@@ -57,6 +57,8 @@ app.use('/api/brochures', require('./routes/brochureRoutes'));
 app.use('/api/otp',      require('./routes/otpRoutes'));
 app.use('/api/placements', require('./routes/placementRoutes'));
 app.use('/api/site-content', require('./routes/siteContentRoutes'));
+app.use('/api/books', require('./routes/bookRoutes'));
+app.use('/api/feedback', require('./routes/feedbackRoutes'));
 
 // Health check
 app.get('/api/health', (req, res) => {

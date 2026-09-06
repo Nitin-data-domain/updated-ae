@@ -56,6 +56,8 @@ export default function Footer() {
             <div className="footer-col">
               <h4 className="footer-heading">Quick Links</h4>
               <ul className="footer-links">
+                <li><Link to="/library">Digital Library (Books)</Link></li>
+                <li><Link to="/feedback">Student Feedback Form</Link></li>
                 <li><Link to="/admissions">Admission Enquiry</Link></li>
                 <li><Link to="/faculty">Our Faculty</Link></li>
                 <li><Link to="/events">Events</Link></li>
@@ -95,6 +97,8 @@ export default function Footer() {
         <div className="container footer-bottom-inner">
           <p>&copy; {new Date().getFullYear()} AHARADA EDUCATION (A UNIT OF PRABHU DRONE RESEARCH AND DEVELOPMENT LLP). All rights reserved.</p>
           <div className="footer-bottom-links">
+            <Link to="/library">Digital Library</Link>
+            <Link to="/feedback">Student Feedback</Link>
             <Link to="/privacy-policy">Privacy Policy</Link>
             <a href="#">Terms of Service</a>
           </div>
