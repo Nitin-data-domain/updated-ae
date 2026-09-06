@@ -4,9 +4,13 @@ const Program = require('../models/Program');
 // @route   GET /api/programs
 exports.getPrograms = async (req, res) => {
   try {
-    const programs = await Program.find({ isActive: true }).sort({ order: 1 });
+    const programs = await Program.findAll({
+      where: { isActive: true },
+      order: [['order', 'ASC']],
+    });
     res.json({ success: true, count: programs.length, data: programs });
   } catch (error) {
+    console.error('getPrograms error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -15,9 +19,12 @@ exports.getPrograms = async (req, res) => {
 // @route   GET /api/programs/admin
 exports.getAllPrograms = async (req, res) => {
   try {
-    const programs = await Program.find().sort({ order: 1 });
+    const programs = await Program.findAll({
+      order: [['order', 'ASC']],
+    });
     res.json({ success: true, count: programs.length, data: programs });
   } catch (error) {
+    console.error('getAllPrograms error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -26,12 +33,15 @@ exports.getAllPrograms = async (req, res) => {
 // @route   GET /api/programs/:slug
 exports.getProgram = async (req, res) => {
   try {
-    const program = await Program.findOne({ slug: req.params.slug, isActive: true });
+    const program = await Program.findOne({
+      where: { slug: req.params.slug, isActive: true },
+    });
     if (!program) {
       return res.status(404).json({ success: false, message: 'Program not found' });
     }
     res.json({ success: true, data: program });
   } catch (error) {
+    console.error('getProgram error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -52,15 +62,18 @@ exports.createProgram = async (req, res) => {
 // @route   PUT /api/programs/:id
 exports.updateProgram = async (req, res) => {
   try {
-    const program = await Program.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true
-    });
+    let program = await Program.findByPk(req.params.id);
+    if (!program) {
+      // Fallback search by slug if slug was passed
+      program = await Program.findOne({ where: { slug: req.params.id } });
+    }
     if (!program) {
       return res.status(404).json({ success: false, message: 'Program not found' });
     }
+    await program.update(req.body);
     res.json({ success: true, data: program });
   } catch (error) {
+    console.error('Update program error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -69,12 +82,17 @@ exports.updateProgram = async (req, res) => {
 // @route   DELETE /api/programs/:id
 exports.deleteProgram = async (req, res) => {
   try {
-    const program = await Program.findByIdAndDelete(req.params.id);
+    let program = await Program.findByPk(req.params.id);
+    if (!program) {
+      program = await Program.findOne({ where: { slug: req.params.id } });
+    }
     if (!program) {
       return res.status(404).json({ success: false, message: 'Program not found' });
     }
+    await program.destroy();
     res.json({ success: true, message: 'Program deleted' });
   } catch (error) {
+    console.error('Delete program error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };

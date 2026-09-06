@@ -1,39 +1,75 @@
-const mongoose = require('mongoose');
+const { DataTypes, Model } = require('sequelize');
+const { sequelize } = require('../config/db');
 
-const eventSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: [true, 'Event title is required'],
-    trim: true
-  },
-  description: {
-    type: String,
-    required: [true, 'Event description is required']
-  },
-  date: {
-    type: Date,
-    required: [true, 'Event date is required']
-  },
-  location: {
-    type: String,
-    default: ''
-  },
-  images: [{
-    type: String
-  }],
-  category: {
-    type: String,
-    enum: ['seminar', 'workshop', 'conference', 'cultural', 'placement', 'other'],
-    default: 'other'
-  },
-  isUpcoming: {
-    type: Boolean,
-    default: true
-  },
-  isActive: {
-    type: Boolean,
-    default: true
+class Event extends Model {
+  toJSON() {
+    const values = { ...this.get() };
+    values._id = values.id;
+    return values;
   }
-}, { timestamps: true });
+}
 
-module.exports = mongoose.model('Event', eventSchema);
+Event.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'Event title is required' },
+      },
+    },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'Event description is required' },
+      },
+    },
+    date: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'Event date is required' },
+      },
+    },
+    location: {
+      type: DataTypes.STRING,
+      defaultValue: '',
+    },
+    images: {
+      type: DataTypes.JSON,
+      defaultValue: [],
+    },
+    category: {
+      type: DataTypes.ENUM('seminar', 'workshop', 'conference', 'cultural', 'placement', 'other'),
+      defaultValue: 'other',
+    },
+    isUpcoming: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
+    _id: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        return this.getDataValue('id');
+      },
+    },
+  },
+  {
+    sequelize,
+    modelName: 'Event',
+    tableName: 'events',
+    timestamps: true,
+  }
+);
+
+module.exports = Event;

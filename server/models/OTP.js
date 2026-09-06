@@ -1,13 +1,67 @@
-const mongoose = require('mongoose');
+const { DataTypes, Model } = require('sequelize');
+const { sequelize } = require('../config/db');
 
-const otpSchema = new mongoose.Schema({
-  phone:     { type: String, required: true, index: true },
-  otp:       { type: String, required: true },
-  expiresAt: { type: Date,   required: true },
-  attempts:  { type: Number, default: 0 },
-});
+class OTP extends Model {
+  toJSON() {
+    const values = { ...this.get() };
+    values._id = values.id;
+    return values;
+  }
+}
 
-// TTL index — MongoDB auto-deletes expired docs
-otpSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+OTP.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'Phone number is required' },
+      },
+    },
+    otp: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'OTP is required' },
+      },
+    },
+    expiresAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'Expiry date is required' },
+      },
+    },
+    attempts: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
+    _id: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        return this.getDataValue('id');
+      },
+    },
+  },
+  {
+    sequelize,
+    modelName: 'OTP',
+    tableName: 'otps',
+    timestamps: true,
+    indexes: [
+      {
+        fields: ['phone'],
+      },
+      {
+        fields: ['expiresAt'],
+      },
+    ],
+  }
+);
 
-module.exports = mongoose.model('OTP', otpSchema);
+module.exports = OTP;

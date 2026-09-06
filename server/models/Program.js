@@ -1,74 +1,120 @@
-const mongoose = require('mongoose');
+const { DataTypes, Model } = require('sequelize');
+const { sequelize } = require('../config/db');
 
-const programSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: [true, 'Program title is required'],
-    trim: true
-  },
-  slug: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true
-  },
-  shortDescription: {
-    type: String,
-    required: [true, 'Short description is required']
-  },
-  overview: {
-    type: String,
-    required: [true, 'Program overview is required']
-  },
-  eligibility: {
-    type: String,
-    required: [true, 'Eligibility criteria is required']
-  },
-  duration: {
-    type: String,
-    required: [true, 'Duration is required']
-  },
-  careerOpportunities: [{
-    type: String
-  }],
-  industryExposure: [{
-    type: String
-  }],
-  highlights: [{
-    type: String
-  }],
-  // University associations
-  universities: [{
-    name: { type: String, required: true },
-    slug: { type: String }
-  }],
-  category: [{
-    type: String,
-    enum: ['aviation', 'engineering', 'management', 'entrepreneurship', 'technology', 'arts', 'science']
-  }],
-  image: {
-    type: String,
-    default: ''
-  },
-  brochureUrl: {
-    type: String,
-    default: ''
-  },
-  isActive: {
-    type: Boolean,
-    default: true
-  },
-  order: {
-    type: Number,
-    default: 0
+class Program extends Model {
+  toJSON() {
+    const values = { ...this.get() };
+    values._id = values.id;
+    return values;
   }
-}, { timestamps: true });
+}
 
-programSchema.pre('save', function(next) {
-  if (!this.slug) {
-    this.slug = this.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+Program.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'Program title is required' },
+      },
+    },
+    slug: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    shortDescription: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'Short description is required' },
+      },
+    },
+    overview: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'Program overview is required' },
+      },
+    },
+    eligibility: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'Eligibility criteria is required' },
+      },
+    },
+    duration: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'Duration is required' },
+      },
+    },
+    careerOpportunities: {
+      type: DataTypes.JSON,
+      defaultValue: [],
+    },
+    industryExposure: {
+      type: DataTypes.JSON,
+      defaultValue: [],
+    },
+    highlights: {
+      type: DataTypes.JSON,
+      defaultValue: [],
+    },
+    universities: {
+      type: DataTypes.JSON,
+      defaultValue: [],
+    },
+    category: {
+      type: DataTypes.JSON,
+      defaultValue: [],
+    },
+    image: {
+      type: DataTypes.STRING,
+      defaultValue: '',
+    },
+    brochureUrl: {
+      type: DataTypes.STRING,
+      defaultValue: '',
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
+    order: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
+    _id: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        return this.getDataValue('id');
+      },
+    },
+  },
+  {
+    sequelize,
+    modelName: 'Program',
+    tableName: 'programs',
+    timestamps: true,
+    hooks: {
+      beforeValidate: (program) => {
+        if (!program.slug && program.title) {
+          program.slug = program.title
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)/g, '');
+        }
+      },
+    },
   }
-  next();
-});
+);
 
-module.exports = mongoose.model('Program', programSchema);
+module.exports = Program;

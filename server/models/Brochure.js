@@ -1,36 +1,75 @@
-const mongoose = require('mongoose');
+const { DataTypes, Model } = require('sequelize');
+const { sequelize } = require('../config/db');
 
-const brochureSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: [true, 'Brochure title is required'],
-    trim: true
-  },
-  fileUrl: {
-    type: String,
-    required: [true, 'File URL is required']
-  },
-  fileName: {
-    type: String
-  },
-  linkedPage: {
-    type: String,
-    enum: ['home', 'faculty', 'events', 'programs', 'contact', 'general'],
-    default: 'general'
-  },
-  linkedProgram: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Program',
-    default: null
-  },
-  fileSize: {
-    type: String,
-    default: ''
-  },
-  isActive: {
-    type: Boolean,
-    default: true
+class Brochure extends Model {
+  toJSON() {
+    const values = { ...this.get() };
+    values._id = values.id;
+    if (values.linkedProgram && typeof values.linkedProgram === 'object') {
+      values.linkedProgram = {
+        ...values.linkedProgram,
+        _id: values.linkedProgram.id,
+      };
+    }
+    return values;
   }
-}, { timestamps: true });
+}
 
-module.exports = mongoose.model('Brochure', brochureSchema);
+Brochure.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'Brochure title is required' },
+      },
+    },
+    fileUrl: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'File URL is required' },
+      },
+    },
+    fileName: {
+      type: DataTypes.STRING,
+      defaultValue: '',
+    },
+    linkedPage: {
+      type: DataTypes.ENUM('home', 'faculty', 'events', 'programs', 'contact', 'general'),
+      defaultValue: 'general',
+    },
+    linkedProgramId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: null,
+    },
+    fileSize: {
+      type: DataTypes.STRING,
+      defaultValue: '',
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
+    _id: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        return this.getDataValue('id');
+      },
+    },
+  },
+  {
+    sequelize,
+    modelName: 'Brochure',
+    tableName: 'brochures',
+    timestamps: true,
+  }
+);
+
+module.exports = Brochure;

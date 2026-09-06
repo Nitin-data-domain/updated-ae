@@ -1,21 +1,26 @@
 const Brochure = require('../models/Brochure');
-const cloudinary = require('cloudinary').v2;
+const Program = require('../models/Program');
 
 // @desc    Upload brochure link
 // @route   POST /api/brochures
 exports.uploadBrochure = async (req, res) => {
   try {
-    const { title, fileUrl, linkedPage, linkedProgram } = req.body;
+    const { title, fileUrl, linkedPage, linkedProgram, linkedProgramId, fileSize, fileName } = req.body;
 
     if (!fileUrl) {
-      return res.status(400).json({ success: false, message: 'Please provide a Google Drive link' });
+      return res.status(400).json({ success: false, message: 'Please provide a file URL or Google Drive link' });
     }
+
+    const programFk = linkedProgramId || linkedProgram || null;
 
     const brochure = await Brochure.create({
       title: title || 'Brochure Link',
-      fileUrl: fileUrl,
+      fileUrl,
+      fileName: fileName || '',
+      fileSize: fileSize || '',
       linkedPage: linkedPage || 'general',
-      linkedProgram: linkedProgram || null
+      linkedProgramId: programFk ? parseInt(programFk, 10) : null,
+      isActive: true,
     });
 
     res.status(201).json({ success: true, data: brochure });
@@ -30,13 +35,25 @@ exports.uploadBrochure = async (req, res) => {
 exports.getBrochures = async (req, res) => {
   try {
     const { linkedPage, linkedProgram } = req.query;
-    const query = { isActive: true };
-    if (linkedPage) query.linkedPage = linkedPage;
-    if (linkedProgram) query.linkedProgram = linkedProgram;
+    const where = { isActive: true };
+    if (linkedPage) where.linkedPage = linkedPage;
+    if (linkedProgram) where.linkedProgramId = linkedProgram;
 
-    const brochures = await Brochure.find(query).populate('linkedProgram', 'title slug');
+    const brochures = await Brochure.findAll({
+      where,
+      include: [
+        {
+          model: Program,
+          as: 'linkedProgram',
+          attributes: ['id', 'title', 'slug'],
+        },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
+
     res.json({ success: true, count: brochures.length, data: brochures });
   } catch (error) {
+    console.error('getBrochures error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -45,9 +62,20 @@ exports.getBrochures = async (req, res) => {
 // @route   GET /api/brochures/admin
 exports.getAllBrochures = async (req, res) => {
   try {
-    const brochures = await Brochure.find().populate('linkedProgram', 'title slug').sort({ createdAt: -1 });
+    const brochures = await Brochure.findAll({
+      include: [
+        {
+          model: Program,
+          as: 'linkedProgram',
+          attributes: ['id', 'title', 'slug'],
+        },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
+
     res.json({ success: true, count: brochures.length, data: brochures });
   } catch (error) {
+    console.error('getAllBrochures error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -56,16 +84,13 @@ exports.getAllBrochures = async (req, res) => {
 // @route   GET /api/brochures/download/:id
 exports.downloadBrochure = async (req, res) => {
   try {
-    const brochure = await Brochure.findById(req.params.id);
+    const brochure = await Brochure.findByPk(req.params.id);
     if (!brochure) {
       return res.status(404).json({ success: false, message: 'Brochure not found' });
     }
-
-    // Redirect directly to the secure Cloudinary URL.
-    // We avoid fl_attachment for PDFs to prevent Cloudinary ERR_INVALID_RESPONSE
-    // when the PDF is treated as an image type. The browser will natively render it.
     res.redirect(brochure.fileUrl);
   } catch (error) {
+    console.error('downloadBrochure error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -74,15 +99,20 @@ exports.downloadBrochure = async (req, res) => {
 // @route   PUT /api/brochures/:id
 exports.updateBrochure = async (req, res) => {
   try {
-    const brochure = await Brochure.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true
-    });
+    const brochure = await Brochure.findByPk(req.params.id);
     if (!brochure) {
       return res.status(404).json({ success: false, message: 'Brochure not found' });
     }
+
+    const data = { ...req.body };
+    if (data.linkedProgram && !data.linkedProgramId) {
+      data.linkedProgramId = parseInt(data.linkedProgram, 10);
+    }
+
+    await brochure.update(data);
     res.json({ success: true, data: brochure });
   } catch (error) {
+    console.error('updateBrochure error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -91,14 +121,14 @@ exports.updateBrochure = async (req, res) => {
 // @route   DELETE /api/brochures/:id
 exports.deleteBrochure = async (req, res) => {
   try {
-    const brochure = await Brochure.findById(req.params.id);
+    const brochure = await Brochure.findByPk(req.params.id);
     if (!brochure) {
       return res.status(404).json({ success: false, message: 'Brochure not found' });
     }
-
-    await Brochure.findByIdAndDelete(req.params.id);
+    await brochure.destroy();
     res.json({ success: true, message: 'Brochure deleted' });
   } catch (error) {
+    console.error('deleteBrochure error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };

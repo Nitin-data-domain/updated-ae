@@ -1,40 +1,81 @@
-const mongoose = require('mongoose');
+const { DataTypes, Model } = require('sequelize');
+const { sequelize } = require('../config/db');
 
-const placementSchema = new mongoose.Schema({
-  companyName: {
-    type: String,
-    required: [true, 'Please add a company name']
-  },
-  studentName: {
-    type: String,
-    required: [true, 'Please add a student name']
-  },
-  program: {
-    type: String,
-    required: [true, 'Please add a program name']
-  },
-  package: {
-    type: String,
-    required: false
-  },
-  year: {
-    type: Number,
-    required: [true, 'Please add the placement year']
-  },
-  image: {
-    type: String,
-    default: 'https://via.placeholder.com/150'
-  },
-  role: {
-    type: String,
-    required: [true, 'Please add the role offered']
-  },
-  order: {
-    type: Number,
-    default: 0
+class Placement extends Model {
+  toJSON() {
+    const values = { ...this.get() };
+    values._id = values.id;
+    return values;
   }
-}, {
-  timestamps: true
-});
+}
 
-module.exports = mongoose.model('Placement', placementSchema);
+Placement.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    companyName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'Company name is required' },
+      },
+    },
+    studentName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'Student name is required' },
+      },
+    },
+    program: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'Program name is required' },
+      },
+    },
+    package: {
+      type: DataTypes.STRING,
+      defaultValue: 'N/A',
+    },
+    year: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'Placement year is required' },
+      },
+    },
+    image: {
+      type: DataTypes.STRING,
+      defaultValue: 'https://via.placeholder.com/150',
+    },
+    role: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'Role is required' },
+      },
+    },
+    order: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
+    _id: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        return this.getDataValue('id');
+      },
+    },
+  },
+  {
+    sequelize,
+    modelName: 'Placement',
+    tableName: 'placements',
+    timestamps: true,
+  }
+);
+
+module.exports = Placement;

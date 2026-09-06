@@ -1,36 +1,42 @@
 require('dotenv').config();
-const mongoose = require('mongoose');
+const { connectDB } = require('./config/db');
 const User = require('./models/User');
 
 const resetAdmin = async () => {
   try {
-    console.log('Connecting to MongoDB...');
-    await mongoose.connect(process.env.MONGODB_URI);
-    console.log('✅ Connected to MongoDB');
+    console.log('Connecting to database...');
+    await connectDB();
+    console.log('✅ Connected to database');
 
-    // Delete existing admin users
-    const deleted = await User.deleteMany({ email: { $in: ['admin@aharada.edu', 'md@aharadaedu.in'] } });
-    if (deleted.deletedCount > 0) {
-      console.log(`🗑️  Removed ${deleted.deletedCount} existing admin user(s)`);
-    }
+    // Remove existing admin accounts
+    await User.destroy({
+      where: {
+        email: ['admin@aharada.edu', 'md@aharadaedu.in'],
+      },
+    });
 
-    // Create fresh admin user
+    // Create fresh superadmin
     const admin = await User.create({
       name: 'Admin',
       email: 'md@aharadaedu.in',
       password: 'Aharada@Prabhu',
-      role: 'superadmin'
+      role: 'superadmin',
     });
 
-    console.log('✅ Admin user created successfully!');
-    console.log('   Email   : md@aharadaedu.in');
-    console.log('   Password: Aharada@Prabhu');
-    console.log('   Role    : superadmin');
-    console.log('   ID      :', admin._id.toString());
+    const admin2 = await User.create({
+      name: 'Admin',
+      email: 'admin@aharada.edu',
+      password: 'admin123',
+      role: 'superadmin',
+    });
+
+    console.log('✅ Admin users reset successfully!');
+    console.log('   1. Email: md@aharadaedu.in  / Password: Aharada@Prabhu');
+    console.log('   2. Email: admin@aharada.edu / Password: admin123');
 
     process.exit(0);
   } catch (error) {
-    console.error('❌ Error:', error.message);
+    console.error('❌ Error resetting admin:', error);
     process.exit(1);
   }
 };

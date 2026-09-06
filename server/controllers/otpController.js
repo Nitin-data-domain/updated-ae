@@ -1,4 +1,5 @@
 const OTP = require('../models/OTP');
+const { Op } = require('sequelize');
 
 function generateOTP() {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -13,9 +14,8 @@ async function sendSMSviaFast2SMS(phone, otp) {
     return true;
   }
 
-  // Fast2SMS Quick SMS API (free tier, no DLT registration needed)
   const message = `Your Aharada Education OTP is ${otp}. Valid for 10 minutes. Do not share it with anyone.`;
-  const mobile = phone.replace(/\D/g, '').slice(-10); // ensure 10-digit
+  const mobile = phone.replace(/\D/g, '').slice(-10);
 
   try {
     const res = await fetch('https://www.fast2sms.com/dev/bulkV2', {
@@ -43,7 +43,7 @@ async function sendSMSviaFast2SMS(phone, otp) {
     console.error('Fast2SMS fetch error:', err.message);
     console.log(`📱 [FALLBACK OTP] Phone: ${phone}  OTP: ${otp}`);
   }
-  return true; // Always succeed so form flow continues
+  return true;
 }
 
 // ── POST /api/otp/send ────────────────────────────────────────────────────────
@@ -57,14 +57,25 @@ exports.sendOTP = async (req, res) => {
 
     // Rate-limit: max 3 OTPs per phone in 15 minutes
     const since = new Date(Date.now() - 15 * 60 * 1000);
-    const recent = await OTP.countDocuments({ phone: clean, expiresAt: { $gt: since } });
+    const recent = await OTP.count({
+      where: {
+        phone: clean,
+        expiresAt: { [Op.gt]: since },
+      },
+    });
+
     if (recent >= 3) {
       return res.status(429).json({ success: false, message: 'Too many OTP requests. Try again in 15 minutes.' });
     }
 
     const otp = generateOTP();
-    await OTP.deleteMany({ phone: clean });
-    await OTP.create({ phone: clean, otp, expiresAt: new Date(Date.now() + 10 * 60 * 1000) });
+    await OTP.destroy({ where: { phone: clean } });
+    await OTP.create({
+      phone: clean,
+      otp,
+      expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+      attempts: 0,
+    });
 
     await sendSMSviaFast2SMS(clean, otp);
 
@@ -82,7 +93,12 @@ exports.verifyOTP = async (req, res) => {
     if (!phone || !otp) return res.status(400).json({ success: false, message: 'Phone and OTP are required' });
 
     const clean = phone.replace(/\D/g, '');
-    const record = await OTP.findOne({ phone: clean, expiresAt: { $gt: new Date() } });
+    const record = await OTP.findOne({
+      where: {
+        phone: clean,
+        expiresAt: { [Op.gt]: new Date() },
+      },
+    });
 
     if (!record) {
       return res.status(400).json({ success: false, message: 'OTP expired or not found. Please request a new OTP.' });
@@ -92,7 +108,7 @@ exports.verifyOTP = async (req, res) => {
     await record.save();
 
     if (record.attempts > 5) {
-      await OTP.deleteMany({ phone: clean });
+      await OTP.destroy({ where: { phone: clean } });
       return res.status(400).json({ success: false, message: 'Too many wrong attempts. Request a new OTP.' });
     }
 
@@ -101,7 +117,7 @@ exports.verifyOTP = async (req, res) => {
       return res.status(400).json({ success: false, message: `Incorrect OTP. ${left} attempt(s) remaining.` });
     }
 
-    await OTP.deleteMany({ phone: clean });
+    await OTP.destroy({ where: { phone: clean } });
     res.json({ success: true, message: 'Phone number verified successfully.' });
   } catch (err) {
     console.error('verifyOTP error:', err);

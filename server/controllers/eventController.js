@@ -4,9 +4,13 @@ const Event = require('../models/Event');
 // @route   GET /api/events
 exports.getEvents = async (req, res) => {
   try {
-    const events = await Event.find({ isActive: true }).sort({ date: -1 });
+    const events = await Event.findAll({
+      where: { isActive: true },
+      order: [['date', 'DESC']],
+    });
     res.json({ success: true, count: events.length, data: events });
   } catch (error) {
+    console.error('getEvents error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -15,9 +19,12 @@ exports.getEvents = async (req, res) => {
 // @route   GET /api/events/admin
 exports.getAllEvents = async (req, res) => {
   try {
-    const events = await Event.find().sort({ date: -1 });
+    const events = await Event.findAll({
+      order: [['date', 'DESC']],
+    });
     res.json({ success: true, count: events.length, data: events });
   } catch (error) {
+    console.error('getAllEvents error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -29,6 +36,7 @@ exports.createEvent = async (req, res) => {
     const event = await Event.create(req.body);
     res.status(201).json({ success: true, data: event });
   } catch (error) {
+    console.error('createEvent error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -37,15 +45,14 @@ exports.createEvent = async (req, res) => {
 // @route   PUT /api/events/:id
 exports.updateEvent = async (req, res) => {
   try {
-    const event = await Event.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true
-    });
+    const event = await Event.findByPk(req.params.id);
     if (!event) {
       return res.status(404).json({ success: false, message: 'Event not found' });
     }
+    await event.update(req.body);
     res.json({ success: true, data: event });
   } catch (error) {
+    console.error('updateEvent error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -54,12 +61,14 @@ exports.updateEvent = async (req, res) => {
 // @route   DELETE /api/events/:id
 exports.deleteEvent = async (req, res) => {
   try {
-    const event = await Event.findByIdAndDelete(req.params.id);
+    const event = await Event.findByPk(req.params.id);
     if (!event) {
       return res.status(404).json({ success: false, message: 'Event not found' });
     }
+    await event.destroy();
     res.json({ success: true, message: 'Event deleted' });
   } catch (error) {
+    console.error('deleteEvent error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };

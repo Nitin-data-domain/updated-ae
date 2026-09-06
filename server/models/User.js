@@ -1,41 +1,86 @@
-const mongoose = require('mongoose');
+const { DataTypes, Model } = require('sequelize');
 const bcrypt = require('bcryptjs');
+const { sequelize } = require('../config/db');
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'Name is required'],
-    trim: true
-  },
-  email: {
-    type: String,
-    required: [true, 'Email is required'],
-    unique: true,
-    lowercase: true,
-    trim: true
-  },
-  password: {
-    type: String,
-    required: [true, 'Password is required'],
-    minlength: 6,
-    select: false
-  },
-  role: {
-    type: String,
-    enum: ['admin', 'superadmin'],
-    default: 'admin'
+class User extends Model {
+  async matchPassword(enteredPassword) {
+    return await bcrypt.compare(enteredPassword, this.password);
   }
-}, { timestamps: true });
 
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
-  const salt = await bcrypt.genSalt(12);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
+  toJSON() {
+    const values = { ...this.get() };
+    values._id = values.id;
+    return values;
+  }
+}
 
-userSchema.methods.matchPassword = async function(enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
-};
+User.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'Name is required' },
+      },
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      validate: {
+        isEmail: { msg: 'Please provide a valid email' },
+        notEmpty: { msg: 'Email is required' },
+      },
+      set(value) {
+        if (value) this.setDataValue('email', value.trim().toLowerCase());
+      },
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        len: {
+          args: [6, 128],
+          msg: 'Password must be at least 6 characters',
+        },
+      },
+    },
+    role: {
+      type: DataTypes.ENUM('admin', 'superadmin'),
+      defaultValue: 'admin',
+    },
+    _id: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        return this.getDataValue('id');
+      },
+    },
+  },
+  {
+    sequelize,
+    modelName: 'User',
+    tableName: 'users',
+    timestamps: true,
+    hooks: {
+      beforeCreate: async (user) => {
+        if (user.password) {
+          const salt = await bcrypt.genSalt(12);
+          user.password = await bcrypt.hash(user.password, salt);
+        }
+      },
+      beforeUpdate: async (user) => {
+        if (user.changed('password')) {
+          const salt = await bcrypt.genSalt(12);
+          user.password = await bcrypt.hash(user.password, salt);
+        }
+      },
+    },
+  }
+);
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = User;

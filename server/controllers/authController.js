@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE || '7d' });
 };
 
 // @desc    Login admin
@@ -15,7 +15,8 @@ exports.login = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please provide email and password' });
     }
 
-    const user = await User.findOne({ email }).select('+password');
+    const cleanEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ where: { email: cleanEmail } });
     if (!user) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
@@ -25,17 +26,18 @@ exports.login = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
-    const token = generateToken(user._id);
+    const token = generateToken(user.id);
 
     res.json({
       success: true,
       token,
       user: {
-        id: user._id,
+        id: user.id,
+        _id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role
-      }
+        role: user.role,
+      },
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -47,7 +49,9 @@ exports.login = async (req, res) => {
 // @route   GET /api/auth/me
 exports.getMe = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findByPk(req.user.id, {
+      attributes: { exclude: ['password'] },
+    });
     res.json({ success: true, user });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error' });
@@ -58,28 +62,35 @@ exports.getMe = async (req, res) => {
 // @route   POST /api/auth/register
 exports.register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
-    const existingUser = await User.findOne({ email });
+    const cleanEmail = email.trim().toLowerCase();
+    const existingUser = await User.findOne({ where: { email: cleanEmail } });
     if (existingUser) {
       return res.status(400).json({ success: false, message: 'User already exists' });
     }
 
-    const user = await User.create({ name, email, password });
-    const token = generateToken(user._id);
+    const user = await User.create({
+      name,
+      email: cleanEmail,
+      password,
+      role: role || 'admin',
+    });
+    const token = generateToken(user.id);
 
     res.status(201).json({
       success: true,
       token,
       user: {
-        id: user._id,
+        id: user.id,
+        _id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role
-      }
+        role: user.role,
+      },
     });
   } catch (error) {
     console.error('Register error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
