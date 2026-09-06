@@ -3,6 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const path = require('path');
+const fs = require('fs');
 const https = require('https');
 require('dotenv').config();
 
@@ -58,11 +59,33 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Aharada Education API is running' });
 });
 
-// Since frontend is hosted on Vercel, the backend acts purely as an API.
-// Send a simple welcome message for root visits.
-app.get('/', (req, res) => {
-  res.json({ message: 'Aharada Education API is running successfully.' });
-});
+// ── Serve Frontend SPA & Static Assets ────────────────────────────────────────
+const possibleDistPaths = [
+  path.join(__dirname, 'public'),
+  path.join(__dirname, '../client/dist'),
+  path.join(__dirname, 'dist'),
+  path.join(__dirname, '../public'),
+];
+
+const distPath = possibleDistPaths.find(p => fs.existsSync(path.join(p, 'index.html')));
+
+if (distPath) {
+  console.log(`🌐 Serving frontend static files from: ${distPath}`);
+  app.use(express.static(distPath));
+
+  // Handle SPA routing for any non-API and non-upload route
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+      return next();
+    }
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+} else {
+  // Simple welcome message if frontend build is not found
+  app.get('/', (req, res) => {
+    res.json({ message: 'Aharada Education API is running successfully.' });
+  });
+}
 
 // Error handling middleware
 app.use((err, req, res, next) => {
