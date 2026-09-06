@@ -4,9 +4,9 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 // ── Cloudinary config ──────────────────────────────────────────────────────
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key:    process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'dprlzu2ns',
+  api_key:    String(process.env.CLOUDINARY_API_KEY || '124785717795421'),
+  api_secret: process.env.CLOUDINARY_API_SECRET || 'MrOGGkP7c9Lqome6_uZQoPNf8HA',
 });
 
 // ── Cloudinary storage for images ──────────────────────────────────────────
