@@ -134,26 +134,46 @@ export default function AdminFeedback() {
       {/* Stats Summary */}
       <div className="admin-stats-grid" style={{ marginBottom: '24px' }}>
         <div className="admin-stat-card">
-          <div className="admin-stat-value">{stats.total}</div>
-          <div className="admin-stat-label">Total Submissions</div>
+          <div className="admin-stat-icon" style={{ background: 'var(--primary-ultralight)', color: 'var(--primary)' }}>
+            <FiMessageSquare />
+          </div>
+          <div className="admin-stat-content">
+            <div className="admin-stat-value">{stats.total}</div>
+            <div className="admin-stat-label">Total Submissions</div>
+          </div>
         </div>
         <div className="admin-stat-card">
-          <div className="admin-stat-value" style={{ color: '#4338ca' }}>
-            {stats.new}
+          <div className="admin-stat-icon" style={{ background: '#eef2ff', color: '#4338ca' }}>
+            <FiClock />
           </div>
-          <div className="admin-stat-label">New / Unread</div>
+          <div className="admin-stat-content">
+            <div className="admin-stat-value" style={{ color: '#4338ca' }}>
+              {stats.new}
+            </div>
+            <div className="admin-stat-label">New / Unread</div>
+          </div>
         </div>
         <div className="admin-stat-card">
-          <div className="admin-stat-value" style={{ color: '#15803d' }}>
-            {stats.resolved}
+          <div className="admin-stat-icon" style={{ background: '#dcfce7', color: '#15803d' }}>
+            <FiCheckCircle />
           </div>
-          <div className="admin-stat-label">Resolved / Actioned</div>
+          <div className="admin-stat-content">
+            <div className="admin-stat-value" style={{ color: '#15803d' }}>
+              {stats.resolved}
+            </div>
+            <div className="admin-stat-label">Resolved / Actioned</div>
+          </div>
         </div>
         <div className="admin-stat-card">
-          <div className="admin-stat-value" style={{ color: '#eab308' }}>
-            ★ {stats.avgRating}
+          <div className="admin-stat-icon" style={{ background: '#fef3c7', color: '#b45309' }}>
+            <FiStar />
           </div>
-          <div className="admin-stat-label">Average Student Rating</div>
+          <div className="admin-stat-content">
+            <div className="admin-stat-value" style={{ color: '#b45309' }}>
+              ★ {stats.avgRating}
+            </div>
+            <div className="admin-stat-label">Average Student Rating</div>
+          </div>
         </div>
       </div>
 

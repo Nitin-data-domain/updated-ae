@@ -223,7 +223,7 @@ async function seedInitialData() {
       const sampleBooks = [
         {
           title: 'Introduction to Aviation Management & Airline Business',
-          academicYear: '1st Year',
+          academicYear: '2025-2026',
           courseName: 'BBA Aviation & Travel',
           subjectCode: 'AV-101',
           subjectName: 'Introduction to Aviation Management',
@@ -237,7 +237,7 @@ async function seedInitialData() {
         },
         {
           title: 'Aviation Meteorology & Air Navigation Handbook',
-          academicYear: '1st Year',
+          academicYear: '2025-2026',
           courseName: 'BBA Aviation & Travel',
           subjectCode: 'AV-102',
           subjectName: 'Aviation Meteorology & Navigation',
@@ -251,7 +251,7 @@ async function seedInitialData() {
         },
         {
           title: 'Airport Ground Handling & Cargo Logistics Guide',
-          academicYear: '2nd Year',
+          academicYear: '2026-2027',
           courseName: 'BBA Aviation & Travel',
           subjectCode: 'AV-201',
           subjectName: 'Airport Ground Handling & Cargo Operations',
@@ -265,7 +265,7 @@ async function seedInitialData() {
         },
         {
           title: 'Fluid Mechanics & Aerospace Thermodynamics',
-          academicYear: '1st Year',
+          academicYear: '2025-2026',
           courseName: 'B.Tech Aerospace Engineering',
           subjectCode: 'AERO-101',
           subjectName: 'Fluid Mechanics & Thermodynamics',
@@ -279,7 +279,7 @@ async function seedInitialData() {
         },
         {
           title: 'Aerodynamics I: Subsonic Flow & Airfoil Theory',
-          academicYear: '2nd Year',
+          academicYear: '2026-2027',
           courseName: 'B.Tech Aerospace Engineering',
           subjectCode: 'AERO-201',
           subjectName: 'Aerodynamics I',
@@ -293,7 +293,7 @@ async function seedInitialData() {
         },
         {
           title: 'Aircraft Propulsion & Gas Turbine Engineering',
-          academicYear: '3rd Year',
+          academicYear: '2025-2026',
           courseName: 'B.Tech Aerospace Engineering',
           subjectCode: 'AERO-301',
           subjectName: 'Aircraft Propulsion',
@@ -307,7 +307,7 @@ async function seedInitialData() {
         },
         {
           title: 'Principles of Aeronautical Science & DGCA Protocols',
-          academicYear: '1st Year',
+          academicYear: '2025-2026',
           courseName: 'B.Sc Aeronautical Science',
           subjectCode: 'AS-101',
           subjectName: 'Aeronautical Science Fundamentals',
@@ -321,7 +321,7 @@ async function seedInitialData() {
         },
         {
           title: 'Strategic Airline Economics & Yield Management',
-          academicYear: '1st Year',
+          academicYear: '2025-2026',
           courseName: 'MBA Aviation Management',
           subjectCode: 'MBA-AV-101',
           subjectName: 'Aviation Economics & Revenue Management',

@@ -48,7 +48,14 @@ const defaultCourses = [
   'Other Program / Certification',
 ]
 
-const academicYears = ['1st Year', '2nd Year', '3rd Year', '4th Year', 'Alumni / Completed']
+const academicYears = [
+  '2023-2024',
+  '2024-2025',
+  '2025-2026',
+  '2026-2027',
+  '2027-2028',
+  '2028-2029',
+]
 
 export default function StudentFeedback() {
   const [formData, setFormData] = useState({
@@ -57,7 +64,7 @@ export default function StudentFeedback() {
     phone: '',
     enrollmentNo: '',
     courseName: 'BBA Aviation & Travel',
-    academicYear: '1st Year',
+    academicYear: '2025-2026',
     category: 'academics',
     rating: 5,
     message: '',
@@ -120,7 +127,7 @@ export default function StudentFeedback() {
       phone: '',
       enrollmentNo: '',
       courseName: 'BBA Aviation & Travel',
-      academicYear: '1st Year',
+      academicYear: '2025-2026',
       category: 'academics',
       rating: 5,
       message: '',

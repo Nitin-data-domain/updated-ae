@@ -11,6 +11,7 @@ import {
   FiLink,
   FiX,
   FiCheck,
+  FiCheckCircle,
   FiFileText,
   FiFilter,
 } from 'react-icons/fi'
@@ -27,7 +28,14 @@ const courseOptions = [
   'Bachelor in Fine Arts',
 ]
 
-const yearOptions = ['1st Year', '2nd Year', '3rd Year', '4th Year']
+const yearOptions = [
+  '2023-2024',
+  '2024-2025',
+  '2025-2026',
+  '2026-2027',
+  '2027-2028',
+  '2028-2029',
+]
 
 export default function AdminBooks() {
   const [books, setBooks] = useState([])
@@ -48,7 +56,7 @@ export default function AdminBooks() {
   // Form state
   const [form, setForm] = useState({
     title: '',
-    academicYear: '1st Year',
+    academicYear: '2025-2026',
     courseName: 'BBA Aviation & Travel',
     subjectCode: '',
     subjectName: '',
@@ -87,7 +95,7 @@ export default function AdminBooks() {
     setUploadType('url')
     setForm({
       title: '',
-      academicYear: '1st Year',
+      academicYear: '2025-2026',
       courseName: 'BBA Aviation & Travel',
       subjectCode: '',
       subjectName: '',
@@ -108,7 +116,7 @@ export default function AdminBooks() {
     setUploadType('url')
     setForm({
       title: book.title || '',
-      academicYear: book.academicYear || '1st Year',
+      academicYear: book.academicYear || '2025-2026',
       courseName: book.courseName || 'BBA Aviation & Travel',
       subjectCode: book.subjectCode || '',
       subjectName: book.subjectName || '',
@@ -238,20 +246,35 @@ export default function AdminBooks() {
       {/* Stats Cards */}
       <div className="admin-stats-grid" style={{ marginBottom: '24px' }}>
         <div className="admin-stat-card">
-          <div className="admin-stat-value">{books.length}</div>
-          <div className="admin-stat-label">Total Books in Library</div>
+          <div className="admin-stat-icon" style={{ background: 'var(--primary-ultralight)', color: 'var(--primary)' }}>
+            <FiBookOpen />
+          </div>
+          <div className="admin-stat-content">
+            <div className="admin-stat-value">{books.length}</div>
+            <div className="admin-stat-label">Total Books in Library</div>
+          </div>
         </div>
         <div className="admin-stat-card">
-          <div className="admin-stat-value" style={{ color: 'var(--accent)' }}>
-            {totalDownloads}
+          <div className="admin-stat-icon" style={{ background: '#fef3c7', color: 'var(--accent)' }}>
+            <FiDownload />
           </div>
-          <div className="admin-stat-label">Total Student Downloads</div>
+          <div className="admin-stat-content">
+            <div className="admin-stat-value" style={{ color: 'var(--accent)' }}>
+              {totalDownloads}
+            </div>
+            <div className="admin-stat-label">Total Student Downloads</div>
+          </div>
         </div>
         <div className="admin-stat-card">
-          <div className="admin-stat-value" style={{ color: 'var(--success)' }}>
-            {books.filter((b) => b.isActive).length}
+          <div className="admin-stat-icon" style={{ background: '#e6f7ed', color: 'var(--success)' }}>
+            <FiCheckCircle />
           </div>
-          <div className="admin-stat-label">Active &amp; Published</div>
+          <div className="admin-stat-content">
+            <div className="admin-stat-value" style={{ color: 'var(--success)' }}>
+              {books.filter((b) => b.isActive).length}
+            </div>
+            <div className="admin-stat-label">Active &amp; Published</div>
+          </div>
         </div>
       </div>
 
@@ -583,14 +606,15 @@ export default function AdminBooks() {
                 )}
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '12px', padding: '12px 16px', background: 'var(--gray-50)', borderRadius: '8px', border: '1px solid var(--gray-200)' }}>
                 <input
                   type="checkbox"
                   id="isActiveBook"
                   checked={form.isActive}
                   onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
+                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                 />
-                <label htmlFor="isActiveBook" style={{ margin: 0, cursor: 'pointer' }}>
+                <label htmlFor="isActiveBook" style={{ margin: 0, cursor: 'pointer', fontSize: '0.9rem', fontWeight: 600, color: 'var(--navy)' }}>
                   Publish &amp; make visible in Digital Library
                 </label>
               </div>
