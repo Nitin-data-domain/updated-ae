@@ -17,30 +17,46 @@ const app = express();
 // Middleware
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
+  crossOriginOpenerPolicy: false,
   contentSecurityPolicy: false,
   frameguard: false,
 }));
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (Postman, curl, server-to-server)
-    if (!origin) return callback(null, true);
-    // Allow any *.vercel.app subdomain or specific production domains
-    const allowed = [
-      /\.vercel\.app$/,
-      /^http:\/\/localhost:\d+$/,
-      'https://www.aharadaedu.com',
-      'https://aharadaedu.com',
-      'http://www.aharadaedu.com',
-      'http://aharadaedu.com',
-    ];
-    // Also allow CLIENT_URL env var if set
-    if (process.env.CLIENT_URL) allowed.push(process.env.CLIENT_URL);
-    const isAllowed = allowed.some(pattern =>
-      typeof pattern === 'string' ? pattern === origin : pattern.test(origin)
-    );
-    callback(isAllowed ? null : new Error('Not allowed by CORS'), isAllowed);
-  },
-  credentials: true,
+app.use(cors((req, callback) => {
+  const origin = req.header('Origin');
+  // Allow requests with no origin (Postman, curl, server-to-server)
+  if (!origin) {
+    return callback(null, { origin: true, credentials: true });
+  }
+
+  const host = req.header('Host');
+  // Check if request is from same host (e.g. preview domain or custom domain)
+  const isSameHost = host && origin.replace(/^https?:\/\//, '').split(':')[0] === host.split(':')[0];
+
+  // Allow Vercel, GoDaddy / Airo preview domains, and production domains
+  const allowed = [
+    /\.vercel\.app$/,
+    /\.airoapp\.ai$/,
+    /\.godaddy\.com$/,
+    /\.godaddysites\.com$/,
+    /^http:\/\/localhost:\d+$/,
+    'https://www.aharadaedu.com',
+    'https://aharadaedu.com',
+    'http://www.aharadaedu.com',
+    'http://aharadaedu.com',
+  ];
+
+  // Also allow CLIENT_URL env var if set
+  if (process.env.CLIENT_URL) allowed.push(process.env.CLIENT_URL);
+
+  const isAllowed = isSameHost || allowed.some(pattern =>
+    typeof pattern === 'string' ? pattern === origin : pattern.test(origin)
+  );
+
+  // Return origin boolean/string without passing Error to prevent crashing static assets or unlisted origins with 500
+  callback(null, {
+    origin: isAllowed ? origin : false,
+    credentials: true,
+  });
 }));
 app.use(morgan('dev'));
 app.use(express.json());
