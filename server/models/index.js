@@ -9,6 +9,7 @@ const Brochure = require('./Brochure');
 const OTP = require('./OTP');
 const Book = require('./Book');
 const Feedback = require('./Feedback');
+const FacultyRole = require('./FacultyRole');
 const { CampusPhoto, CompanyPartner } = require('./SiteContent');
 
 // Define Associations
@@ -58,9 +59,7 @@ async function seedInitialData() {
         category: ['aviation'],
         universities: [
           { name: 'IIMT University', slug: 'iimt' },
-          { name: 'Future University', slug: 'future' },
-          { name: 'Subharti University', slug: 'subharti' },
-          { name: 'Sage University', slug: 'sage' }
+          { name: 'Subharti University', slug: 'subharti' }
         ],
         careerOpportunities: ['Airline Operations Manager', 'Airport Ground Staff Manager', 'Travel Agency Manager', 'Cargo Operations Executive', 'Flight Operations Coordinator', 'Aviation Sales & Marketing Manager', 'Tourism Officer', 'Hospitality Manager'],
         industryExposure: ['Airport visits and live operations training', 'Airline management internships', 'Guest lectures by aviation industry leaders', 'Travel agency operational projects', 'International aviation conference participation'],
@@ -77,7 +76,6 @@ async function seedInitialData() {
         category: ['engineering'],
         universities: [
           { name: 'IIMT University', slug: 'iimt' },
-          { name: 'Future University', slug: 'future' },
           { name: 'Subharti University', slug: 'subharti' }
         ],
         careerOpportunities: ['Aerospace Design Engineer', 'Aircraft Maintenance Engineer', 'Avionics Systems Engineer', 'Propulsion Engineer', 'Space Research Scientist (ISRO/DRDO)', 'Quality Assurance Engineer', 'Flight Test Engineer', 'UAV/Drone Technology Specialist'],
@@ -110,8 +108,7 @@ async function seedInitialData() {
         duration: '2 Years (4 Semesters)',
         category: ['management'],
         universities: [
-          { name: 'IIMT University', slug: 'iimt' },
-          { name: 'Future University', slug: 'future' }
+          { name: 'IIMT University', slug: 'iimt' }
         ],
         careerOpportunities: ['Aviation Business Consultant', 'Airport Operations Director', 'Airline Strategy Manager', 'Aviation Finance Manager', 'Air Cargo Business Head', 'MRO Business Manager', 'Aviation Policy Analyst', 'Airport Commercial Manager'],
         industryExposure: ['C-suite mentorship from airline executives', 'International airport management case studies', 'Aviation business plan competitions', 'Global aviation industry conference participation', 'Strategic consulting projects with airlines'],
@@ -187,12 +184,163 @@ async function seedInitialData() {
 
     // Faculty
     const faculty = [
-      { name: 'Dr. Rajesh Kumar Singh', designation: 'Professor & Head - Aviation Studies', qualification: 'Ph.D. in Aviation Management, MBA', experience: '18 years in Aviation Industry & Academia', specialization: 'Airline Operations & Airport Management', bio: 'Former operations manager at a major Indian airline with extensive experience in airport ground operations and airline strategy.', order: 1 },
-      { name: 'Dr. Priya Sharma', designation: 'Associate Professor - Aerospace Engineering', qualification: 'Ph.D. in Aerospace Engineering, M.Tech', experience: '15 years in Aerospace R&D & Teaching', specialization: 'Aerodynamics & Propulsion Systems', bio: 'Research scientist with publications in leading aerospace journals and experience at DRDO and NAL.', order: 2 },
-      { name: 'Prof. Amit Verma', designation: 'Professor - Entrepreneurship', qualification: 'MBA, Certified Business Coach', experience: '12 years in Startups & Business Mentoring', specialization: 'Startup Strategy & Venture Capital', bio: 'Founded two successful startups and mentored over 50 student ventures. Angel investor and TEDx speaker.', order: 3 },
-      { name: 'Capt. Vikram Malhotra (Retd.)', designation: 'Senior Instructor - Aviation Science', qualification: 'ATPL, B.Sc Aviation, DGCA Certified', experience: '22 years as Commercial Airline Pilot', specialization: 'Flight Operations & Aviation Safety', bio: 'Retired captain with 15,000+ flying hours. Specialist in flight safety, CRM, and aviation regulations.', order: 4 },
-      { name: 'Dr. Sneha Patel', designation: 'Assistant Professor - Management Studies', qualification: 'Ph.D. in Business Administration, NET Qualified', experience: '10 years in Academia & Corporate Training', specialization: 'Aviation Finance & Marketing', bio: 'Corporate trainer turned academician with expertise in aviation marketing strategies and airline economics.', order: 5 },
-      { name: 'Prof. Mohammed Irfan', designation: 'Associate Professor - Technology', qualification: 'M.Tech in Avionics, B.E. Electronics', experience: '14 years in Avionics Systems', specialization: 'Avionics & Navigation Systems', bio: 'Former avionics engineer at HAL with expertise in aircraft electronics, radar systems, and modern CNS/ATM.', order: 6 },
+      {
+        name: 'Prof. (Dr.) Amitabh Sen',
+        designation: 'Head of Department (HOD) - Aeronautical & Aerospace Engineering',
+        qualification: 'Ph.D. in Aeronautical Engineering (IIT Bombay), M.Tech (Aerospace), DGCA Certified',
+        experience: '22 years in Aerospace Engineering & Academic Administration',
+        specialization: 'Hypersonic Aerodynamics, Aircraft Structural Dynamics & Space Propulsion',
+        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&auto=format&fit=crop&q=80',
+        bio: 'Leading the Aerospace & Aeronautical Engineering Department at Aharada Education. Former senior scientist at DRDO and advisor for commercial aerospace research initiatives.',
+        rolesAndResponsibilities: `• Academic & Strategic Leadership of the Department of Aerospace Engineering
+• Oversight of DGCA & AICTE compliant aeronautical curriculum development and laboratory upgrades
+• Direct supervision of Flight Simulator & Wind Tunnel research facilities
+• Industry collaboration with DRDO, HAL, ISRO, and global aerospace defense cells
+• Guiding M.Tech & Ph.D. research scholars in hypersonic flows, CFD modeling, and space systems
+• Steering faculty development programs, academic audits, and institutional accreditation`,
+        order: 1
+      },
+      {
+        name: 'Dr. Rajesh Kumar Singh',
+        designation: 'Professor & Head - Aviation Studies',
+        qualification: 'Ph.D. in Aviation Management, MBA',
+        experience: '18 years in Aviation Industry & Academia',
+        specialization: 'Airline Operations & Airport Management',
+        image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=800&auto=format&fit=crop&q=80',
+        bio: 'Former operations manager at a major Indian airline with extensive experience in airport ground operations and airline strategy.',
+        rolesAndResponsibilities: `• Department Head for Aviation Management, Airport Economics, and Air Cargo Studies
+• Academic coordination of undergraduate and postgraduate aviation management programs
+• Chair of Student Academic Grievance, Ethics & Mentorship Committee
+• Industry immersion liaison with commercial airlines, GMR, and Adani Airport operators
+• Executive workshops on air freight logistics, airline revenue management, and fleet scheduling`,
+        order: 2
+      },
+      {
+        name: 'Dr. Priya Sharma',
+        designation: 'Associate Professor - Aerospace Engineering',
+        qualification: 'Ph.D. in Aerospace Engineering, M.Tech',
+        experience: '15 years in Aerospace R&D & Teaching',
+        specialization: 'Aerodynamics & Propulsion Systems',
+        image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80',
+        bio: 'Research scientist with publications in leading aerospace journals and experience at DRDO and NAL.',
+        rolesAndResponsibilities: `• Course coordinator for Aerodynamics, Flight Dynamics, and Gas Turbine Propulsion
+• Laboratory In-Charge for Subsonic Wind Tunnel and Flow Visualization facilities
+• Research supervisor for student aerodynamic modeling and UAV drag reduction projects
+• Academic audit, mid-term evaluations, and continuous internal assessment management`,
+        order: 3
+      },
+      {
+        name: 'Prof. Amit Verma',
+        designation: 'Professor - Entrepreneurship',
+        qualification: 'MBA, Certified Business Coach',
+        experience: '12 years in Startups & Business Mentoring',
+        specialization: 'Startup Strategy & Venture Capital',
+        image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&auto=format&fit=crop&q=80',
+        bio: 'Founded two successful startups and mentored over 50 student ventures. Angel investor and TEDx speaker.',
+        rolesAndResponsibilities: `• Director of the Aharada Aviation & Aerospace Incubation Hub
+• Mentoring student startups in drone delivery, aviation tech, and charter services
+• Organizing Annual Angel Investor Pitch Sessions and Venture Capital networking
+• Business plan development, intellectual property advisory, and seed grant management`,
+        order: 4
+      },
+      {
+        name: 'Capt. Vikram Malhotra (Retd.)',
+        designation: 'Senior Instructor - Aviation Science',
+        qualification: 'ATPL, B.Sc Aviation, DGCA Certified',
+        experience: '22 years as Commercial Airline Pilot',
+        specialization: 'Flight Operations & Aviation Safety',
+        image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=800&auto=format&fit=crop&q=80',
+        bio: 'Retired captain with 15,000+ flying hours. Specialist in flight safety, CRM, and aviation regulations.',
+        rolesAndResponsibilities: `• Lead Ground Instructor for Commercial Pilot License (CPL) and Instrument Rating (IR)
+• Instruction in DGCA Air Regulations, Aviation Meteorology, and Radio Telephony
+• Cockpit Resource Management (CRM) and Line-Oriented Flight Training (LOFT) workshops
+• Pilot career counseling and interview preparation for major international carriers`,
+        order: 5
+      },
+      {
+        name: 'Capt. Meenakshi Sundaram',
+        designation: 'Chief Flight Instructor & Head - Pilot Ground Training',
+        qualification: 'ATPL (Airline Transport Pilot License), B.Sc Aviation Science, DGCA Ground Instructor',
+        experience: '16 years in Commercial Aviation (Ex-Air India Commander, 12,000+ flight hours)',
+        specialization: 'Multi-Crew Cooperation (MCC), Cockpit Resource Management (CRM) & Flight Navigation',
+        image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop&q=80',
+        bio: 'Senior airline commander and certified DGCA ground instructor guiding aspiring aviators through instrument rating, navigation, and commercial pilot licensure.',
+        rolesAndResponsibilities: `• Department Leadership for Pilot Ground School and Aviation Flight Sciences
+• In-charge of Multi-Engine & Instrument Rating syllabus alignment with DGCA standards
+• Conducting advanced flight simulator debriefings and emergency procedure drills
+• Coordination with domestic flying clubs and flying training organizations (FTOs)`,
+        order: 6
+      },
+      {
+        name: 'Dr. Sneha Patel',
+        designation: 'Assistant Professor - Management Studies',
+        qualification: 'Ph.D. in Business Administration, NET Qualified',
+        experience: '10 years in Academia & Corporate Training',
+        specialization: 'Aviation Finance & Marketing',
+        image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&auto=format&fit=crop&q=80',
+        bio: 'Corporate trainer turned academician with expertise in aviation marketing strategies and airline economics.',
+        rolesAndResponsibilities: `• Teaching Airline Marketing, Aviation Finance, and Consumer Behavior in Travel
+• Coordinator for Student Industry Internships and Live Corporate Projects
+• Class mentor for BBA & MBA Aviation batches
+• Managing guest lecture series with senior aviation executives`,
+        order: 7
+      },
+      {
+        name: 'Dr. Arvind Swaminathan',
+        designation: 'Associate Professor - Avionics & Satellite Navigation',
+        qualification: 'Ph.D. in Avionics & Telecommunications, M.Tech (Satellite Communications)',
+        experience: '14 years in Radar Telemetry & NextGen Avionics',
+        specialization: 'Fly-By-Wire Flight Controls, ADS-B Systems, Radar & Satellite Navigation',
+        image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&auto=format&fit=crop&q=80',
+        bio: 'Former satellite telemetry specialist with ISRO payload teams. Conducts research and practical training on modern CNS/ATM systems and glass cockpit avionics.',
+        rolesAndResponsibilities: `• Academic coordinator for Aircraft Avionics, Fly-By-Wire systems, and Radar Telemetry
+• Managing NextGen CNS/ATM (Communication, Navigation, Surveillance / Air Traffic Management) lab
+• Guiding student projects in ADS-B tracking and satellite communications
+• In-charge of Departmental Technical Symposiums and IEEE Aerospace student chapter`,
+        order: 8
+      },
+      {
+        name: 'Prof. Mohammed Irfan',
+        designation: 'Associate Professor - Technology',
+        qualification: 'M.Tech in Avionics, B.E. Electronics',
+        experience: '14 years in Avionics Systems',
+        specialization: 'Avionics & Navigation Systems',
+        image: 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=800&auto=format&fit=crop&q=80',
+        bio: 'Former avionics engineer at HAL with expertise in aircraft electronics, radar systems, and modern CNS/ATM.',
+        rolesAndResponsibilities: `• In-charge of Avionics Hardware Laboratories, Digital Circuits, and Microcontroller Systems
+• Practical training on aircraft wiring standards, radio altimeters, and glass cockpit displays
+• Supervision of laboratory safety protocols and electronic test bench calibration
+• Student mentoring for national hackathons and robotics competitions`,
+        order: 9
+      },
+      {
+        name: 'Prof. Sunita Deshmukh',
+        designation: 'Assistant Professor - Airport Operations & Airline Ground Services',
+        qualification: 'MBA in Aviation Management, IATA Certified Ground Handling & Ramp Safety',
+        experience: '11 years in Airport Ramp Operations & Passenger Logistics',
+        specialization: 'Airport Terminal Operations, Air Cargo Handling & Passenger Services',
+        image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=800&auto=format&fit=crop&q=80',
+        bio: 'Over a decade of direct airline operations experience with Singapore Airlines and DIAL. Mentors students in airline customer experience and ramp safety standards.',
+        rolesAndResponsibilities: `• Course lead for Airport Terminal Operations, Ramp Safety Management, and Air Cargo Handling
+• IATA certification preparation modules and Dangerous Goods Regulations (DGR) instruction
+• Organizing on-site study visits to Indira Gandhi International Airport (IGI)
+• Coordinator for campus recruitment drives with airline ground handling agencies`,
+        order: 10
+      },
+      {
+        name: 'Er. Devendra Pratap Verma',
+        designation: 'Senior Technical Officer & Flight Simulator Instructor',
+        qualification: 'B.Tech Aerospace, EASA & DGCA Approved Simulator Systems Specialist',
+        experience: '9 years in Flight Simulator Maintenance & Flight Dynamics Prototyping',
+        specialization: 'Full Flight Simulators (FFS), Drone Telemetry & Wind Tunnel Diagnostics',
+        image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800&auto=format&fit=crop&q=80',
+        bio: 'Oversees Aharada\'s high-fidelity flight simulation laboratory and drone prototyping facility. Coordinates live wind-tunnel data acquisition practicals.',
+        rolesAndResponsibilities: `• Technical management and maintenance of Level-D Full Flight Simulators (FFS)
+• Practical flight dynamics simulation exercises and flight envelope expansion labs
+• In-charge of the Drone Testing and Rapid Prototyping Workshop
+• Equipment maintenance, safety audits, and simulator software updates`,
+        order: 11
+      }
     ];
     await Faculty.bulkCreate(faculty);
 
@@ -338,6 +486,141 @@ async function seedInitialData() {
       console.log('   ✅ Seeded sample library books.');
     }
 
+    // Seed sample faculty roles and responsibilities if empty
+    const roleCount = await FacultyRole.count();
+    if (roleCount === 0) {
+      const sampleRoles = [
+        {
+          title: 'Teaching Excellence & Curriculum Delivery',
+          designationLevel: 'All Faculty Members',
+          category: 'Teaching & Curriculum',
+          icon: 'FiBookOpen',
+          summary: 'Design, plan, and deliver industry-aligned academic sessions in aviation, aerospace engineering, technology, management, and creative arts with measurable learning outcomes.',
+          responsibilities: [
+            'Prepare comprehensive course lesson plans, syllabi trackers, and learning resources prior to semester commencement.',
+            'Deliver interactive classroom lectures utilizing modern pedagogic tools, aviation case studies, and digital simulations.',
+            'Align academic course modules with UGC, DGCA, and partnering university curriculum standards.',
+            'Maintain structured records of student attendance, continuous internal evaluations (CIE), and term progress.',
+            'Conduct regular remedial sessions and academic clinic hours for students needing additional conceptual clarity.'
+          ],
+          expectations: [
+            '100% on-time syllabus completion with verifiable course completion logs',
+            'Maintenance of updated course files, lecture notes, and digital study materials',
+            'Minimum 85% average student satisfaction feedback across all assigned courses'
+          ],
+          order: 1,
+          isActive: true,
+        },
+        {
+          title: 'Aviation, Simulator & Laboratory Practical Training',
+          designationLevel: 'Technical Instructors & Lab Faculty',
+          category: 'Practical & Lab Training',
+          icon: 'FiCpu',
+          summary: 'Supervise and lead hands-on laboratory sessions, wind tunnel testing, drone prototyping, flight simulator modules, and technical workshops.',
+          responsibilities: [
+            'Ensure 100% adherence to lab safety protocols, equipment calibration, and standard operating procedures (SOPs).',
+            'Demonstrate live equipment operations, avionics telemetry systems, and computer-aided design (CAD/CFD) simulations.',
+            'Guide undergraduate and postgraduate students through capstone engineering projects and experimental thesis work.',
+            'Maintain logbooks, consumable inventory, safety equipment, and flight simulator run-time records.',
+            'Coordinate with airport hangars and DGCA-approved maintenance organizations (MROs) for live component exposure.'
+          ],
+          expectations: [
+            'Zero safety incidents across all engineering and avionics practical sessions',
+            'Regular preventative maintenance and calibration logs for all simulator systems',
+            'High-quality project prototypes suitable for national design competitions'
+          ],
+          order: 2,
+          isActive: true,
+        },
+        {
+          title: 'Student Mentorship, Welfare & Career Guidance',
+          designationLevel: 'Class Coordinators & Faculty Mentors',
+          category: 'Student Mentorship',
+          icon: 'FiUsers',
+          summary: 'Act as personal mentors and academic guides to empower students, monitor academic progression, resolve grievances, and foster career clarity.',
+          responsibilities: [
+            'Conduct bi-weekly proctoring and 1-on-1 mentorship meetings with assigned student batches.',
+            'Monitor individual student attendance, identify early academic warning signs, and communicate with guardians proactively.',
+            'Provide specialized counseling for competitive exams, aviation licenses, higher studies, and corporate recruitment.',
+            'Address student academic grievances promptly and liaise with the Student Grievance & Academic Feedback Desk.',
+            'Foster an inclusive, supportive, and psychologically safe learning environment on campus.'
+          ],
+          expectations: [
+            'Documented mentorship interaction logs for all assigned mentees each semester',
+            'Timely intervention for students falling below 75% attendance thresholds',
+            'Cohesive liaison between parents, academic chairs, and student welfare bodies'
+          ],
+          order: 3,
+          isActive: true,
+        },
+        {
+          title: 'Industry Immersion, Internships & Corporate Liaison',
+          designationLevel: 'Industry Liaison Faculty & Professors',
+          category: 'Industry Collaboration',
+          icon: 'FiBriefcase',
+          summary: 'Bridge academia and the aviation industry by coordinating live airline visits, guest masterclasses, student internships, and corporate capstone projects.',
+          responsibilities: [
+            'Facilitate industry study tours to international airports (IGI Delhi, Jewar), airline maintenance bases, and cargo terminals.',
+            'Invite C-suite aviation executives, airline captains, and defense scientists for guest lectures and leadership summits.',
+            'Liaise with airline and corporate recruitment partners (IndiGo, Air India, Boeing, Airbus) for internship placements.',
+            'Supervise student summer internships, ensure corporate mentor evaluation sheets, and review final internship reports.',
+            'Track emerging aerospace trends (eVTOL, sustainable aviation fuels, AI in ATC) and infuse insights into classroom discussions.'
+          ],
+          expectations: [
+            'Minimum 2 industry expert masterclasses organized per academic semester',
+            '100% internship placement coordination for eligible students in assigned programs',
+            'Active MoU collaborations and joint technical training workshops with corporate partners'
+          ],
+          order: 4,
+          isActive: true,
+        },
+        {
+          title: 'Examination, Assessment & Academic Integrity',
+          designationLevel: 'Course Instructors & Exam Committee',
+          category: 'Governance & Exams',
+          icon: 'FiCheckCircle',
+          summary: 'Uphold the highest standards of academic integrity through transparent evaluation, robust paper setting, invigilation, and timely assessment.',
+          responsibilities: [
+            'Formulate balanced, objective examination question papers aligned with Bloom\'s Taxonomy and course outcomes.',
+            'Conduct diligent examination invigilation, upholding zero-tolerance policies toward unfair means and malpractice.',
+            'Evaluate answer scripts, assignments, and capstone presentations fairly and transparently within institutional deadlines.',
+            'Publish continuous evaluation marks and provide constructive feedback to students to guide performance improvement.',
+            'Coordinate with university examination branches (IIMT, Subharti) for end-term score tabulation and grade moderation.'
+          ],
+          expectations: [
+            'Submission of all internal assessment grades within 7 days of examination completion',
+            'Zero compliance discrepancies in university grade moderation audits',
+            'Strict adherence to standardized marking rubrics and transparent scoring keys'
+          ],
+          order: 5,
+          isActive: true,
+        },
+        {
+          title: 'Institutional Leadership, Accreditation & Research',
+          designationLevel: 'Professors & Academic Committee Chairs',
+          category: 'Leadership & Governance',
+          icon: 'FiAward',
+          summary: 'Drive institutional advancement through peer-reviewed research publications, committee leadership, university accreditation processes, and faculty development.',
+          responsibilities: [
+            'Publish research articles in Scopus / Web of Science / UGC-CARE indexed aerospace and management journals.',
+            'Contribute to university accreditation preparations, academic audits, and statutory regulatory filings.',
+            'Participate in Board of Studies (BOS) meetings, curriculum restructuring committees, and academic council discussions.',
+            'Mentor junior faculty members in research methodology, classroom management, and innovative instructional tech.',
+            'Organize national and international academic conferences, aerospace hackathons, and industry symposiums.'
+          ],
+          expectations: [
+            'Publication of at least 1 quality research paper or case study per academic year',
+            'Active membership in at least 2 institutional administrative or academic committees',
+            'Participation in Faculty Development Programs (FDPs) and continuous pedagogy workshops'
+          ],
+          order: 6,
+          isActive: true,
+        }
+      ];
+      await FacultyRole.bulkCreate(sampleRoles);
+      console.log('   ✅ Seeded sample faculty roles & responsibilities.');
+    }
+
     console.log('✅ Initial database check & seed completed successfully!');
   } catch (error) {
     console.error('Initial database seed error:', error);
@@ -355,6 +638,7 @@ module.exports = {
   OTP,
   Book,
   Feedback,
+  FacultyRole,
   CampusPhoto,
   CompanyPartner,
   syncModels,

@@ -446,19 +446,28 @@ export default function ProgramDetail() {
                 <p>{program.duration}</p>
               </div>
 
-              {program.universities && program.universities.length > 0 && (
-                <div className="pd-sidebar-card">
-                  <h3><FiBookOpen size={18} /> Available At</h3>
-                  <div className="pd-sidebar-unis">
-                    {program.universities.map((u, i) => (
-                      <div key={i} className="pd-sidebar-uni">
-                        <div className="pd-uni-dot" />
-                        {u.name}
-                      </div>
-                    ))}
+              {(() => {
+                const excludedUnis = ['sage university', 'future university', 'sage', 'future']
+                const displayedUnis = (program.universities || []).filter(u => {
+                  const name = (typeof u === 'object' ? u.name : u) || ''
+                  const slug = (typeof u === 'object' ? u.slug : '') || ''
+                  return !excludedUnis.includes(name.toLowerCase().trim()) && !excludedUnis.includes(slug.toLowerCase().trim())
+                })
+                if (!displayedUnis.length) return null
+                return (
+                  <div className="pd-sidebar-card">
+                    <h3><FiBookOpen size={18} /> Available At</h3>
+                    <div className="pd-sidebar-unis">
+                      {displayedUnis.map((u, i) => (
+                        <div key={i} className="pd-sidebar-uni">
+                          <div className="pd-uni-dot" />
+                          {typeof u === 'object' ? u.name : u}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )
+              })()}
 
               {/* CTA */}
               <div className="pd-sidebar-cta">

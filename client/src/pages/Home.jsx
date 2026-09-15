@@ -25,15 +25,13 @@ import campusClassroom from '../assets/campus-classroom.jpg'
 import campusGroupStudy from '../assets/campus-group-study.jpg'
 import iimtLogo from '../assets/iimt-logo.png'
 import subhartiLogo from '../assets/subharti-logo.png'
-import futureLogo from '../assets/future-logo.png'
-import sageLogo from '../assets/sage-logo.jpg'
 import './Home.css'
 
 const stats = [
   { icon: <FiUsers size={22} />, value: '1000+', label: 'Students Placed' },
   { icon: <FiAward size={22} />, value: '6+', label: 'Years of Excellence' },
   { icon: <FiBriefcase size={22} />, value: '25+', label: 'Industry Partners' },
-  { icon: <FiGlobe size={22} />, value: '4', label: 'Partner Universities' },
+  { icon: <FiGlobe size={22} />, value: '2', label: 'Partner Universities' },
 ]
 
 const whyChoose = [
@@ -42,14 +40,12 @@ const whyChoose = [
   { title: 'Expert Faculty', desc: 'Learn from retired airline captains, aerospace scientists, and seasoned business professionals.', icon: <HiAcademicCap size={28} /> },
   { title: 'Airport & Airline Exposure', desc: 'Regular visits to international airports, airlines, and MRO facilities for hands-on learning.', icon: <FiNavigation size={28} /> },
   { title: 'Modern Infrastructure', desc: 'State-of-the-art labs, flight simulators, and innovation centers for immersive education.', icon: <FiCpu size={28} /> },
-  { title: 'Multi-University Network', desc: 'Programs offered through 4 prestigious partner universities for maximum flexibility and reach.', icon: <FiLayers size={28} /> },
+  { title: 'Multi-University Network', desc: 'Programs offered through 2 prestigious partner universities for maximum flexibility and reach.', icon: <FiLayers size={28} /> },
 ]
 
 const universities = [
   { name: 'IIMT University', defaultPrograms: 9, location: 'Meerut, UP', established: '2002', logo: iimtLogo },
-  { name: 'Future University', defaultPrograms: 3, location: 'Bareilly, UP', established: '2010', logo: futureLogo },
   { name: 'Subharti University', defaultPrograms: 3, location: 'Meerut, UP', established: '2008', logo: subhartiLogo },
-  { name: 'Sage University', defaultPrograms: 1, location: 'Indore, MP', established: '2015', logo: sageLogo },
 ]
 
 // Airline/Company partners (static)
@@ -331,8 +327,8 @@ export default function Home() {
                 transition={{ delay: i * 0.12, type: 'spring', stiffness: 100 }}
                 whileHover={{ y: -8, scale: 1.02 }}
               >
-                <div className="uni-logo-placeholder" style={uni.logo ? { background: 'transparent', width: '100%', height: uni.name === 'Sage University' ? '100px' : '80px', borderRadius: '0', display: 'flex', alignItems: 'center', justifyContent: 'center' } : {}}>
-                  {uni.logo ? <img src={uni.logo} alt={uni.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', transform: uni.name === 'Sage University' ? 'scale(1.4)' : 'none' }} /> : <HiAcademicCap size={36} />}
+                <div className="uni-logo-placeholder" style={uni.logo ? { background: 'transparent', width: '100%', height: '80px', borderRadius: '0', display: 'flex', alignItems: 'center', justifyContent: 'center' } : {}}>
+                  {uni.logo ? <img src={uni.logo} alt={uni.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} /> : <HiAcademicCap size={36} />}
                 </div>
                 <h3>{uni.name}</h3>
                 <div className="uni-meta">

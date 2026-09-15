@@ -58,17 +58,17 @@ export default function Footer() {
               <ul className="footer-links">
                 <li><Link to="/library">Digital Library (Books)</Link></li>
                 <li><Link to="/feedback">Student Feedback Form</Link></li>
+                <li><Link to="/grievance">Student Grievance</Link></li>
                 <li><Link to="/admissions">Admission Enquiry</Link></li>
                 <li><Link to="/faculty">Our Faculty</Link></li>
+                <li><Link to="/faculty-roles">Faculty Roles & Responsibilities</Link></li>
                 <li><Link to="/events">Events</Link></li>
                 <li><Link to="/contact">Contact Us</Link></li>
               </ul>
               <h4 className="footer-heading" style={{ marginTop: '24px' }}>Partner Universities</h4>
               <ul className="footer-links">
                 <li><span>IIMT University</span></li>
-                <li><span>Future University</span></li>
                 <li><span>Subharti University</span></li>
-                <li><span>Sage University</span></li>
               </ul>
             </div>
 
@@ -99,6 +99,8 @@ export default function Footer() {
           <div className="footer-bottom-links">
             <Link to="/library">Digital Library</Link>
             <Link to="/feedback">Student Feedback</Link>
+            <Link to="/grievance">Student Grievance</Link>
+            <Link to="/faculty-roles">Faculty Roles</Link>
             <Link to="/privacy-policy">Privacy Policy</Link>
             <a href="#">Terms of Service</a>
           </div>

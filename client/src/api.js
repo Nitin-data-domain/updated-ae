@@ -152,5 +152,12 @@ export const getFeedbackStats = () => api.get('/feedback/stats');
 export const updateFeedbackStatus = (id, status) => api.put(`/feedback/${id}/status`, { status });
 export const deleteFeedback = (id) => api.delete(`/feedback/${id}`);
 
+// Faculty Roles & Responsibilities
+export const getFacultyRoles = () => api.get('/faculty-roles');
+export const getAllFacultyRolesAdmin = () => api.get('/faculty-roles/admin');
+export const createFacultyRole = (data) => api.post('/faculty-roles', data);
+export const updateFacultyRole = (id, data) => api.put(`/faculty-roles/${id}`, data);
+export const deleteFacultyRole = (id) => api.delete(`/faculty-roles/${id}`);
+
 export default api;
 

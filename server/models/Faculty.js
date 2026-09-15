@@ -56,6 +56,10 @@ Faculty.init(
       type: DataTypes.TEXT,
       defaultValue: '',
     },
+    rolesAndResponsibilities: {
+      type: DataTypes.TEXT,
+      defaultValue: '',
+    },
     order: {
       type: DataTypes.INTEGER,
       defaultValue: 0,

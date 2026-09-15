@@ -66,7 +66,7 @@ const programHighlights = [
   { icon: <FiUsers size={22} />, val: '1000+', label: 'Students Placed' },
   { icon: <FiAward size={22} />, val: '6+', label: 'Years of Excellence' },
   { icon: <HiAcademicCap size={22} />, val: '25+', label: 'University Partners' },
-  { icon: <FiShield size={22} />, val: '4', label: 'Partner Universities' },
+  { icon: <FiShield size={22} />, val: '2', label: 'Partner Universities' },
 ]
 
 export default function Programs() {
@@ -105,9 +105,7 @@ export default function Programs() {
   ))].filter(Boolean)
   const uniList = [
     { slug: 'iimt', name: 'IIMT University' },
-    { slug: 'future', name: 'Future University' },
     { slug: 'subharti', name: 'Subharti University' },
-    { slug: 'sage', name: 'Sage University' },
   ]
 
   if (loading) {

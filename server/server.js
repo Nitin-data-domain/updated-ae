@@ -5,7 +5,7 @@ const morgan = require('morgan');
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const connectDB = require('./config/db');
 
@@ -63,6 +63,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
+// Static uploads directory
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+app.use('/uploads', express.static(uploadsDir));
+
 // API Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/programs', require('./routes/programRoutes'));
@@ -75,6 +80,13 @@ app.use('/api/placements', require('./routes/placementRoutes'));
 app.use('/api/site-content', require('./routes/siteContentRoutes'));
 app.use('/api/books', require('./routes/bookRoutes'));
 app.use('/api/feedback', require('./routes/feedbackRoutes'));
+app.use('/api/faculty-roles', require('./routes/facultyRoleRoutes'));
+
+// College Grievance Portal API Routes
+app.use('/api/grievances', require('./portal/routes/grievances'));
+app.use('/api/users',      require('./portal/routes/users'));
+app.use('/api/reports',    require('./portal/routes/reports'));
+app.use('/api/webhooks',   require('./portal/routes/webhooks'));
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -156,8 +156,8 @@ export default function PrivacyPolicy() {
                 </a>{' '}
                 and related subdomains, hereinafter referred to as the <em>"Website"</em>). This
                 Policy also details how we safeguard your data, execute data transfers with our
-                partner universities (such as IIMT University, Future University, Subharti
-                University, and SAGE University), and handle processing requests from data subjects.
+                partner universities (such as IIMT University and Subharti
+                University), and handle processing requests from data subjects.
               </p>
               <p>
                 This Policy applies to all systems, personnel, and processes that constitute the

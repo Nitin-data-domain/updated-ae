@@ -315,7 +315,7 @@ export default function AdminPrograms() {
               </div>
               <div className="form-group">
                 <label className="form-label">Universities (one per line)</label>
-                <textarea className="form-textarea" style={{ minHeight: '80px' }} value={form.universities} onChange={e => setForm({...form, universities: e.target.value})} placeholder="IIMT University&#10;Future University" />
+                <textarea className="form-textarea" style={{ minHeight: '80px' }} value={form.universities} onChange={e => setForm({...form, universities: e.target.value})} placeholder="IIMT University&#10;Subharti University" />
               </div>
 
               {/* ── Program Image Upload ── */}

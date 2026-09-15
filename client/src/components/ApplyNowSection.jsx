@@ -66,11 +66,13 @@ export default function ApplyNowSection({ heroMode = false }) {
     getPrograms().then(r => setAllPrograms(r.data.data)).catch(() => {})
   }, [])
 
-  // Universities list (excluding Sage)
+  // Universities list (excluding Sage and Future)
   const universities = useMemo(() => {
     const s = new Set()
+    const excluded = ['sage university', 'future university']
     allPrograms.forEach(p => (p.universities || []).forEach(u => {
-      if (u.name && u.name.toLowerCase() !== 'sage university') s.add(u.name)
+      const name = typeof u === 'object' ? u.name : u
+      if (name && !excluded.includes(name.toLowerCase().trim())) s.add(name)
     }))
     return [...s]
   }, [allPrograms])
@@ -79,7 +81,7 @@ export default function ApplyNowSection({ heroMode = false }) {
   const filteredPrograms = useMemo(() => {
     if (!form.university) return []
     return allPrograms.filter(p =>
-      (p.universities || []).some(u => u.name === form.university)
+      (p.universities || []).some(u => (typeof u === 'object' ? u.name : u) === form.university)
     )
   }, [allPrograms, form.university])
 

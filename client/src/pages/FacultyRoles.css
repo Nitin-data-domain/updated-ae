@@ -1,0 +1,861 @@
+/* ═══════════════════════════════════════════════════════════════════
+   FACULTY ROLES & RESPONSIBILITIES STYLES
+   (One Large Photo - Name - Designation - Roles & Responsibilities)
+   ═══════════════════════════════════════════════════════════════════ */
+
+.faculty-roles-page {
+  background: #f8fafc;
+  min-height: 100vh;
+}
+
+/* ── Hero Customization ── */
+.faculty-roles-page .page-hero {
+  position: relative;
+  background: linear-gradient(135deg, #0a192f 0%, #172a45 50%, #0d233a 100%);
+  color: var(--white);
+  padding: 100px 0 80px;
+  overflow: hidden;
+  text-align: center;
+}
+
+.faculty-roles-page .page-hero-title {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 800;
+  color: var(--white);
+  margin: 16px 0;
+  letter-spacing: -0.02em;
+}
+
+.faculty-roles-page .page-hero-subtitle {
+  font-size: 1.12rem;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 780px;
+  margin: 0 auto 32px;
+  line-height: 1.7;
+}
+
+/* ── Institutional Pillars ── */
+.fr-pillars-section {
+  position: relative;
+  margin-top: -45px;
+  z-index: 10;
+  padding-bottom: 24px;
+}
+
+.fr-pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.fr-pillar-card {
+  background: var(--white);
+  border-radius: var(--radius-lg, 16px);
+  padding: 24px 20px;
+  box-shadow: 0 10px 30px rgba(10, 25, 47, 0.08);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.fr-pillar-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 36px rgba(10, 25, 47, 0.12);
+  border-color: rgba(212, 160, 23, 0.4);
+}
+
+.fr-pillar-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(10, 25, 47, 0.06);
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+.fr-pillar-card:hover .fr-pillar-icon {
+  background: var(--navy);
+  color: var(--gold);
+}
+
+.fr-pillar-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 8px;
+}
+
+.fr-pillar-card p {
+  font-size: 0.86rem;
+  color: var(--gray-600);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ── Controls Section ── */
+.fr-controls-section {
+  padding-top: 36px;
+  margin-bottom: 24px;
+}
+
+.fr-controls-wrapper {
+  background: var(--white);
+  border-radius: var(--radius-xl, 20px);
+  padding: 22px 26px;
+  border: 1px solid var(--gray-200);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  margin-bottom: 20px;
+}
+
+.fr-search-box {
+  position: relative;
+  margin-bottom: 18px;
+}
+
+.fr-search-icon {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray-400);
+  font-size: 1.15rem;
+}
+
+.fr-search-input {
+  width: 100%;
+  padding: 14px 44px 14px 48px;
+  border-radius: 9999px;
+  border: 1.5px solid var(--gray-200);
+  background: var(--gray-50);
+  font-size: 0.96rem;
+  color: var(--gray-800);
+  transition: all 0.25s ease;
+  outline: none;
+}
+
+.fr-search-input:focus {
+  border-color: var(--navy);
+  background: var(--white);
+  box-shadow: 0 0 0 3px rgba(10, 25, 47, 0.08);
+}
+
+.fr-search-clear {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1.35rem;
+  color: var(--gray-400);
+  cursor: pointer;
+}
+
+.fr-categories-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.fr-cat-btn {
+  padding: 9px 20px;
+  border-radius: 9999px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border: 1.5px solid var(--gray-200);
+  background: var(--white);
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fr-cat-btn:hover {
+  border-color: var(--navy);
+  color: var(--navy);
+}
+
+.fr-cat-btn.active {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: var(--white);
+  box-shadow: 0 4px 12px rgba(10, 25, 47, 0.15);
+}
+
+.fr-cat-btn.hod-pill {
+  border-color: rgba(217, 119, 6, 0.4);
+  color: #b45309;
+}
+
+.fr-cat-btn.hod-pill.active {
+  background: linear-gradient(135deg, #d97706, #b45309);
+  border-color: #b45309;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3);
+}
+
+.fr-results-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4px;
+  font-size: 0.92rem;
+  color: var(--gray-600);
+}
+
+.btn-reset-filters {
+  background: none;
+  border: 1px solid var(--gray-300);
+  padding: 4px 14px;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  color: var(--navy);
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   FACULTY ROLES PROFILE CARDS (ONE LARGE PHOTO - NAME - DESIGNATION)
+   ═══════════════════════════════════════════════════════════════════ */
+
+.fr-showcase-section {
+  padding-bottom: 70px;
+}
+
+.fr-faculty-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.fr-faculty-profile-card {
+  position: relative;
+  background: var(--white);
+  border-radius: var(--radius-2xl, 24px);
+  padding: 36px;
+  border: 1.5px solid var(--gray-200);
+  box-shadow: 0 6px 24px rgba(10, 25, 47, 0.05);
+  display: grid;
+  grid-template-columns: 330px 1fr;
+  gap: 40px;
+  align-items: stretch;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.fr-faculty-profile-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 40px rgba(10, 25, 47, 0.1);
+  border-color: rgba(212, 160, 23, 0.4);
+}
+
+.fr-faculty-profile-card.is-hod {
+  border: 2px solid #f59e0b;
+  box-shadow: 0 8px 30px rgba(217, 119, 6, 0.12);
+}
+
+/* HOD Banner */
+.fr-hod-banner {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: linear-gradient(135deg, #d97706, #b45309);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 8px 24px 8px 28px;
+  border-bottom-left-radius: 20px;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 5;
+}
+
+/* ── LEFT COLUMN: ONE LARGE EXTENDED PHOTO ── */
+.fr-photo-column {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.fr-photo-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 440px;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 10px 28px rgba(10, 25, 47, 0.12);
+  border: 2.5px solid #e2e8f0;
+  cursor: pointer;
+  background: #f1f5f9;
+}
+
+.fr-faculty-profile-card.is-hod .fr-photo-frame {
+  border-color: #f59e0b;
+}
+
+.fr-large-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: block;
+}
+
+.fr-photo-bottom-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(10, 25, 47, 0.88) 0%, rgba(10, 25, 47, 0.45) 60%, transparent 100%);
+  color: #ffffff;
+  padding: 28px 16px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  letter-spacing: 0.02em;
+  opacity: 0.92;
+  transition: all 0.25s ease;
+}
+
+.fr-photo-frame:hover .fr-photo-bottom-bar {
+  opacity: 1;
+  background: linear-gradient(to top, rgba(10, 25, 47, 0.95) 0%, rgba(10, 25, 47, 0.65) 70%, transparent 100%);
+}
+
+.fr-photo-frame:hover .fr-large-photo {
+  transform: scale(1.04);
+}
+
+.fr-large-photo-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #0a192f, #1e3a8a);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.fr-photo-hover-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 25, 47, 0.65);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.fr-photo-frame:hover .fr-photo-hover-overlay {
+  opacity: 1;
+}
+
+.fr-photo-meta {
+  width: 100%;
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meta-chip {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 7px 12px;
+  font-size: 0.82rem;
+  color: var(--gray-700);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chip-icon {
+  color: var(--navy);
+  flex-shrink: 0;
+}
+
+.btn-inspect-photo {
+  margin-top: 10px;
+  width: 100%;
+  padding: 8px 14px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: var(--gray-700);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-inspect-photo:hover {
+  background: var(--navy);
+  color: #ffffff;
+  border-color: var(--navy);
+}
+
+/* ── RIGHT COLUMN: NAME, DESIGNATION, ROLES & RESPONSIBILITIES ── */
+.fr-content-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.fr-header-box {
+  margin-bottom: 20px;
+}
+
+.fr-name-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.fr-faculty-name {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.fr-hod-pill {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid #f59e0b;
+  letter-spacing: 0.04em;
+}
+
+.fr-faculty-designation {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #4338ca;
+  margin: 0 0 12px 0;
+}
+
+.fr-specialization-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.spec-icon {
+  color: #2563eb;
+  flex-shrink: 0;
+}
+
+/* ── Roles & Responsibilities Container ── */
+.fr-roles-box {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  margin: 18px 0;
+}
+
+.fr-roles-box-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.header-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--navy);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.fr-roles-box-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0 0 3px 0;
+}
+
+.fr-roles-box-subtitle {
+  font-size: 0.82rem;
+  color: var(--gray-500);
+  margin: 0;
+}
+
+.fr-duties-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fr-duty-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.92rem;
+  color: var(--gray-800);
+  line-height: 1.55;
+}
+
+.duty-bullet {
+  color: #059669;
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fr-faculty-profile-card.is-hod .duty-bullet {
+  color: #d97706;
+}
+
+.duty-text {
+  flex: 1;
+}
+
+/* Bio Box */
+.fr-bio-box {
+  background: #fffbeb;
+  border-left: 3px solid #f59e0b;
+  padding: 10px 16px;
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 20px;
+}
+
+.fr-bio-text {
+  margin: 0;
+  font-size: 0.86rem;
+  font-style: italic;
+  color: #78350f;
+  line-height: 1.5;
+}
+
+/* Footer Actions */
+.fr-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-top: 10px;
+  margin-top: auto;
+}
+
+/* ── Code of Conduct & Ethics ── */
+.fr-ethics-section {
+  padding: 50px 0 80px;
+}
+
+.fr-ethics-card {
+  background: linear-gradient(135deg, #0a192f 0%, #112240 100%);
+  border-radius: var(--radius-2xl, 24px);
+  padding: 48px;
+  color: #ffffff;
+  box-shadow: 0 16px 40px rgba(10, 25, 47, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.fr-ethics-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 36px;
+}
+
+.ethics-icon {
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+.fr-ethics-header h2 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 6px 0;
+}
+
+.fr-ethics-header p {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0;
+}
+
+.fr-ethics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.ethics-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 22px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  transition: all 0.25s ease;
+}
+
+.ethics-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(212, 160, 23, 0.4);
+  transform: translateY(-3px);
+}
+
+.item-icon {
+  color: var(--gold);
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.ethics-item h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 6px 0;
+}
+
+.ethics-item p {
+  font-size: 0.86rem;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ── Lightbox Modal ── */
+.fr-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 25, 47, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.fr-modal-content {
+  position: relative;
+  background: #ffffff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.fr-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #1f2937;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.fr-modal-close:hover {
+  background: #ffffff;
+  transform: scale(1.1);
+}
+
+.fr-modal-inner {
+  display: flex;
+  flex-direction: column;
+}
+
+.fr-modal-img-wrap {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  background: #0f172a;
+}
+
+.fr-modal-large-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.fr-modal-hod-tag {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: linear-gradient(135deg, #d97706, #b45309);
+  color: #ffffff;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.fr-modal-info {
+  padding: 24px;
+}
+
+.modal-fac-name {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin: 0 0 4px 0;
+}
+
+.modal-fac-desig {
+  font-size: 0.94rem;
+  color: #4338ca;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.modal-fac-qual {
+  font-size: 0.85rem;
+  color: var(--gray-600);
+  margin: 0 0 10px 0;
+}
+
+.modal-fac-spec {
+  font-size: 0.85rem;
+  color: var(--gray-700);
+  margin: 0 0 18px 0;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* ── Empty State ── */
+.fr-empty-state {
+  text-align: center;
+  padding: 70px 20px;
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1.5px dashed #cbd5e1;
+}
+
+.empty-icon {
+  color: #94a3b8;
+  margin-bottom: 16px;
+}
+
+/* ── Responsive Queries ── */
+@media (max-width: 992px) {
+  .fr-pillars-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .fr-faculty-profile-card {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 28px;
+  }
+
+  .fr-photo-frame {
+    height: 320px;
+  }
+
+  .fr-ethics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .fr-pillars-section {
+    margin-top: -30px;
+  }
+
+  .fr-pillars-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fr-faculty-name {
+    font-size: 1.5rem;
+  }
+
+  .fr-faculty-profile-card {
+    padding: 20px;
+  }
+
+  .fr-ethics-card {
+    padding: 28px 20px;
+  }
+
+  .fr-footer-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .fr-footer-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

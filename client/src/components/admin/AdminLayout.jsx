@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
-import { FiGrid, FiBook, FiUsers, FiCalendar, FiMail, FiFile, FiLogOut, FiMenu, FiX, FiAward, FiMessageSquare, FiBookOpen } from 'react-icons/fi'
+import { FiGrid, FiBook, FiUsers, FiCalendar, FiMail, FiFile, FiLogOut, FiMenu, FiX, FiAward, FiMessageSquare, FiBookOpen, FiShield } from 'react-icons/fi'
 import { HiAcademicCap } from 'react-icons/hi'
 import Logo from '../Logo'
 import './AdminLayout.css'
@@ -11,6 +11,7 @@ const sidebarLinks = [
   { path: '/admin/books', label: 'Library Books', icon: <FiBookOpen /> },
   { path: '/admin/feedback', label: 'Student Feedback', icon: <FiMessageSquare /> },
   { path: '/admin/faculty', label: 'Faculty', icon: <FiUsers /> },
+  { path: '/admin/faculty-roles', label: 'Faculty Roles', icon: <FiShield /> },
   { path: '/admin/placements', label: 'Placements', icon: <FiAward /> },
   { path: '/admin/events', label: 'Events', icon: <FiCalendar /> },
   { path: '/admin/admission-leads', label: 'Admission Leads', icon: <HiAcademicCap /> },

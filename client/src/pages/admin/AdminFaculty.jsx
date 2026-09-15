@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import toast from 'react-hot-toast'
-import { FiPlus, FiEdit2, FiTrash2, FiUpload, FiX } from 'react-icons/fi'
+import { FiPlus, FiEdit2, FiTrash2, FiUpload, FiX, FiEye, FiStar } from 'react-icons/fi'
 import { getFaculty, createFaculty, updateFaculty, deleteFaculty, uploadFacultyImage, fetchFacultyImage } from '../../api'
 
 const emptyFaculty = {
   name: '', designation: '', qualification: '', experience: '',
-  specialization: '', bio: '', image: '', order: 0
+  specialization: '', bio: '', rolesAndResponsibilities: '', image: '', order: 0
 }
 
 export default function AdminFaculty() {
@@ -18,6 +18,7 @@ export default function AdminFaculty() {
   const [fetching, setFetching] = useState(false)
   const [urlInput, setUrlInput] = useState('')
   const [preview, setPreview] = useState('')
+  const [photoModalMember, setPhotoModalMember] = useState(null)
   const fileInputRef = useRef(null)
 
   useEffect(() => {
@@ -117,12 +118,17 @@ export default function AdminFaculty() {
     catch { toast.error('Failed to delete') }
   }
 
+  const isHOD = (f) => {
+    const des = (f.designation || '').toLowerCase()
+    return des.includes('hod') || des.includes('head of department') || des.includes('head -')
+  }
+
   return (
     <div>
       <div className="admin-header-row">
         <div>
           <h1 className="admin-page-title">Faculty</h1>
-          <p className="admin-page-subtitle">Manage faculty members</p>
+          <p className="admin-page-subtitle">Manage faculty members, photos, and department heads</p>
         </div>
         <button className="admin-btn-add" onClick={openAdd}><FiPlus /> Add Faculty</button>
       </div>
@@ -142,18 +148,111 @@ export default function AdminFaculty() {
           <tbody>
             {faculty.map(f => (
               <tr key={f._id}>
-                <td>
-                  {f.image
-                    ? <img src={f.image} alt={f.name} style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--primary-100, #e0e7ff)' }} />
-                    : <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'var(--gray-200, #e5e7eb)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: 'var(--gray-400, #9ca3af)' }}>{f.name[0]}</div>
-                  }
+                <td style={{ verticalAlign: 'middle' }}>
+                  {f.image ? (
+                    <div
+                      onClick={() => setPhotoModalMember(f)}
+                      style={{
+                        position: 'relative',
+                        width: 46,
+                        height: 46,
+                        cursor: 'pointer',
+                        display: 'inline-block',
+                        transition: 'transform 0.15s ease'
+                      }}
+                      title="Click to view photograph"
+                    >
+                      <img
+                        src={f.image}
+                        alt={f.name}
+                        style={{
+                          width: 46,
+                          height: 46,
+                          borderRadius: '50%',
+                          objectFit: 'cover',
+                          border: '2px solid #6366f1',
+                          boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                        }}
+                      />
+                      <span
+                        style={{
+                          position: 'absolute',
+                          bottom: -2,
+                          right: -2,
+                          background: '#4f46e5',
+                          color: '#fff',
+                          borderRadius: '50%',
+                          width: 18,
+                          height: 18,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: 10,
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.3)'
+                        }}
+                      >
+                        <FiEye size={10} />
+                      </span>
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        width: 46,
+                        height: 46,
+                        borderRadius: '50%',
+                        background: 'var(--gray-200, #e5e7eb)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 18,
+                        color: 'var(--gray-400, #9ca3af)',
+                        fontWeight: 600
+                      }}
+                    >
+                      {f.name ? f.name[0] : '?'}
+                    </div>
+                  )}
                 </td>
-                <td><strong>{f.name}</strong></td>
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                    <strong>{f.name}</strong>
+                    {isHOD(f) && (
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 3,
+                          background: 'linear-gradient(135deg, #fef3c7, #fde68a)',
+                          color: '#92400e',
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          padding: '2px 8px',
+                          borderRadius: 12,
+                          border: '1px solid #f59e0b',
+                          letterSpacing: '0.03em'
+                        }}
+                      >
+                        <FiStar size={10} /> HOD
+                      </span>
+                    )}
+                  </div>
+                </td>
                 <td>{f.designation}</td>
                 <td style={{ fontSize: '0.85rem' }}>{f.qualification}</td>
                 <td style={{ fontSize: '0.85rem' }}>{f.experience}</td>
                 <td>
                   <div className="admin-actions">
+                    {f.image && (
+                      <button
+                        type="button"
+                        className="admin-btn"
+                        style={{ background: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db' }}
+                        onClick={() => setPhotoModalMember(f)}
+                        title="View Photograph"
+                      >
+                        <FiEye size={13} /> Photo
+                      </button>
+                    )}
                     <button className="admin-btn admin-btn-edit" onClick={() => openEdit(f)}><FiEdit2 /> Edit</button>
                     <button className="admin-btn admin-btn-delete" onClick={() => handleDelete(f._id)}><FiTrash2 /></button>
                   </div>
@@ -167,6 +266,7 @@ export default function AdminFaculty() {
         </table>
       </div>
 
+      {/* ── Add / Edit Modal ── */}
       {showModal && (
         <div className="admin-modal-overlay" onClick={() => setShowModal(false)}>
           <div className="admin-modal" onClick={e => e.stopPropagation()}>
@@ -174,20 +274,33 @@ export default function AdminFaculty() {
             <form onSubmit={handleSave}>
               <div className="form-group">
                 <label className="form-label">Name *</label>
-                <input className="form-input" value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Dr. John Doe" />
+                <input className="form-input" value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Prof. (Dr.) John Doe" />
               </div>
               <div className="form-group">
-                <label className="form-label">Designation *</label>
-                <input className="form-input" value={form.designation} onChange={e => setForm({...form, designation: e.target.value})} placeholder="Professor & Head" />
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <label className="form-label">Designation *</label>
+                  <button
+                    type="button"
+                    style={{ background: 'none', border: 'none', color: '#d97706', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', padding: 0 }}
+                    onClick={() => {
+                      if (!form.designation.includes('Head of Department (HOD)')) {
+                        setForm(prev => ({ ...prev, designation: 'Head of Department (HOD) - ' + (prev.designation || '') }))
+                      }
+                    }}
+                  >
+                    + Set as HOD
+                  </button>
+                </div>
+                <input className="form-input" value={form.designation} onChange={e => setForm({...form, designation: e.target.value})} placeholder="e.g. Head of Department (HOD) - Aerospace Engineering" />
               </div>
               <div className="form-group">
                 <label className="form-label">Qualification *</label>
-                <input className="form-input" value={form.qualification} onChange={e => setForm({...form, qualification: e.target.value})} placeholder="Ph.D., MBA" />
+                <input className="form-input" value={form.qualification} onChange={e => setForm({...form, qualification: e.target.value})} placeholder="Ph.D., MBA, B.Tech" />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div className="form-group">
                   <label className="form-label">Experience *</label>
-                  <input className="form-input" value={form.experience} onChange={e => setForm({...form, experience: e.target.value})} placeholder="15 years" />
+                  <input className="form-input" value={form.experience} onChange={e => setForm({...form, experience: e.target.value})} placeholder="15+ years" />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Order</label>
@@ -196,11 +309,25 @@ export default function AdminFaculty() {
               </div>
               <div className="form-group">
                 <label className="form-label">Specialization</label>
-                <input className="form-input" value={form.specialization} onChange={e => setForm({...form, specialization: e.target.value})} />
+                <input className="form-input" value={form.specialization} onChange={e => setForm({...form, specialization: e.target.value})} placeholder="e.g. Flight Dynamics, Avionics, Propulsion" />
               </div>
               <div className="form-group">
                 <label className="form-label">Bio</label>
-                <textarea className="form-textarea" value={form.bio} onChange={e => setForm({...form, bio: e.target.value})} />
+                <textarea className="form-textarea" rows="3" value={form.bio} onChange={e => setForm({...form, bio: e.target.value})} placeholder="Brief academic and professional bio..." />
+              </div>
+
+              <div className="form-group">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <label className="form-label">Roles & Responsibilities</label>
+                  <span style={{ fontSize: '0.75rem', color: '#6366f1' }}>Each line with • or - becomes a bullet</span>
+                </div>
+                <textarea
+                  className="form-textarea"
+                  rows="5"
+                  value={form.rolesAndResponsibilities || ''}
+                  onChange={e => setForm({...form, rolesAndResponsibilities: e.target.value})}
+                  placeholder="• Departmental academic & administrative leadership&#10;• Laboratory oversight & syllabus management&#10;• Industry collaboration & student placement mentoring"
+                />
               </div>
 
               {/* ── Photo Upload ── */}
@@ -264,6 +391,60 @@ export default function AdminFaculty() {
                 <button type="submit" className="btn btn-primary btn-sm" disabled={saving || uploading}>{saving ? 'Saving...' : editing ? 'Update' : 'Create'}</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Photo Preview Lightbox Modal in Admin ── */}
+      {photoModalMember && (
+        <div className="admin-modal-overlay" onClick={() => setPhotoModalMember(null)} style={{ zIndex: 1200 }}>
+          <div className="admin-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 440, textAlign: 'center', padding: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <h3 style={{ margin: 0, fontSize: '1.15rem' }}>Faculty Photograph</h3>
+              <button
+                type="button"
+                onClick={() => setPhotoModalMember(null)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: '#6b7280', padding: 4 }}
+                aria-label="Close photo preview"
+              >
+                <FiX />
+              </button>
+            </div>
+
+            <div style={{ position: 'relative', borderRadius: 12, overflow: 'hidden', border: '1px solid #e5e7eb', marginBottom: 16, backgroundColor: '#f8fafc' }}>
+              <img
+                src={photoModalMember.image}
+                alt={photoModalMember.name}
+                style={{ width: '100%', maxHeight: 380, objectFit: 'cover', display: 'block' }}
+              />
+              {isHOD(photoModalMember) && (
+                <span style={{ position: 'absolute', top: 12, left: 12, background: 'linear-gradient(135deg, #d97706, #b45309)', color: '#fff', fontSize: '0.75rem', fontWeight: 700, padding: '4px 10px', borderRadius: 20, boxShadow: '0 2px 6px rgba(0,0,0,0.2)' }}>
+                  ⭐ Head of Department (HOD)
+                </span>
+              )}
+            </div>
+
+            <h4 style={{ margin: '0 0 4px', fontSize: '1.1rem', color: '#111827' }}>{photoModalMember.name}</h4>
+            <p style={{ margin: '0 0 8px', fontSize: '0.85rem', color: '#6366f1', fontWeight: 600 }}>{photoModalMember.designation}</p>
+            <p style={{ margin: '0 0 16px', fontSize: '0.8rem', color: '#6b7280' }}>{photoModalMember.qualification} • {photoModalMember.experience}</p>
+
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 10 }}>
+              <a
+                href={photoModalMember.image}
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-outline btn-sm"
+              >
+                Open Full Size ↗
+              </a>
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={() => setPhotoModalMember(null)}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
