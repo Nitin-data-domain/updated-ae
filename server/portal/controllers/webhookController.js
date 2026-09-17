@@ -6,6 +6,7 @@
 const pool = require('../config/db');
 const notify = require('../services/notifications');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 /**
  * POST /api/webhooks/google-form
@@ -44,24 +45,77 @@ async function handleGoogleFormWebhook(req, res) {
     const pName  = program_name || 'General';
     const gTitle = (title || problem_desc).substring(0, 255);
 
-    // ── Deduplication: Prevent duplicate tickets if webhook is triggered multiple times in rapid succession
-    const dedupeWindow = new Date(Date.now() - 60 * 1000); // 60-second window
-    const dupCheck = await pool.query(
-      `SELECT grievance_id FROM grievances 
-       WHERE LOWER(student_email) = $1 
-         AND description = $2 
-         AND created_at >= $3 
-       ORDER BY grievance_id DESC LIMIT 1`,
-      [sEmail, problem_desc, dedupeWindow]
-    );
+    // ── Atomic Deduplication Lock
+    // Generates a hash fingerprint for this student submission and uses an atomic PostgreSQL
+    // UPSERT lock. This physically prevents concurrent/parallel requests (even 1 millisecond apart)
+    // from ever executing duplicate insertions or triggering duplicate notification emails.
+    const lockKey = crypto.createHash('sha256')
+      .update(`${sEmail}:::${problem_desc.trim()}`)
+      .digest('hex');
 
-    if (dupCheck.rows.length > 0) {
-      const existingGrievanceId = dupCheck.rows[0].grievance_id;
-      console.log(`⚠️ Duplicate submission detected for ${sEmail}. Returning existing grievance #${existingGrievanceId}`);
+    let lockAcquired = false;
+    try {
+      const lockResult = await pool.query(
+        `INSERT INTO webhook_locks (lock_key, created_at)
+         VALUES ($1, NOW())
+         ON CONFLICT (lock_key) DO UPDATE
+           SET created_at = NOW()
+           WHERE webhook_locks.created_at < NOW() - INTERVAL '60 seconds'
+         RETURNING lock_key, grievance_id`,
+        [lockKey]
+      );
+      if (lockResult.rows.length > 0) {
+        lockAcquired = true;
+      }
+    } catch (lockErr) {
+      console.warn('⚠️ Webhook lock notice:', lockErr.message);
+      // If lock table query fails for any reason, fallback to query check
+      const fallbackCheck = await pool.query(
+        `SELECT grievance_id FROM grievances 
+         WHERE LOWER(student_email) = $1 AND description = $2 AND created_at >= NOW() - INTERVAL '60 seconds'
+         LIMIT 1`,
+        [sEmail, problem_desc]
+      );
+      lockAcquired = fallbackCheck.rows.length === 0;
+    }
+
+    if (!lockAcquired) {
+      console.log(`⚠️ Parallel/duplicate submission suppressed for ${sEmail} (lock: ${lockKey.substring(0, 8)}).`);
+      
+      // Wait briefly for winning request to write grievance_id
+      let existingTicketId = null;
+      for (let attempt = 0; attempt < 6; attempt++) {
+        await new Promise(r => setTimeout(r, 250));
+        try {
+          const checkLock = await pool.query(
+            `SELECT grievance_id FROM webhook_locks WHERE lock_key = $1 AND grievance_id IS NOT NULL`,
+            [lockKey]
+          );
+          if (checkLock.rows.length > 0 && checkLock.rows[0].grievance_id) {
+            existingTicketId = checkLock.rows[0].grievance_id;
+            break;
+          }
+        } catch (e) {}
+      }
+
+      if (!existingTicketId) {
+        try {
+          const recent = await pool.query(
+            `SELECT grievance_id FROM grievances 
+             WHERE LOWER(student_email) = $1 
+             ORDER BY grievance_id DESC LIMIT 1`,
+            [sEmail]
+          );
+          if (recent.rows.length > 0) {
+            existingTicketId = recent.rows[0].grievance_id;
+          }
+        } catch (e) {}
+      }
+
       return res.status(200).json({
         success: true,
-        message: `Duplicate submission avoided. Existing ticket #${existingGrievanceId}`,
-        grievance_id: existingGrievanceId,
+        message: `Duplicate submission avoided. Existing ticket #${existingTicketId || 'recorded'}`,
+        grievance_id: existingTicketId || null,
       });
     }
 
@@ -96,6 +150,12 @@ async function handleGoogleFormWebhook(req, res) {
       [gTitle, problem_desc, studentId, sName, sEmail, phone || null, admNo, pName, file_url || null]
     );
     const grievance = result.rows[0];
+
+    // ── Update atomic lock with created grievance_id for parallel waiters
+    pool.query(
+      `UPDATE webhook_locks SET grievance_id = $1 WHERE lock_key = $2`,
+      [grievance.grievance_id, lockKey]
+    ).catch(e => console.warn('Lock update notice:', e.message));
 
     // ── Log history (Stage 0)
     await pool.query(
