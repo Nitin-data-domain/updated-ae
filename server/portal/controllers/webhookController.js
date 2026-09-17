@@ -44,6 +44,27 @@ async function handleGoogleFormWebhook(req, res) {
     const pName  = program_name || 'General';
     const gTitle = (title || problem_desc).substring(0, 255);
 
+    // ── Deduplication: Prevent duplicate tickets if webhook is triggered multiple times in rapid succession
+    const dedupeWindow = new Date(Date.now() - 60 * 1000); // 60-second window
+    const dupCheck = await pool.query(
+      `SELECT grievance_id FROM grievances 
+       WHERE LOWER(student_email) = $1 
+         AND description = $2 
+         AND created_at >= $3 
+       ORDER BY grievance_id DESC LIMIT 1`,
+      [sEmail, problem_desc, dedupeWindow]
+    );
+
+    if (dupCheck.rows.length > 0) {
+      const existingGrievanceId = dupCheck.rows[0].grievance_id;
+      console.log(`⚠️ Duplicate submission detected for ${sEmail}. Returning existing grievance #${existingGrievanceId}`);
+      return res.status(200).json({
+        success: true,
+        message: `Duplicate submission avoided. Existing ticket #${existingGrievanceId}`,
+        grievance_id: existingGrievanceId,
+      });
+    }
+
     // ── Find or create student user
     let studentId;
     const existing = await pool.query(
