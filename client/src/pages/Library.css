@@ -176,20 +176,26 @@
   font-size: 1rem;
 }
 
-/* 4 Mandatory Cascading Filter Dropdowns */
+/* 5 Cascading Filter Dropdowns */
 .filter-dropdowns-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
+  .filter-dropdowns-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
   .filter-dropdowns-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 500px) {
   .filter-dropdowns-grid {
     grid-template-columns: 1fr;
   }
@@ -638,3 +644,289 @@
   background: var(--accent-light);
   transform: translateY(-2px);
 }
+
+/* ============================================
+   UNIT-WISE NOTES & RESOURCE TABS EXTENSION
+   ============================================ */
+
+/* Primary Resource Tabs */
+.library-resource-tabs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.resource-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 22px;
+  border-radius: 12px;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  color: var(--navy);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  transition: all 0.25s ease;
+}
+
+.resource-tab:hover {
+  border-color: var(--accent);
+  color: var(--navy-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(17, 33, 56, 0.08);
+}
+
+.resource-tab.active {
+  background: var(--primary);
+  color: var(--white);
+  border-color: var(--primary);
+  box-shadow: 0 6px 20px rgba(28, 53, 87, 0.25);
+}
+
+.resource-tab.active.notes-tab {
+  background: linear-gradient(135deg, #112138 0%, #1e3a61 100%);
+  border-color: #f59e0b;
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.25);
+}
+
+.resource-tab.active.notes-tab svg {
+  color: #fbbf24;
+}
+
+.resource-tab svg {
+  font-size: 1.15rem;
+}
+
+.tab-pill-count {
+  background: rgba(0, 0, 0, 0.08);
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.resource-tab.active .tab-pill-count {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--white);
+}
+
+.tab-badge-new {
+  background: #f59e0b;
+  color: #112138;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Quick Unit Selector Bar */
+.library-unit-bar {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 22px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.unit-bar-label {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #92400e;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.unit-pills-list {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1;
+}
+
+.unit-filter-pill {
+  border: 1px solid #fcd34d;
+  background: var(--white);
+  color: #78350f;
+  font-size: 0.84rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.unit-filter-pill:hover {
+  background: #fef3c7;
+  border-color: #f59e0b;
+  color: #92400e;
+  transform: translateY(-1px);
+}
+
+.unit-filter-pill.active {
+  background: #d97706;
+  border-color: #d97706;
+  color: var(--white);
+  box-shadow: 0 4px 10px rgba(217, 119, 6, 0.3);
+}
+
+/* Active Filter Special Badges */
+.filter-pill.filter-pill-category {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.filter-pill.filter-pill-unit {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+/* Book Card Enhancements for Unit Notes */
+.book-card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.book-unit-badge {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: var(--white);
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.25);
+  white-space: nowrap;
+}
+
+.book-sem-badge {
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: var(--white);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.filter-pill.filter-pill-sem {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.book-card.card-notes {
+  border-top: 3px solid #f59e0b;
+}
+
+.book-card.card-notes:hover {
+  border-color: #d97706;
+  box-shadow: 0 14px 32px rgba(217, 119, 6, 0.15);
+}
+
+.book-card-header.header-notes {
+  background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
+}
+
+.book-category-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.book-category-row .book-course-tag {
+  margin-bottom: 0;
+}
+
+.book-type-pill {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.book-type-pill.pill-notes {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.book-type-pill.pill-book {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+/* Download Notes Button */
+.btn-download-book.btn-download-notes {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  color: var(--white);
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.25);
+}
+
+.btn-download-book.btn-download-notes:hover {
+  background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
+  box-shadow: 0 6px 18px rgba(217, 119, 6, 0.35);
+}
+
+/* Mobile Responsiveness for Library Extensions */
+@media (max-width: 768px) {
+  .library-resource-tabs {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .resource-tab {
+    justify-content: center;
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+  }
+
+  .library-unit-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .unit-pills-list {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .unit-filter-pill {
+    padding: 5px 12px;
+    font-size: 0.8rem;
+  }
+}
+

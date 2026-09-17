@@ -48,16 +48,22 @@
 .topbar-cta {
   background: var(--accent);
   color: var(--white);
-  padding: 4px 16px;
-  border-radius: var(--radius-sm);
-  font-weight: 600;
-  font-size: 0.72rem;
+  padding: 6px 18px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 1px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  text-decoration: none;
 }
 
 .topbar-cta:hover {
   background: var(--accent-light);
+  transform: translateY(-1px);
 }
 
 /* ============================================
@@ -145,6 +151,23 @@
 
 .nav-cta {
   margin-left: 12px;
+  background: var(--primary) !important;
+  color: var(--white) !important;
+  padding: 10px 22px !important;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all var(--transition-fast) !important;
+}
+
+.nav-cta:hover {
+  background: var(--primary-light) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(28, 53, 87, 0.25);
 }
 
 .navbar-toggle {

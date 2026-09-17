@@ -5,7 +5,7 @@ import {
   FiArrowRight, FiCheckCircle, FiUsers, FiAward, FiBriefcase, FiGlobe,
   FiBookOpen, FiTarget, FiTrendingUp, FiLayers, FiCpu, FiNavigation,
   FiStar, FiMapPin, FiPhone, FiMail, FiChevronRight,
-  FiShield, FiZap, FiHeart
+  FiShield, FiZap, FiHeart, FiClock
 } from 'react-icons/fi'
 import { HiDownload, HiAcademicCap, HiOutlineOfficeBuilding } from 'react-icons/hi'
 import { getPrograms } from '../api'
@@ -44,8 +44,60 @@ const whyChoose = [
 ]
 
 const universities = [
-  { name: 'IIMT University', defaultPrograms: 9, location: 'Meerut, UP', established: '2002', logo: iimtLogo },
-  { name: 'Subharti University', defaultPrograms: 3, location: 'Meerut, UP', established: '2008', logo: subhartiLogo },
+  {
+    name: 'IIMT University',
+    shortName: 'IIMT',
+    slug: 'iimt',
+    partnerType: 'Flagship Academic Partner',
+    tagline: "NAAC 'A' Accredited | UGC Approved State Private University",
+    location: 'Meerut, NCR / Uttar Pradesh',
+    established: '2002',
+    campusSize: '100+ Acre Campus',
+    accreditation: "NAAC Grade 'A'",
+    recognition: 'UGC Approved Section 2(f) & 12(B)',
+    logo: iimtLogo,
+    defaultPrograms: 8,
+    description: 'A distinguished higher education institution empowering students with UGC-recognized degrees in Aviation, Aerospace, and Business Studies coupled with Aharada’s advanced flight simulation and airport operations training.',
+    highlights: [
+      'UGC Section 2(f) & 12(B) Recognized Degree Framework',
+      'Flight Simulator & Aeronautical Systems Lab Access',
+      '100+ Acre Smart Campus with Advanced R&D Centers',
+      'Direct On-Campus Airline & Aerospace Placement Drives',
+    ],
+    popularPrograms: [
+      'BBA Aviation & Travel',
+      'B.Tech Aerospace Engineering',
+      'B.Sc Aeronautical Science',
+      'MBA Aviation Management',
+    ],
+  },
+  {
+    name: 'Swami Vivekanand Subharti University',
+    shortName: 'Subharti University',
+    slug: 'subharti',
+    partnerType: 'Premier Academic Partner',
+    tagline: "NAAC 'A' Accredited | Multi-Disciplinary State University",
+    location: 'Meerut, NCR / Uttar Pradesh',
+    established: '2008',
+    campusSize: '250+ Acre Campus',
+    accreditation: "NAAC Grade 'A'",
+    recognition: 'UGC Approved State University',
+    logo: subhartiLogo,
+    defaultPrograms: 2,
+    description: 'A prominent multi-disciplinary university offering globally aligned degree curriculums, expansive campus infrastructure, specialized aviation operations coursework, and structured airline corporate internships.',
+    highlights: [
+      'NAAC Grade A Accredited State University Credentials',
+      'Aircraft Mockup Cabin Operations & Ground Staff Modules',
+      '250+ Acre Vibrant Multi-Disciplinary Campus Infrastructure',
+      'Dedicated Corporate Relations & Placement Coordination',
+    ],
+    popularPrograms: [
+      'BBA Aviation & Travel',
+      'B.Tech Aerospace Engineering',
+      'Aviation Management Modules',
+      'Airport Ground Operations Tracks',
+    ],
+  },
 ]
 
 // Airline/Company partners (static)
@@ -308,40 +360,184 @@ export default function Home() {
             viewport={{ once: true }}
             className="section-header-center"
           >
-            <div className="section-label"><FiLayers className="label-icon" /> Partner Universities</div>
+            <div className="section-label"><FiAward className="label-icon" /> Partner Universities</div>
             <h2 className="section-title">Our University Network</h2>
             <p className="section-subtitle">
-              Aharada Education partners with prestigious universities across India to deliver
-              world-class aviation and management programs with UGC-approved degrees.
+              Aharada Education partners with distinguished NAAC 'A' accredited and UGC-recognized universities
+              to deliver industry-embedded degree programs with world-class aviation training.
             </p>
           </motion.div>
 
-          <div className="uni-grid">
-            {universities.map((uni, i) => (
-              <motion.div
-                key={i}
-                className="uni-card"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.12, type: 'spring', stiffness: 100 }}
-                whileHover={{ y: -8, scale: 1.02 }}
-              >
-                <div className="uni-logo-placeholder" style={uni.logo ? { background: 'transparent', width: '100%', height: '80px', borderRadius: '0', display: 'flex', alignItems: 'center', justifyContent: 'center' } : {}}>
-                  {uni.logo ? <img src={uni.logo} alt={uni.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} /> : <HiAcademicCap size={36} />}
-                </div>
-                <h3>{uni.name}</h3>
-                <div className="uni-meta">
-                  <span><FiMapPin size={12} /> {uni.location}</span>
-                  <span>Est. {uni.established}</span>
-                </div>
-                <p className="uni-programs-count">
-                  <strong>{programs.length > 0 ? programs.filter(p => p.universities && p.universities.some(u => typeof u === 'object' ? u.name?.toLowerCase().includes(uni.name.split(' ')[0].toLowerCase()) : u?.toLowerCase().includes(uni.name.split(' ')[0].toLowerCase()))).length : uni.defaultPrograms}</strong> Programs Available
-                </p>
-                <Link to="/programs" className="uni-link">View Programs <FiArrowRight size={14} /></Link>
-              </motion.div>
-            ))}
+          {/* Institutional Trust Assurances (Pure SVG Icons, NO Emojis) */}
+          <div className="uni-trust-strip">
+            <div className="uni-trust-card">
+              <div className="uni-trust-icon-box">
+                <FiShield size={20} />
+              </div>
+              <div className="uni-trust-info">
+                <h4>UGC & Govt. Recognized</h4>
+                <p>Formal degrees valid globally across aviation & corporate sectors</p>
+              </div>
+            </div>
+            <div className="uni-trust-card">
+              <div className="uni-trust-icon-box">
+                <FiAward size={20} />
+              </div>
+              <div className="uni-trust-info">
+                <h4>NAAC 'A' Grade Quality</h4>
+                <p>High academic standards, robust research & verified institutional excellence</p>
+              </div>
+            </div>
+            <div className="uni-trust-card">
+              <div className="uni-trust-icon-box">
+                <FiNavigation size={20} />
+              </div>
+              <div className="uni-trust-info">
+                <h4>Aviation Simulator Labs</h4>
+                <p>Practical airport ground handling & flight operations simulation</p>
+              </div>
+            </div>
+            <div className="uni-trust-card">
+              <div className="uni-trust-icon-box">
+                <FiBriefcase size={20} />
+              </div>
+              <div className="uni-trust-info">
+                <h4>100% Placement Pathway</h4>
+                <p>Direct recruitment drives with IndiGo, Air India, SpiceJet & Vistara</p>
+              </div>
+            </div>
           </div>
+
+          {/* Balanced 2-Column Flagship University Cards */}
+          <div className="uni-dual-grid">
+            {universities.map((uni, i) => {
+              const programCount = programs.length > 0
+                ? programs.filter(p => {
+                    if (!p.universities) return false;
+                    return p.universities.some(u => {
+                      const uName = typeof u === 'object' && u !== null ? (u.name || u.slug || '') : String(u || '');
+                      return uName.toLowerCase().includes(uni.slug.toLowerCase()) ||
+                             uName.toLowerCase().includes(uni.name.split(' ')[0].toLowerCase());
+                    });
+                  }).length || uni.defaultPrograms
+                : uni.defaultPrograms;
+
+              return (
+                <motion.div
+                  key={uni.slug}
+                  className="uni-flagship-card"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.15, type: 'spring', stiffness: 90 }}
+                  whileHover={{ y: -6 }}
+                >
+                  {/* Top Status Badges */}
+                  <div className="uni-card-top-bar">
+                    <span className="uni-badge-partner">
+                      <HiAcademicCap className="uni-pill-icon" /> {uni.partnerType}
+                    </span>
+                    <span className="uni-badge-accredit">
+                      <FiAward className="uni-pill-icon gold" /> {uni.accreditation}
+                    </span>
+                  </div>
+
+                  {/* Brand Display */}
+                  <div className="uni-card-brand">
+                    <div className="uni-brand-logo-frame">
+                      <img src={uni.logo} alt={uni.name} className="uni-brand-logo-img" />
+                    </div>
+                    <div className="uni-brand-headings">
+                      <h3 className="uni-card-title">{uni.name}</h3>
+                      <p className="uni-card-tagline">{uni.tagline}</p>
+                      <div className="uni-card-meta-row">
+                        <span className="uni-meta-chip">
+                          <FiMapPin size={12} /> {uni.location}
+                        </span>
+                        <span className="uni-meta-chip">
+                          <FiClock size={12} /> Est. {uni.established}
+                        </span>
+                        <span className="uni-meta-chip">
+                          <HiOutlineOfficeBuilding size={12} /> {uni.campusSize}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Partnership Narrative */}
+                  <p className="uni-card-desc">{uni.description}</p>
+
+                  {/* Highlights Grid (Clean SVG checkmarks, NO emojis) */}
+                  <div className="uni-card-features">
+                    <h5 className="uni-features-heading">Institutional & Campus Highlights</h5>
+                    <div className="uni-features-list">
+                      {uni.highlights.map((item, idx) => (
+                        <div key={idx} className="uni-feature-item">
+                          <FiCheckCircle className="uni-feature-icon" />
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Featured Program Specialization Chips */}
+                  <div className="uni-tracks-section">
+                    <span className="uni-tracks-label">Featured Programs:</span>
+                    <div className="uni-tracks-chips">
+                      {uni.popularPrograms.map((prog, idx) => (
+                        <span key={idx} className="uni-track-chip">{prog}</span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Card Bottom: Metric & Action Buttons */}
+                  <div className="uni-card-bottom">
+                    <div className="uni-metric-badge">
+                      <span className="uni-metric-num">{programCount}</span>
+                      <div className="uni-metric-label">
+                        <strong>Programs Available</strong>
+                        <span>Degree & Diploma Tracks</span>
+                      </div>
+                    </div>
+
+                    <div className="uni-card-ctas">
+                      <Link to={`/programs?uni=${uni.slug}`} className="btn-uni-primary">
+                        View Programs <FiArrowRight size={14} className="btn-arrow" />
+                      </Link>
+                      <Link to="/admissions" className="btn-uni-secondary">
+                        Admission Enquiry
+                      </Link>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Bottom Guidance & Selection Banner (NO emojis) */}
+          <motion.div
+            className="uni-counselling-banner"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <div className="uni-counselling-left">
+              <div className="uni-counselling-icon-wrap">
+                <FiLayers size={24} />
+              </div>
+              <div>
+                <h4 className="uni-counselling-title">Need Guidance Selecting the Right Partner University?</h4>
+                <p className="uni-counselling-desc">
+                  Our senior counsellors provide personalized 1-on-1 guidance to help you compare program options, eligibility criteria, and campus facilities.
+                </p>
+              </div>
+            </div>
+            <div className="uni-counselling-right">
+              <Link to="/admissions" className="btn btn-gold btn-sm">
+                Speak with a Counsellor <FiArrowRight size={14} />
+              </Link>
+            </div>
+          </motion.div>
         </div>
       </section>
 

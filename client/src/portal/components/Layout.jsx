@@ -63,21 +63,21 @@ export default function Layout({ children }) {
       </aside>
 
       <main className="main-content">
-        <div className="topbar">
+        <div className="portal-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <button className="mobile-menu-btn" onClick={() => setSidebarOpen(true)} aria-label="Open menu">
               <FiMenu />
             </button>
-            <span className="topbar-title">
+            <span className="portal-topbar-title">
               {user?.role === 'Faculty' && 'Faculty Workspace'}
               {user?.role === 'HOD' && 'HOD Oversight & Reports'}
               {user?.role === 'Dean' && 'Dean Executive Control Panel'}
             </span>
           </div>
-          <div className="topbar-actions">
-            <span className="topbar-user-badge">
+          <div className="portal-topbar-actions">
+            <span className="portal-topbar-user-badge">
               <FiUser style={{ marginRight: 4, verticalAlign: 'middle' }} />
-              <span className="topbar-user-name">{user?.name}</span> ({user?.role})
+              <span className="portal-topbar-user-name">{user?.name}</span> ({user?.role})
             </span>
           </div>
         </div>

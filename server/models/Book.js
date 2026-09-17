@@ -78,6 +78,18 @@ Book.init(
       type: DataTypes.INTEGER,
       defaultValue: 0,
     },
+    materialType: {
+      type: DataTypes.STRING,
+      defaultValue: 'book',
+    },
+    unit: {
+      type: DataTypes.STRING,
+      defaultValue: '',
+    },
+    semester: {
+      type: DataTypes.STRING,
+      defaultValue: '',
+    },
     isActive: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,

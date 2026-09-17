@@ -19,6 +19,41 @@ Program.hasMany(Brochure, { foreignKey: 'linkedProgramId', as: 'brochures' });
 // Function to sync all models
 async function syncModels() {
   await sequelize.sync({ alter: false });
+
+  // Ensure columns exist on books table
+  try {
+    const queryInterface = sequelize.getQueryInterface();
+    const tableDesc = await queryInterface.describeTable('books');
+    if (!tableDesc.materialType) {
+      await queryInterface.addColumn('books', 'materialType', {
+        type: sequelize.Sequelize.STRING,
+        defaultValue: 'book',
+      });
+      console.log('Added materialType column to books table');
+    }
+    if (!tableDesc.unit) {
+      await queryInterface.addColumn('books', 'unit', {
+        type: sequelize.Sequelize.STRING,
+        defaultValue: '',
+      });
+      console.log('Added unit column to books table');
+    }
+    if (!tableDesc.semester) {
+      await queryInterface.addColumn('books', 'semester', {
+        type: sequelize.Sequelize.STRING,
+        defaultValue: '',
+      });
+      console.log('Added semester column to books table');
+    }
+
+    // Backfill any books that don't have a semester yet
+    await Book.update(
+      { semester: 'Semester 1' },
+      { where: { semester: ['', null] } }
+    );
+  } catch (colErr) {
+    console.warn('Notice: Column migration check:', colErr.message);
+  }
 }
 
 // Function to seed initial data
@@ -484,6 +519,95 @@ async function seedInitialData() {
       ];
       await Book.bulkCreate(sampleBooks);
       console.log('   ✅ Seeded sample library books.');
+    }
+
+    // Seed sample unit-wise notes if none exist
+    const notesCount = await Book.count({ where: { materialType: 'notes' } });
+    if (notesCount === 0) {
+      const sampleNotes = [
+        {
+          title: 'Unit 1: Introduction to Civil Aviation & Global Regulatory Bodies',
+          academicYear: '2025-2026',
+          courseName: 'BBA Aviation & Travel',
+          subjectCode: 'AV-101',
+          subjectName: 'Introduction to Aviation Management',
+          author: 'Prof. Rajesh Kumar Singh',
+          description: 'Comprehensive handwritten & lecture slides covering ICAO annexes, DGCA civil aviation requirements (CARs), and international freedoms of air.',
+          materialType: 'notes',
+          unit: 'Unit 1',
+          fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+          fileName: 'AV101_Unit1_Civil_Aviation_Intro.pdf',
+          fileSize: '2.4 MB',
+          downloadCount: 84,
+          order: 1,
+        },
+        {
+          title: 'Unit 2: Airport Infrastructure, Airside Operations & Runways',
+          academicYear: '2025-2026',
+          courseName: 'BBA Aviation & Travel',
+          subjectCode: 'AV-101',
+          subjectName: 'Introduction to Aviation Management',
+          author: 'Prof. Rajesh Kumar Singh',
+          description: 'Lecture notes covering airport terminal design, runway pavement classifications (PCN/ACN), taxiway lighting, and apron operations.',
+          materialType: 'notes',
+          unit: 'Unit 2',
+          fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+          fileName: 'AV101_Unit2_Airside_Operations.pdf',
+          fileSize: '3.1 MB',
+          downloadCount: 65,
+          order: 2,
+        },
+        {
+          title: 'Unit 3: Airline Business Models (LCC vs FSC) & Revenue Streams',
+          academicYear: '2025-2026',
+          courseName: 'BBA Aviation & Travel',
+          subjectCode: 'AV-101',
+          subjectName: 'Introduction to Aviation Management',
+          author: 'Prof. Rajesh Kumar Singh',
+          description: 'Detailed unit study notes analyzing Low-Cost Carrier (LCC) economics, Full Service Carrier networks, code-share alliances, and ancillary revenues.',
+          materialType: 'notes',
+          unit: 'Unit 3',
+          fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+          fileName: 'AV101_Unit3_Airline_Business_Models.pdf',
+          fileSize: '1.9 MB',
+          downloadCount: 52,
+          order: 3,
+        },
+        {
+          title: 'Unit 1: Aerodynamic Forces, Boundary Layers & Incompressible Flow',
+          academicYear: '2025-2026',
+          courseName: 'B.Tech Aerospace Engineering',
+          subjectCode: 'AERO-101',
+          subjectName: 'Aerodynamics & Fluid Mechanics',
+          author: 'Prof. (Dr.) Amitabh Sen',
+          description: 'Mathematical derivation of Navier-Stokes equations, laminar to turbulent transition, and airfoil pressure distribution diagrams.',
+          materialType: 'notes',
+          unit: 'Unit 1',
+          fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+          fileName: 'AERO101_Unit1_Aerodynamics.pdf',
+          fileSize: '4.5 MB',
+          downloadCount: 112,
+          order: 1,
+        },
+        {
+          title: 'Unit 2: Airfoil Geometry, NACA Nomenclature & Lift-Drag Polars',
+          academicYear: '2025-2026',
+          courseName: 'B.Tech Aerospace Engineering',
+          subjectCode: 'AERO-101',
+          subjectName: 'Aerodynamics & Fluid Mechanics',
+          author: 'Prof. (Dr.) Amitabh Sen',
+          description: 'Detailed unit notes on 4-digit, 5-digit NACA profiles, supercritical airfoils, vortex drag generation, and wing tip stall mitigation.',
+          materialType: 'notes',
+          unit: 'Unit 2',
+          fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+          fileName: 'AERO101_Unit2_Airfoil_Geometry.pdf',
+          fileSize: '3.8 MB',
+          downloadCount: 95,
+          order: 2,
+        },
+      ];
+      await Book.bulkCreate(sampleNotes);
+      console.log('   ✅ Seeded sample unit-wise notes.');
     }
 
     // Seed sample faculty roles and responsibilities if empty

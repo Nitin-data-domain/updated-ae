@@ -24,9 +24,21 @@ const uploadToCloudinary = (buffer, filename) => {
 // @route   GET /api/books
 exports.getBooks = async (req, res) => {
   try {
-    const { academicYear, courseName, subjectCode, subjectName, search } = req.query;
+    const { academicYear, courseName, subjectCode, subjectName, search, materialType, unit, semester } = req.query;
 
     const where = { isActive: true };
+
+    if (materialType && materialType !== 'all') {
+      where.materialType = materialType;
+    }
+
+    if (unit && unit !== 'all') {
+      where.unit = unit;
+    }
+
+    if (semester && semester !== 'all') {
+      where.semester = semester;
+    }
 
     if (academicYear && academicYear !== 'all') {
       where.academicYear = academicYear;
@@ -53,6 +65,8 @@ exports.getBooks = async (req, res) => {
         { author: { [Op.like]: q } },
         { courseName: { [Op.like]: q } },
         { description: { [Op.like]: q } },
+        { unit: { [Op.like]: q } },
+        { semester: { [Op.like]: q } },
       ];
     }
 
@@ -81,7 +95,7 @@ exports.getBooks = async (req, res) => {
 // @route   GET /api/books/options
 exports.getBookOptions = async (req, res) => {
   try {
-    const { academicYear, courseName, subjectCode } = req.query;
+    const { academicYear, courseName, subjectCode, semester } = req.query;
 
     // 1. All distinct academic years
     const allYears = await Book.findAll({
@@ -94,7 +108,21 @@ exports.getBookOptions = async (req, res) => {
       .filter(Boolean)
       .sort();
 
-    // 2. Courses (filtered by academicYear if selected)
+    // 2. Semesters
+    const semWhere = { isActive: true };
+    if (academicYear && academicYear !== 'all') semWhere.academicYear = academicYear;
+    if (courseName && courseName !== 'all') semWhere.courseName = courseName;
+    const allSemesters = await Book.findAll({
+      where: semWhere,
+      attributes: ['semester'],
+      group: ['semester'],
+    });
+    const semesters = allSemesters
+      .map((b) => b.semester)
+      .filter(Boolean)
+      .sort();
+
+    // 3. Courses (filtered by academicYear if selected)
     const courseWhere = { isActive: true };
     if (academicYear && academicYear !== 'all') {
       courseWhere.academicYear = academicYear;
@@ -109,10 +137,11 @@ exports.getBookOptions = async (req, res) => {
       .filter(Boolean)
       .sort();
 
-    // 3. Subject Codes (filtered by academicYear & courseName if selected)
+    // 4. Subject Codes (filtered by academicYear & courseName & semester if selected)
     const codeWhere = { isActive: true };
     if (academicYear && academicYear !== 'all') codeWhere.academicYear = academicYear;
     if (courseName && courseName !== 'all') codeWhere.courseName = courseName;
+    if (semester && semester !== 'all') codeWhere.semester = semester;
     const allCodes = await Book.findAll({
       where: codeWhere,
       attributes: ['subjectCode'],
@@ -123,11 +152,12 @@ exports.getBookOptions = async (req, res) => {
       .filter(Boolean)
       .sort();
 
-    // 4. Subject Names (filtered by academicYear, courseName, subjectCode if selected)
+    // 5. Subject Names (filtered by academicYear, courseName, subjectCode if selected)
     const nameWhere = { isActive: true };
     if (academicYear && academicYear !== 'all') nameWhere.academicYear = academicYear;
     if (courseName && courseName !== 'all') nameWhere.courseName = courseName;
     if (subjectCode && subjectCode !== 'all') nameWhere.subjectCode = subjectCode;
+    if (semester && semester !== 'all') nameWhere.semester = semester;
     const allNames = await Book.findAll({
       where: nameWhere,
       attributes: ['subjectName'],
@@ -138,13 +168,31 @@ exports.getBookOptions = async (req, res) => {
       .filter(Boolean)
       .sort();
 
+    // 6. Distinct units for notes
+    const unitWhere = { isActive: true };
+    if (academicYear && academicYear !== 'all') unitWhere.academicYear = academicYear;
+    if (courseName && courseName !== 'all') unitWhere.courseName = courseName;
+    if (subjectCode && subjectCode !== 'all') unitWhere.subjectCode = subjectCode;
+    if (semester && semester !== 'all') unitWhere.semester = semester;
+    const allUnits = await Book.findAll({
+      where: unitWhere,
+      attributes: ['unit'],
+      group: ['unit'],
+    });
+    const units = allUnits
+      .map((b) => b.unit)
+      .filter(Boolean)
+      .sort();
+
     res.json({
       success: true,
       data: {
         academicYears,
+        semesters,
         courseNames,
         subjectCodes,
         subjectNames,
+        units,
       },
     });
   } catch (error) {
@@ -214,6 +262,9 @@ exports.createBook = async (req, res) => {
       subjectName,
       author,
       description,
+      materialType,
+      unit,
+      semester,
       fileUrl: providedFileUrl,
       fileName: providedFileName,
       fileSize: providedFileSize,
@@ -237,7 +288,7 @@ exports.createBook = async (req, res) => {
     if (!fileUrl) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide either a book file upload or a download link / file URL',
+        message: 'Please provide either a file upload or a download link / file URL',
       });
     }
 
@@ -248,16 +299,21 @@ exports.createBook = async (req, res) => {
       });
     }
 
+    const isNotes = (materialType || '').toLowerCase() === 'notes';
+
     const book = await Book.create({
       title: title.trim(),
       academicYear: academicYear.trim(),
       courseName: courseName.trim(),
       subjectCode: subjectCode.trim().toUpperCase(),
       subjectName: subjectName.trim(),
-      author: author ? author.trim() : '',
+      author: author ? author.trim() : (isNotes ? 'Faculty Notes' : ''),
       description: description ? description.trim() : '',
+      materialType: isNotes ? 'notes' : 'book',
+      unit: unit ? unit.trim() : '',
+      semester: semester ? semester.trim() : '',
       fileUrl,
-      fileName: fileName || `${subjectCode.trim()}_Book.pdf`,
+      fileName: fileName || `${subjectCode.trim()}_${isNotes ? (unit || 'Notes') : 'Book'}.pdf`,
       fileSize: fileSize || 'PDF Document',
       isActive: isActive !== undefined ? isActive : true,
       order: order ? parseInt(order, 10) : 0,

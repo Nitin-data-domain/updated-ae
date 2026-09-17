@@ -482,6 +482,21 @@
   border-radius: 8px;
   font-size: 0.86rem;
   line-height: 1.45;
+  max-width: 100%;
+  word-break: break-word;
+  flex-wrap: wrap;
+}
+
+.btn-outline-navy {
+  background: transparent;
+  color: var(--navy);
+  border: 1.5px solid var(--navy);
+  font-weight: 600;
+}
+
+.btn-outline-navy:hover {
+  background: var(--navy);
+  color: #ffffff;
 }
 
 .spec-icon {
@@ -808,19 +823,26 @@
 }
 
 /* ── Responsive Queries ── */
-@media (max-width: 992px) {
+@media (max-width: 1100px) {
   .fr-pillars-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+}
 
+@media (max-width: 992px) {
   .fr-faculty-profile-card {
     grid-template-columns: 1fr;
-    gap: 28px;
-    padding: 28px;
+    gap: 24px;
+    padding: 26px;
   }
 
   .fr-photo-frame {
-    height: 320px;
+    height: 300px;
+    min-height: unset;
+  }
+
+  .fr-large-photo {
+    object-position: center 20%;
   }
 
   .fr-ethics-grid {
@@ -829,33 +851,225 @@
 }
 
 @media (max-width: 768px) {
+  .faculty-roles-page .page-hero {
+    padding: 60px 0 50px;
+  }
+
+  .faculty-roles-page .page-hero-title {
+    font-size: 1.85rem;
+  }
+
+  .faculty-roles-page .page-hero-subtitle {
+    font-size: 0.95rem;
+    margin-bottom: 24px;
+  }
+
+  .faculty-roles-page .hero-cta-row {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .faculty-roles-page .hero-cta-row .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
   .fr-pillars-section {
-    margin-top: -30px;
+    margin-top: -24px;
   }
 
   .fr-pillars-grid {
     grid-template-columns: 1fr;
+    gap: 14px;
   }
 
-  .fr-faculty-name {
-    font-size: 1.5rem;
+  .fr-pillar-card {
+    padding: 18px 16px;
+  }
+
+  .fr-controls-section {
+    padding-top: 24px;
+  }
+
+  .fr-controls-wrapper {
+    padding: 16px 14px;
+    border-radius: 16px;
+  }
+
+  .fr-search-input {
+    padding: 12px 36px 12px 42px;
+    font-size: 0.9rem;
+  }
+
+  .fr-categories-pills {
+    gap: 8px;
+  }
+
+  .fr-cat-btn {
+    padding: 7px 14px;
+    font-size: 0.82rem;
+  }
+
+  .fr-results-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.85rem;
   }
 
   .fr-faculty-profile-card {
-    padding: 20px;
+    padding: 20px 16px;
+    border-radius: 18px;
+    gap: 20px;
   }
 
-  .fr-ethics-card {
-    padding: 28px 20px;
+  .fr-faculty-name {
+    font-size: 1.45rem;
+  }
+
+  .fr-faculty-designation {
+    font-size: 0.98rem;
+    margin-bottom: 10px;
+  }
+
+  .fr-photo-frame {
+    height: 250px;
+    min-height: unset;
+    border-radius: 14px;
+  }
+
+  .fr-hod-banner {
+    position: static;
+    display: inline-flex;
+    margin-bottom: 12px;
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 0.72rem;
+    align-self: flex-start;
+  }
+
+  .fr-roles-box {
+    padding: 16px 14px;
+    border-radius: 14px;
+    margin: 14px 0;
+  }
+
+  .fr-roles-box-header {
+    gap: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+  }
+
+  .header-icon-wrap {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+
+  .fr-roles-box-title {
+    font-size: 0.95rem;
+  }
+
+  .fr-duty-item {
+    font-size: 0.88rem;
+    gap: 10px;
   }
 
   .fr-footer-actions {
     flex-direction: column;
     width: 100%;
+    gap: 10px;
   }
 
   .fr-footer-actions .btn {
     width: 100%;
     justify-content: center;
+  }
+
+  .fr-ethics-section {
+    padding: 30px 0 60px;
+  }
+
+  .fr-ethics-card {
+    padding: 24px 16px;
+    border-radius: 18px;
+  }
+
+  .fr-ethics-header {
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .fr-ethics-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .ethics-item {
+    padding: 16px 14px;
+    gap: 12px;
+    border-radius: 12px;
+  }
+
+  .fr-modal-backdrop {
+    padding: 12px;
+  }
+
+  .fr-modal-content {
+    max-width: 100%;
+    max-height: 88vh;
+    border-radius: 16px;
+  }
+
+  .fr-modal-img-wrap {
+    height: 240px;
+  }
+
+  .fr-modal-info {
+    padding: 18px 16px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .modal-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .fr-faculty-profile-card {
+    padding: 16px 12px;
+  }
+
+  .fr-photo-frame {
+    height: 220px;
+    min-height: unset;
+  }
+
+  .fr-faculty-name {
+    font-size: 1.3rem;
+  }
+
+  .fr-specialization-badge {
+    font-size: 0.8rem;
+    padding: 5px 10px;
+  }
+
+  .fr-cat-btn {
+    padding: 6px 12px;
+    font-size: 0.78rem;
+  }
+
+  .meta-chip {
+    font-size: 0.76rem;
+    padding: 5px 10px;
+  }
+
+  .fr-duty-item {
+    font-size: 0.84rem;
   }
 }

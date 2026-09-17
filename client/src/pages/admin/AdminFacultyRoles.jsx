@@ -427,7 +427,7 @@ export default function AdminFacultyRoles() {
                       <div className="afr-name-cell">
                         <div className="afr-name-row">
                           <strong className="afr-name">{f.name}</strong>
-                          {hod && <span className="afr-hod-badge">⭐ HOD</span>}
+                          {hod && <span className="afr-hod-badge">HOD</span>}
                         </div>
                         <div className="afr-desig">{f.designation}</div>
                         <div className="afr-exp">{f.experience}</div>
@@ -774,7 +774,7 @@ export default function AdminFacultyRoles() {
               />
               {isHOD(photoPreviewModal) && (
                 <span style={{ position: 'absolute', top: 12, left: 12, background: 'linear-gradient(135deg, #d97706, #b45309)', color: '#fff', fontSize: '0.75rem', fontWeight: 700, padding: '4px 10px', borderRadius: 20 }}>
-                  ⭐ Head of Department (HOD)
+                  Head of Department (HOD)
                 </span>
               )}
             </div>

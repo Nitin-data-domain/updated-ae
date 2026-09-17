@@ -340,7 +340,7 @@ export default function FacultyRoles() {
                       <div className="fr-header-box">
                         <div className="fr-name-row">
                           <h2 className="fr-faculty-name">{member.name}</h2>
-                          {hod && <span className="fr-hod-pill">⭐ HOD</span>}
+                          {hod && <span className="fr-hod-pill">HOD</span>}
                         </div>
                         <p className="fr-faculty-designation">{member.designation}</p>
 

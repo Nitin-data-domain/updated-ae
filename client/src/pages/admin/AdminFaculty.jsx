@@ -365,7 +365,7 @@ export default function AdminFaculty() {
                 {/* OR fetch from URL */}
                 <p style={{ fontSize: 12, color: 'var(--gray-400)', margin: '6px 0 4px' }}>— or fetch from a URL / Google Drive link —</p>
                 <p style={{ fontSize: 11, color: '#6366f1', margin: '0 0 6px', lineHeight: 1.5 }}>
-                  📌 For Google Drive: Right-click file → Share → "Anyone with the link" → Copy link → paste below → click Fetch
+                  Note for Google Drive: Right-click file → Share → "Anyone with the link" → Copy link → paste below → click Fetch
                 </p>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <input
@@ -381,7 +381,7 @@ export default function AdminFaculty() {
                     disabled={fetching || !urlInput.trim()}
                     style={{ padding: '8px 14px', background: '#6366f1', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 13, whiteSpace: 'nowrap', opacity: fetching ? 0.7 : 1 }}
                   >
-                    {fetching ? '⏳ Fetching...' : '⬇️ Fetch Image'}
+                    {fetching ? 'Fetching...' : 'Fetch Image'}
                   </button>
                 </div>
               </div>
@@ -419,7 +419,7 @@ export default function AdminFaculty() {
               />
               {isHOD(photoModalMember) && (
                 <span style={{ position: 'absolute', top: 12, left: 12, background: 'linear-gradient(135deg, #d97706, #b45309)', color: '#fff', fontSize: '0.75rem', fontWeight: 700, padding: '4px 10px', borderRadius: 20, boxShadow: '0 2px 6px rgba(0,0,0,0.2)' }}>
-                  ⭐ Head of Department (HOD)
+                  Head of Department (HOD)
                 </span>
               )}
             </div>
