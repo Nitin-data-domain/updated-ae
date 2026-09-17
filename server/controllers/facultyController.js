@@ -1,17 +1,44 @@
 const Faculty = require('../models/Faculty');
 
+// Helper to safely fetch faculty with auto-repair for missing rolesAndResponsibilities column
+async function safeFindFaculty(whereClause = {}) {
+  try {
+    return await Faculty.findAll({
+      where: whereClause,
+      order: [['order', 'ASC']],
+    });
+  } catch (findErr) {
+    console.warn('Notice: Faculty.findAll error, attempting auto-repair:', findErr.message);
+    try {
+      const queryInterface = Faculty.sequelize.getQueryInterface();
+      await queryInterface.addColumn('faculties', 'rolesAndResponsibilities', {
+        type: Faculty.sequelize.Sequelize.TEXT,
+        defaultValue: '',
+      });
+      return await Faculty.findAll({
+        where: whereClause,
+        order: [['order', 'ASC']],
+      });
+    } catch (repairErr) {
+      // Fallback: select standard columns without rolesAndResponsibilities
+      return await Faculty.findAll({
+        attributes: ['id', 'name', 'designation', 'qualification', 'experience', 'specialization', 'image', 'bio', 'order', 'isActive'],
+        where: whereClause,
+        order: [['order', 'ASC']],
+      });
+    }
+  }
+}
+
 // @desc    Get all faculty
 // @route   GET /api/faculty
 exports.getFaculty = async (req, res) => {
   try {
-    const faculty = await Faculty.findAll({
-      where: { isActive: true },
-      order: [['order', 'ASC']],
-    });
+    const faculty = await safeFindFaculty({ isActive: true });
     res.json({ success: true, count: faculty.length, data: faculty });
   } catch (error) {
-    console.error('getFaculty error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    console.error('getFaculty fatal error:', error);
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
@@ -19,13 +46,11 @@ exports.getFaculty = async (req, res) => {
 // @route   GET /api/faculty/admin
 exports.getAllFaculty = async (req, res) => {
   try {
-    const faculty = await Faculty.findAll({
-      order: [['order', 'ASC']],
-    });
+    const faculty = await safeFindFaculty({});
     res.json({ success: true, count: faculty.length, data: faculty });
   } catch (error) {
-    console.error('getAllFaculty error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    console.error('getAllFaculty fatal error:', error);
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 

@@ -54,6 +54,21 @@ async function syncModels() {
   } catch (colErr) {
     console.warn('Notice: Column migration check:', colErr.message);
   }
+
+  // Ensure columns exist on faculties table
+  try {
+    const queryInterface = sequelize.getQueryInterface();
+    const facultyDesc = await queryInterface.describeTable('faculties');
+    if (!facultyDesc.rolesAndResponsibilities) {
+      await queryInterface.addColumn('faculties', 'rolesAndResponsibilities', {
+        type: sequelize.Sequelize.TEXT,
+        defaultValue: '',
+      });
+      console.log('✅ Added rolesAndResponsibilities column to faculties table');
+    }
+  } catch (colErr) {
+    console.warn('Notice: Faculty column migration check:', colErr.message);
+  }
 }
 
 // Function to seed initial data
@@ -81,9 +96,13 @@ async function seedInitialData() {
     console.log('   ✅ Default Admin Accounts created:');
     console.log('      - admin@aharada.edu / admin123');
     console.log('      - md@aharadaedu.in / Aharada@Prabhu');
+    }
 
     // Programs
-    const programs = [
+    const progCount = await Program.count();
+    if (progCount === 0) {
+      console.log('🌱 Seeding sample programs...');
+      const programs = [
       {
         title: 'BBA Aviation & Travel',
         slug: 'bba-aviation-travel',
@@ -215,10 +234,15 @@ async function seedInitialData() {
         order: 8
       }
     ];
-    await Program.bulkCreate(programs);
+      await Program.bulkCreate(programs);
+      console.log('   ✅ Seeded sample programs.');
+    }
 
     // Faculty
-    const faculty = [
+    const facultyCount = await Faculty.count();
+    if (facultyCount === 0) {
+      console.log('🌱 Seeding sample faculty...');
+      const faculty = [
       {
         name: 'Prof. (Dr.) Amitabh Sen',
         designation: 'Head of Department (HOD) - Aeronautical & Aerospace Engineering',
@@ -377,27 +401,38 @@ async function seedInitialData() {
         order: 11
       }
     ];
-    await Faculty.bulkCreate(faculty);
+      await Faculty.bulkCreate(faculty);
+      console.log('   ✅ Seeded sample faculty.');
+    }
 
     // Events
-    const events = [
-      { title: 'National Aviation Summit 2026', description: 'Annual National Aviation Summit featuring keynote speeches from airline CEOs, panel discussions on the future of Indian aviation, and networking opportunities with industry leaders.', date: new Date('2026-05-15'), location: 'IIMT University Campus', category: 'conference', isUpcoming: true },
-      { title: 'Aerospace Innovation Hackathon', description: 'A 48-hour hackathon challenging students to develop innovative solutions for real-world aerospace problems including drone technology and sustainable aviation fuels.', date: new Date('2026-04-20'), location: 'Innovation Lab, IIMT University', category: 'workshop', isUpcoming: true },
-      { title: 'Career Fair - Aviation & Aerospace', description: 'Annual placement drive featuring over 30 aviation and aerospace companies including major airlines, airport operators, MRO companies, and aerospace defense firms.', date: new Date('2026-06-10'), location: 'Placement Cell, Main Campus', category: 'placement', isUpcoming: true },
-      { title: 'Startup Pitch Day 2026', description: 'Entrepreneurship students present their startup ideas to angel investors and venture capitalists. Top pitches receive seed funding and incubation support.', date: new Date('2026-03-25'), location: 'Entrepreneurship Hub', category: 'seminar', isUpcoming: false },
-      { title: 'Airport Operations Workshop', description: 'Hands-on workshop conducted in collaboration with Delhi International Airport. Students experience real-time airport ground operations and passenger management.', date: new Date('2026-07-05'), location: 'IGI Airport, New Delhi', category: 'workshop', isUpcoming: true },
-    ];
-    await Event.bulkCreate(events);
+    const eventCount = await Event.count();
+    if (eventCount === 0) {
+      console.log('🌱 Seeding sample events...');
+      const events = [
+        { title: 'National Aviation Summit 2026', description: 'Annual National Aviation Summit featuring keynote speeches from airline CEOs, panel discussions on the future of Indian aviation, and networking opportunities with industry leaders.', date: new Date('2026-05-15'), location: 'IIMT University Campus', category: 'conference', isUpcoming: true },
+        { title: 'Aerospace Innovation Hackathon', description: 'A 48-hour hackathon challenging students to develop innovative solutions for real-world aerospace problems including drone technology and sustainable aviation fuels.', date: new Date('2026-04-20'), location: 'Innovation Lab, IIMT University', category: 'workshop', isUpcoming: true },
+        { title: 'Career Fair - Aviation & Aerospace', description: 'Annual placement drive featuring over 30 aviation and aerospace companies including major airlines, airport operators, MRO companies, and aerospace defense firms.', date: new Date('2026-06-10'), location: 'Placement Cell, Main Campus', category: 'placement', isUpcoming: true },
+        { title: 'Startup Pitch Day 2026', description: 'Entrepreneurship students present their startup ideas to angel investors and venture capitalists. Top pitches receive seed funding and incubation support.', date: new Date('2026-03-25'), location: 'Entrepreneurship Hub', category: 'seminar', isUpcoming: false },
+        { title: 'Airport Operations Workshop', description: 'Hands-on workshop conducted in collaboration with Delhi International Airport. Students experience real-time airport ground operations and passenger management.', date: new Date('2026-07-05'), location: 'IGI Airport, New Delhi', category: 'workshop', isUpcoming: true },
+      ];
+      await Event.bulkCreate(events);
+      console.log('   ✅ Seeded sample events.');
+    }
 
     // Placements
-    const placements = [
-      { companyName: 'IndiGo Airlines', studentName: 'Rahul Verma', program: 'BBA Aviation & Travel Management', package: '6.5 LPA', year: 2026, role: 'Airport Operations Manager', order: 1 },
-      { companyName: 'Air India', studentName: 'Priya Sharma', program: 'BBA Aviation & Travel Management', package: '7.2 LPA', year: 2026, role: 'Customer Service Executive', order: 2 },
-      { companyName: 'Boeing India', studentName: 'Amit Kumar', program: 'B.Tech Aerospace Engineering', package: '12.5 LPA', year: 2026, role: 'Aerospace Design Engineer', order: 3 },
-      { companyName: 'Airbus', studentName: 'Sneha Gupta', program: 'B.Tech Aerospace Engineering', package: '14.0 LPA', year: 2026, role: 'Systems Engineer', order: 4 },
-      { companyName: 'GMR Group', studentName: 'Vikram Singh', program: 'MBA Aviation Management', package: '10.5 LPA', year: 2026, role: 'Airport Manager', order: 5 }
-    ];
-    await Placement.bulkCreate(placements);
+    const placementCount = await Placement.count();
+    if (placementCount === 0) {
+      console.log('🌱 Seeding sample placements...');
+      const placements = [
+        { companyName: 'IndiGo Airlines', studentName: 'Rahul Verma', program: 'BBA Aviation & Travel Management', package: '6.5 LPA', year: 2026, role: 'Airport Operations Manager', order: 1 },
+        { companyName: 'Air India', studentName: 'Priya Sharma', program: 'BBA Aviation & Travel Management', package: '7.2 LPA', year: 2026, role: 'Customer Service Executive', order: 2 },
+        { companyName: 'Boeing India', studentName: 'Amit Kumar', program: 'B.Tech Aerospace Engineering', package: '12.5 LPA', year: 2026, role: 'Aerospace Design Engineer', order: 3 },
+        { companyName: 'Airbus', studentName: 'Sneha Gupta', program: 'B.Tech Aerospace Engineering', package: '14.0 LPA', year: 2026, role: 'Systems Engineer', order: 4 },
+        { companyName: 'GMR Group', studentName: 'Vikram Singh', program: 'MBA Aviation Management', package: '10.5 LPA', year: 2026, role: 'Airport Manager', order: 5 }
+      ];
+      await Placement.bulkCreate(placements);
+      console.log('   ✅ Seeded sample placements.');
     }
 
     // Seed sample books if empty

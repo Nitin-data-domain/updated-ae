@@ -15,7 +15,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     document.title = 'Dashboard | Aharada Admin'
-    Promise.all([
+    Promise.allSettled([
       getPrograms(),
       getFaculty(),
       getEvents(),
@@ -23,13 +23,13 @@ export default function AdminDashboard() {
       getEnquiryStats('enquiry')
     ]).then(([progs, facs, evts, admLeads, enqs]) => {
       setStats({
-        programs: progs.data.count,
-        faculty: facs.data.count,
-        events: evts.data.count,
-        admissionLeads: admLeads.data.data,
-        enquiries: enqs.data.data
+        programs: progs.status === 'fulfilled' ? (progs.value.data?.count ?? progs.value.data?.data?.length ?? 0) : 0,
+        faculty: facs.status === 'fulfilled' ? (facs.value.data?.count ?? facs.value.data?.data?.length ?? 0) : 0,
+        events: evts.status === 'fulfilled' ? (evts.value.data?.count ?? evts.value.data?.data?.length ?? 0) : 0,
+        admissionLeads: admLeads.status === 'fulfilled' ? (admLeads.value.data?.data || { total: 0, new: 0 }) : { total: 0, new: 0 },
+        enquiries: enqs.status === 'fulfilled' ? (enqs.value.data?.data || { total: 0, new: 0 }) : { total: 0, new: 0 }
       })
-    }).catch(() => {})
+    })
   }, [])
 
   const cards = [
