@@ -40,7 +40,7 @@ async function getAllUsers(req, res) {
     const { role } = req.query;
     let query = `
       SELECT u.user_id, u.name, u.email, u.phone, u.role, u.department, u.is_active, 
-             COALESCE(u.can_manage_staff, 0) AS can_manage_staff, u.created_at,
+             COALESCE(u.can_manage_staff, false) AS can_manage_staff, u.created_at,
              (SELECT COUNT(*) FROM grievances g 
               WHERE (g.assigned_to = u.user_id OR g.assigned_hod = u.user_id OR g.assigned_dean = u.user_id)
                 AND g.status NOT IN ('Resolved', 'Closed')) AS pending_tasks_count
@@ -76,7 +76,7 @@ async function createUser(req, res) {
     if (existing.rows.length > 0) return res.status(409).json({ error: 'Email already in use.' });
 
     const hashed = await bcrypt.hash(password, 10);
-    const managePower = (role === 'Dean' || can_manage_staff) ? 1 : 0;
+    const managePower = (role === 'Dean' || Boolean(can_manage_staff));
 
     const result = await pool.query(
       `INSERT INTO users (name, email, phone, password, role, department, can_manage_staff)
@@ -129,7 +129,7 @@ async function updateUser(req, res) {
     }
     if (can_manage_staff !== undefined) {
       updates.push(`can_manage_staff = $${idx++}`);
-      params.push(can_manage_staff ? 1 : 0);
+      params.push(Boolean(can_manage_staff));
     }
     if (password && password.trim()) {
       const hashed = await bcrypt.hash(password.trim(), 10);
