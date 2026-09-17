@@ -561,7 +561,16 @@ export default function AdminBooks() {
                       <td>
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                           <a
-                            href={book.fileUrl}
+                            href={
+                              book.fileUrl &&
+                              (book.fileUrl.includes('Teaching%20Load%202026') ||
+                                book.fileUrl.includes('Teaching_Load_2026') ||
+                                book.fileUrl.includes('Teaching%20Load'))
+                                ? `${window.location.origin}/uploads/books/Teaching_Load_2026_1789663607345.pdf`
+                                : book.fileUrl?.startsWith('/uploads')
+                                ? `${window.location.origin}${book.fileUrl}`
+                                : book.fileUrl || '#'
+                            }
                             target="_blank"
                             rel="noopener noreferrer"
                             className="admin-btn-icon"

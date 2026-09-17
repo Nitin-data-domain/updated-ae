@@ -51,6 +51,31 @@ async function syncModels() {
       { semester: 'Semester 1' },
       { where: { semester: ['', null] } }
     );
+
+    // Auto-migrate any book records with broken Cloudinary PDF URLs
+    const { Op } = require('sequelize');
+    try {
+      const brokenBooks = await Book.findAll({
+        where: {
+          fileUrl: {
+            [Op.or]: [
+              { [Op.like]: '%cloudinary%Teaching%20Load%202026%' },
+              { [Op.like]: '%cloudinary%Teaching_Load_2026%' },
+              { [Op.like]: '%Teaching%20Load%202026%' },
+              { [Op.like]: '%Teaching_Load_2026%' },
+            ],
+          },
+        },
+      });
+      for (const b of brokenBooks) {
+        await b.update({
+          fileUrl: '/uploads/books/Teaching_Load_2026_1789663607345.pdf',
+        });
+        console.log(`Repaired book #${b.id} (${b.title}) fileUrl to local uploads`);
+      }
+    } catch (migErr) {
+      console.warn('Book URL migration check:', migErr.message);
+    }
   } catch (colErr) {
     console.warn('Notice: Column migration check:', colErr.message);
   }

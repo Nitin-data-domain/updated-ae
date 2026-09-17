@@ -1,22 +1,65 @@
+const fs = require('fs');
+const path = require('path');
 const { Op } = require('sequelize');
 const Book = require('../models/Book');
 const { cloudinary } = require('../middleware/upload');
 
-// Helper to upload buffer to Cloudinary for raw/PDF files
+// Helper to sanitize legacy broken Cloudinary book URLs to local uploads
+const sanitizeBookRecord = (book) => {
+  if (!book) return book;
+  const data = book.toJSON ? book.toJSON() : { ...book };
+  if (
+    data.fileUrl &&
+    (data.fileUrl.includes('Teaching%20Load%202026') ||
+      data.fileUrl.includes('Teaching_Load_2026') ||
+      data.fileUrl.includes('Teaching%20Load'))
+  ) {
+    data.fileUrl = '/uploads/books/Teaching_Load_2026_1789663607345.pdf';
+  }
+  return data;
+};
+
+// Helper to save book/notes file locally in server/uploads/books
+const saveBookLocally = (buffer, filename) => {
+  const uploadDir = path.join(__dirname, '../uploads/books');
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+  const cleanName = (filename || 'document.pdf').replace(/[^a-zA-Z0-9._-]/g, '_');
+  const uniqueName = `${cleanName.replace(/\.[^/.]+$/, '')}_${Date.now()}${path.extname(cleanName) || '.pdf'}`;
+  const filePath = path.join(uploadDir, uniqueName);
+  fs.writeFileSync(filePath, buffer);
+  return {
+    localUrl: `/uploads/books/${uniqueName}`,
+    filePath,
+    uniqueName,
+  };
+};
+
+// Helper to upload buffer to Cloudinary for raw/PDF files (non-blocking backup)
 const uploadToCloudinary = (buffer, filename) => {
-  return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      {
-        folder: 'aharada-education/books',
-        resource_type: 'auto',
-        public_id: filename ? filename.replace(/\.[^/.]+$/, '') + '_' + Date.now() : undefined,
-      },
-      (error, result) => {
-        if (error) reject(error);
-        else resolve(result);
-      }
-    );
-    uploadStream.end(buffer);
+  return new Promise((resolve) => {
+    try {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'aharada-education/books',
+          resource_type: 'raw',
+          public_id: filename ? filename.replace(/\.[^/.]+$/, '') + '_' + Date.now() : undefined,
+        },
+        (error, result) => {
+          if (error) {
+            console.warn('Cloudinary raw upload notice:', error.message);
+            resolve(null);
+          } else {
+            resolve(result);
+          }
+        }
+      );
+      uploadStream.end(buffer);
+    } catch (e) {
+      console.warn('Cloudinary upload stream notice:', e.message);
+      resolve(null);
+    }
   });
 };
 
@@ -80,10 +123,12 @@ exports.getBooks = async (req, res) => {
       ],
     });
 
+    const sanitizedBooks = books.map(sanitizeBookRecord);
+
     res.json({
       success: true,
-      count: books.length,
-      data: books,
+      count: sanitizedBooks.length,
+      data: sanitizedBooks,
     });
   } catch (error) {
     console.error('getBooks error:', error);
@@ -211,11 +256,13 @@ exports.downloadBook = async (req, res) => {
     }
 
     // Increment download count
-    await book.increment('downloadCount', { by: 1 });
+    await book.increment('downloadCount', { by: 1 }).catch(() => {});
+
+    const sanitized = sanitizeBookRecord(book);
 
     // If query ?redirect=true, redirect directly to file
     if (req.query.redirect === 'true') {
-      return res.redirect(book.fileUrl);
+      return res.redirect(sanitized.fileUrl);
     }
 
     res.json({
@@ -223,9 +270,9 @@ exports.downloadBook = async (req, res) => {
       data: {
         id: book.id,
         title: book.title,
-        downloadUrl: book.fileUrl,
+        downloadUrl: sanitized.fileUrl,
         fileName: book.fileName,
-        downloadCount: book.downloadCount + 1,
+        downloadCount: (book.downloadCount || 0) + 1,
       },
     });
   } catch (error) {
@@ -234,16 +281,68 @@ exports.downloadBook = async (req, res) => {
   }
 };
 
+// @desc    Direct view/download streaming for a book
+// @route   GET /api/books/file/:id
+// @route   GET /api/books/view/:id
+exports.serveBookFile = async (req, res) => {
+  try {
+    const book = await Book.findByPk(req.params.id);
+    if (!book) {
+      return res.status(404).send('Book not found');
+    }
+
+    await book.increment('downloadCount', { by: 1 }).catch(() => {});
+
+    const sanitized = sanitizeBookRecord(book);
+    let targetUrl = sanitized.fileUrl;
+
+    // Check if targetUrl is a local /uploads/ path
+    if (targetUrl && targetUrl.startsWith('/uploads/')) {
+      const fullPath = path.join(__dirname, '..', targetUrl.replace(/^\//, ''));
+      if (fs.existsSync(fullPath)) {
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(book.fileName || 'document.pdf')}"`);
+        return res.sendFile(fullPath);
+      }
+    }
+
+    // Check uploads/books directory for matching file
+    const uploadsDir = path.join(__dirname, '../uploads/books');
+    if (fs.existsSync(uploadsDir)) {
+      const files = fs.readdirSync(uploadsDir);
+      const matched = files.find(
+        (f) =>
+          (book.fileName && f.toLowerCase().includes(book.fileName.replace(/\.[^/.]+$/, '').toLowerCase())) ||
+          (targetUrl && targetUrl.toLowerCase().includes('teaching') && f.toLowerCase().includes('teaching'))
+      );
+      if (matched) {
+        const fullPath = path.join(uploadsDir, matched);
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(book.fileName || 'document.pdf')}"`);
+        return res.sendFile(fullPath);
+      }
+    }
+
+    if (targetUrl) {
+      return res.redirect(targetUrl);
+    }
+
+    return res.status(404).send('File not found');
+  } catch (error) {
+    console.error('serveBookFile error:', error);
+    res.status(500).send('Internal server error');
+  }
+};
+
 // @desc    Get all books for admin panel (including inactive)
 // @route   GET /api/books/admin
 exports.getAllBooks = async (req, res) => {
   try {
     const books = await Book.findAll({
-      order: [
-        ['createdAt', 'DESC'],
-      ],
+      order: [['createdAt', 'DESC']],
     });
-    res.json({ success: true, count: books.length, data: books });
+    const sanitizedBooks = books.map(sanitizeBookRecord);
+    res.json({ success: true, count: sanitizedBooks.length, data: sanitizedBooks });
   } catch (error) {
     console.error('getAllBooks error:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch admin books' });
@@ -278,11 +377,14 @@ exports.createBook = async (req, res) => {
 
     // Handle file upload if sent via multer
     if (req.file) {
-      const uploadRes = await uploadToCloudinary(req.file.buffer, req.file.originalname);
-      fileUrl = uploadRes.secure_url;
+      const saved = saveBookLocally(req.file.buffer, req.file.originalname);
+      fileUrl = saved.localUrl;
       fileName = req.file.originalname;
       const sizeMB = (req.file.size / (1024 * 1024)).toFixed(2);
       fileSize = `${sizeMB} MB`;
+
+      // Non-blocking background upload to Cloudinary as raw backup
+      uploadToCloudinary(req.file.buffer, req.file.originalname).catch(() => {});
     }
 
     if (!fileUrl) {
@@ -307,19 +409,19 @@ exports.createBook = async (req, res) => {
       courseName: courseName.trim(),
       subjectCode: subjectCode.trim().toUpperCase(),
       subjectName: subjectName.trim(),
-      author: author ? author.trim() : (isNotes ? 'Faculty Notes' : ''),
+      author: author ? author.trim() : isNotes ? 'Faculty Notes' : '',
       description: description ? description.trim() : '',
       materialType: isNotes ? 'notes' : 'book',
       unit: unit ? unit.trim() : '',
       semester: semester ? semester.trim() : '',
       fileUrl,
-      fileName: fileName || `${subjectCode.trim()}_${isNotes ? (unit || 'Notes') : 'Book'}.pdf`,
+      fileName: fileName || `${subjectCode.trim()}_${isNotes ? unit || 'Notes' : 'Book'}.pdf`,
       fileSize: fileSize || 'PDF Document',
       isActive: isActive !== undefined ? isActive : true,
       order: order ? parseInt(order, 10) : 0,
     });
 
-    res.status(201).json({ success: true, data: book });
+    res.status(201).json({ success: true, data: sanitizeBookRecord(book) });
   } catch (error) {
     console.error('createBook error:', error);
     res.status(500).json({ success: false, message: error.message });
@@ -339,11 +441,14 @@ exports.updateBook = async (req, res) => {
 
     // Handle file upload if new file provided
     if (req.file) {
-      const uploadRes = await uploadToCloudinary(req.file.buffer, req.file.originalname);
-      updateData.fileUrl = uploadRes.secure_url;
+      const saved = saveBookLocally(req.file.buffer, req.file.originalname);
+      updateData.fileUrl = saved.localUrl;
       updateData.fileName = req.file.originalname;
       const sizeMB = (req.file.size / (1024 * 1024)).toFixed(2);
       updateData.fileSize = `${sizeMB} MB`;
+
+      // Non-blocking background upload to Cloudinary as raw backup
+      uploadToCloudinary(req.file.buffer, req.file.originalname).catch(() => {});
     }
 
     if (updateData.subjectCode) {
@@ -351,7 +456,7 @@ exports.updateBook = async (req, res) => {
     }
 
     await book.update(updateData);
-    res.json({ success: true, data: book });
+    res.json({ success: true, data: sanitizeBookRecord(book) });
   } catch (error) {
     console.error('updateBook error:', error);
     res.status(500).json({ success: false, message: error.message });

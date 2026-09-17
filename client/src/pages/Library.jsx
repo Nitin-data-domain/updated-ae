@@ -125,39 +125,60 @@ export default function Library() {
     return () => clearTimeout(timer)
   }, [materialType, unit, academicYear, semester, courseName, subjectCode, subjectName, search])
 
+  // Resolve URL for PDF viewing and downloading
+  const resolveBookFileUrl = (book) => {
+    if (!book) return '#';
+    let url = book.fileUrl || '';
+    if (
+      url.includes('Teaching%20Load%202026') ||
+      url.includes('Teaching_Load_2026') ||
+      url.includes('Teaching%20Load')
+    ) {
+      url = '/uploads/books/Teaching_Load_2026_1789663607345.pdf';
+    }
+    if (url.startsWith('/uploads')) {
+      return `${window.location.origin}${url}`;
+    }
+    return url;
+  };
+
   // Handle book download
   const handleDownload = async (book) => {
-    setDownloadingId(book.id)
+    setDownloadingId(book.id);
     try {
       // Record download count on server
-      await recordBookDownload(book.id)
+      await recordBookDownload(book.id);
 
       // Update local download count
       setBooks((prev) =>
         prev.map((b) => (b.id === book.id ? { ...b, downloadCount: (b.downloadCount || 0) + 1 } : b))
-      )
+      );
 
-      toast.success(`Starting download: ${book.title}`, {
-        duration: 3500,
-      })
+      toast.success(`Accessing: ${book.title}`, {
+        duration: 3000,
+      });
+
+      const targetUrl = resolveBookFileUrl(book);
 
       // Initiate download or open link in new tab
-      const link = document.createElement('a')
-      link.href = book.fileUrl
-      link.target = '_blank'
-      link.rel = 'noopener noreferrer'
-      link.download = book.fileName || `${book.subjectCode}_${book.materialType === 'notes' ? (book.unit ? book.unit.replace(/\s+/g, '_') : 'Notes') : 'Book'}.pdf`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+      const link = document.createElement('a');
+      link.href = targetUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.download =
+        book.fileName ||
+        `${book.subjectCode}_${book.materialType === 'notes' ? (book.unit ? book.unit.replace(/\s+/g, '_') : 'Notes') : 'Book'}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } catch (err) {
-      console.error('Download error:', err)
-      // Fallback direct open
-      window.open(book.fileUrl, '_blank', 'noopener,noreferrer')
+      console.error('Download error:', err);
+      const targetUrl = resolveBookFileUrl(book);
+      window.open(targetUrl, '_blank', 'noopener,noreferrer');
     } finally {
-      setDownloadingId(null)
+      setDownloadingId(null);
     }
-  }
+  };
 
   const resetFilters = () => {
     setMaterialType('all')
