@@ -1733,7 +1733,6 @@
   .hero-trust-badges { justify-content: center; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .stat-card:nth-child(2)::after { display: none; }
-  .uni-grid { grid-template-columns: repeat(2, 1fr); }
   .why-grid { grid-template-columns: repeat(2, 1fr); }
   .testimonials-grid { grid-template-columns: 1fr; }
   .campus-gallery-grid { grid-template-columns: 1fr; }
@@ -1746,7 +1745,6 @@
 @media (max-width: 768px) {
   .programs-grid { grid-template-columns: 1fr; }
   .why-grid { grid-template-columns: 1fr; }
-  .uni-grid { grid-template-columns: 1fr 1fr; }
   .journey-steps { grid-template-columns: 1fr 1fr; gap: 16px; }
   .journey-connector { display: none; }
   .company-logos-grid { grid-template-columns: repeat(2, 1fr); }
@@ -1757,7 +1755,6 @@
 @media (max-width: 480px) {
   .stats-grid { grid-template-columns: 1fr 1fr; border-radius: var(--radius-md); }
   .stat-card:not(:last-child)::after { display: none; }
-  .uni-grid { grid-template-columns: 1fr; }
   .campus-gallery-side { flex-direction: column; }
   .campus-stats-bar { grid-template-columns: 1fr 1fr; }
   .journey-steps { grid-template-columns: 1fr; }
