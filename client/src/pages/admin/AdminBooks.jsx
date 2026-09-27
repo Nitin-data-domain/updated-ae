@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import toast from 'react-hot-toast'
 import {
   FiBookOpen,
@@ -15,9 +15,9 @@ import {
   FiFileText,
   FiFilter,
 } from 'react-icons/fi'
-import { getAllBooksAdmin, createBook, updateBook, deleteBook } from '../../api'
+import { getAllBooksAdmin, createBook, updateBook, deleteBook, getPrograms } from '../../api'
 
-const courseOptions = [
+const defaultCourseOptions = [
   'BBA Aviation & Travel',
   'B.Tech Aerospace Engineering',
   'B.Sc Aeronautical Science',
@@ -60,6 +60,7 @@ const semesterOptions = [
 
 export default function AdminBooks() {
   const [books, setBooks] = useState([])
+  const [programs, setPrograms] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [selectedCourse, setSelectedCourse] = useState('all')
@@ -72,9 +73,26 @@ export default function AdminBooks() {
   const [saving, setSaving] = useState(false)
   const [editingBook, setEditingBook] = useState(null)
 
+  // Custom course name toggle
+  const [isCustomCourse, setIsCustomCourse] = useState(false)
+  const [customCourseInput, setCustomCourseInput] = useState('')
+
   // Upload type: 'file' or 'url'
   const [uploadType, setUploadType] = useState('url')
   const [fileToUpload, setFileToUpload] = useState(null)
+
+  // Dynamic merged course options: Database Programs + Existing Books + Defaults
+  const allCourseOptions = useMemo(() => {
+    const set = new Set()
+    programs.forEach((p) => {
+      if (p.title && p.title.trim()) set.add(p.title.trim())
+    })
+    books.forEach((b) => {
+      if (b.courseName && b.courseName.trim()) set.add(b.courseName.trim())
+    })
+    defaultCourseOptions.forEach((c) => set.add(c))
+    return Array.from(set).sort((a, b) => a.localeCompare(b))
+  }, [programs, books])
 
   // Form state
   const [form, setForm] = useState({
@@ -103,9 +121,15 @@ export default function AdminBooks() {
   const loadBooks = async () => {
     setLoading(true)
     try {
-      const res = await getAllBooksAdmin()
-      if (res.data?.success) {
-        setBooks(res.data.data)
+      const [booksRes, progsRes] = await Promise.allSettled([
+        getAllBooksAdmin(),
+        getPrograms(),
+      ])
+      if (booksRes.status === 'fulfilled' && booksRes.value.data?.success) {
+        setBooks(booksRes.value.data.data)
+      }
+      if (progsRes.status === 'fulfilled' && progsRes.value.data?.data) {
+        setPrograms(progsRes.value.data.data)
       }
     } catch (err) {
       console.error(err)
@@ -119,11 +143,14 @@ export default function AdminBooks() {
     setEditingBook(null)
     setFileToUpload(null)
     setUploadType('url')
+    setIsCustomCourse(false)
+    setCustomCourseInput('')
+    const defaultCourse = allCourseOptions[0] || 'BBA Aviation & Travel'
     setForm({
       title: '',
       academicYear: '2025-2026',
       semester: 'Semester 1',
-      courseName: 'BBA Aviation & Travel',
+      courseName: defaultCourse,
       subjectCode: '',
       subjectName: '',
       author: '',
@@ -143,11 +170,13 @@ export default function AdminBooks() {
     setEditingBook(book)
     setFileToUpload(null)
     setUploadType('url')
+    setIsCustomCourse(false)
+    setCustomCourseInput('')
     setForm({
       title: book.title || '',
       academicYear: book.academicYear || '2025-2026',
       semester: book.semester || 'Semester 1',
-      courseName: book.courseName || 'BBA Aviation & Travel',
+      courseName: book.courseName || allCourseOptions[0] || 'BBA Aviation & Travel',
       subjectCode: book.subjectCode || '',
       subjectName: book.subjectName || '',
       author: book.author || '',
@@ -192,18 +221,25 @@ export default function AdminBooks() {
       return
     }
 
+    const finalCourseName = (isCustomCourse ? customCourseInput : form.courseName).trim()
+    if (!finalCourseName) {
+      toast.error('Course / program name is required')
+      return
+    }
+
     setSaving(true)
     try {
       if (uploadType === 'file' && fileToUpload) {
         const formData = new FormData()
         formData.append('file', fileToUpload)
-        formData.append('title', form.title)
+        formData.append('title', form.title.trim())
         formData.append('academicYear', form.academicYear)
-        formData.append('courseName', form.courseName)
-        formData.append('subjectCode', form.subjectCode)
-        formData.append('subjectName', form.subjectName)
-        formData.append('author', form.author)
-        formData.append('description', form.description)
+        formData.append('semester', form.semester || 'Semester 1')
+        formData.append('courseName', finalCourseName)
+        formData.append('subjectCode', form.subjectCode.trim().toUpperCase())
+        formData.append('subjectName', form.subjectName.trim())
+        formData.append('author', form.author.trim())
+        formData.append('description', form.description.trim())
         formData.append('materialType', form.materialType)
         formData.append('unit', isNotes ? form.unit : '')
         formData.append('isActive', form.isActive)
@@ -220,6 +256,13 @@ export default function AdminBooks() {
         // Direct link / URL
         const payload = {
           ...form,
+          title: form.title.trim(),
+          courseName: finalCourseName,
+          semester: form.semester || 'Semester 1',
+          subjectCode: form.subjectCode.trim().toUpperCase(),
+          subjectName: form.subjectName.trim(),
+          author: form.author.trim(),
+          description: form.description.trim(),
           unit: isNotes ? form.unit : '',
         }
         if (editingBook) {
@@ -254,9 +297,9 @@ export default function AdminBooks() {
 
   // Filter books & notes list
   const filteredBooks = books.filter((b) => {
-    if (selectedCourse !== 'all' && b.courseName !== selectedCourse) return false
-    if (selectedYear !== 'all' && b.academicYear !== selectedYear) return false
-    if (selectedSemester !== 'all' && (b.semester || '').toLowerCase() !== selectedSemester.toLowerCase()) return false
+    if (selectedCourse !== 'all' && (b.courseName || '').trim().toLowerCase() !== selectedCourse.trim().toLowerCase()) return false
+    if (selectedYear !== 'all' && (b.academicYear || '').trim().toLowerCase() !== selectedYear.trim().toLowerCase()) return false
+    if (selectedSemester !== 'all' && (b.semester || '').trim().toLowerCase() !== selectedSemester.trim().toLowerCase()) return false
     if (selectedType !== 'all') {
       const isNoteItem = (b.materialType || '').toLowerCase() === 'notes'
       if (selectedType === 'notes' && !isNoteItem) return false
@@ -270,6 +313,7 @@ export default function AdminBooks() {
         b.subjectName?.toLowerCase().includes(q) ||
         b.author?.toLowerCase().includes(q) ||
         b.unit?.toLowerCase().includes(q) ||
+        b.courseName?.toLowerCase().includes(q) ||
         b.semester?.toLowerCase().includes(q)
       if (!match) return false
     }
@@ -397,8 +441,8 @@ export default function AdminBooks() {
             value={selectedCourse}
             onChange={(e) => setSelectedCourse(e.target.value)}
           >
-            <option value="all">All Courses</option>
-            {courseOptions.map((c) => (
+            <option value="all">All Courses / Programs</option>
+            {allCourseOptions.map((c) => (
               <option key={c} value={c}>
                 {c}
               </option>
@@ -519,21 +563,19 @@ export default function AdminBooks() {
                           >
                             {book.academicYear}
                           </span>
-                          {book.semester && (
-                            <span
-                              style={{
-                                fontSize: '0.75rem',
-                                background: '#f0fdf4',
-                                color: '#15803d',
-                                border: '1px solid #bbf7d0',
-                                padding: '2px 8px',
-                                borderRadius: '12px',
-                                fontWeight: 600,
-                              }}
-                            >
-                              {book.semester}
-                            </span>
-                          )}
+                          <span
+                            style={{
+                              fontSize: '0.75rem',
+                              background: '#f0fdf4',
+                              color: '#15803d',
+                              border: '1px solid #bbf7d0',
+                              padding: '2px 8px',
+                              borderRadius: '12px',
+                              fontWeight: 600,
+                            }}
+                          >
+                            {book.semester || 'Semester 1'}
+                          </span>
                         </div>
                       </td>
                       <td style={{ fontSize: '0.85rem', color: 'var(--gray-600)' }}>
@@ -714,19 +756,63 @@ export default function AdminBooks() {
                 </div>
 
                 <div className="admin-form-group">
-                  <label>Course Name *</label>
-                  <select
-                    className="admin-form-select"
-                    value={form.courseName}
-                    onChange={(e) => setForm({ ...form, courseName: e.target.value })}
-                    required
-                  >
-                    {courseOptions.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </select>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <label style={{ margin: 0 }}>Course / Program *</label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsCustomCourse(!isCustomCourse)
+                        if (!isCustomCourse && !customCourseInput) {
+                          setCustomCourseInput(form.courseName)
+                        }
+                      }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--primary)',
+                        fontSize: '0.78rem',
+                        cursor: 'pointer',
+                        padding: 0,
+                        textDecoration: 'underline',
+                      }}
+                    >
+                      {isCustomCourse ? 'Choose from list' : '+ Custom Course'}
+                    </button>
+                  </div>
+                  {isCustomCourse ? (
+                    <input
+                      type="text"
+                      className="admin-form-input"
+                      placeholder="e.g. BBA Aviation & Travel"
+                      value={customCourseInput}
+                      onChange={(e) => {
+                        setCustomCourseInput(e.target.value)
+                        setForm({ ...form, courseName: e.target.value })
+                      }}
+                      required
+                    />
+                  ) : (
+                    <select
+                      className="admin-form-select"
+                      value={form.courseName}
+                      onChange={(e) => {
+                        if (e.target.value === '__custom__') {
+                          setIsCustomCourse(true)
+                          setCustomCourseInput('')
+                        } else {
+                          setForm({ ...form, courseName: e.target.value })
+                        }
+                      }}
+                      required
+                    >
+                      {allCourseOptions.map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                      <option value="__custom__">+ Enter Custom Course...</option>
+                    </select>
+                  )}
                 </div>
               </div>
 

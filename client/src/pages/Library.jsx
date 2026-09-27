@@ -19,7 +19,7 @@ import {
   FiX,
 } from 'react-icons/fi'
 import toast from 'react-hot-toast'
-import { getBooks, getBookOptions, recordBookDownload } from '../api'
+import { getBooks, getBookOptions, recordBookDownload, getPrograms } from '../api'
 import './Library.css'
 
 export default function Library() {
@@ -27,6 +27,7 @@ export default function Library() {
   const [loading, setLoading] = useState(true)
   const [downloadingId, setDownloadingId] = useState(null)
   const [, startTransition] = useTransition()
+  const [dbPrograms, setDbPrograms] = useState([])
 
   // Material type filter: 'all' | 'notes' | 'book'
   const [materialType, setMaterialType] = useState('all')
@@ -52,6 +53,15 @@ export default function Library() {
     'Semester 8',
   ]
 
+  const defaultYearList = [
+    '2023-2024',
+    '2024-2025',
+    '2025-2026',
+    '2026-2027',
+    '2027-2028',
+    '2028-2029',
+  ]
+
   const unitList = [
     'Unit 1',
     'Unit 2',
@@ -71,6 +81,28 @@ export default function Library() {
     subjectNames: [],
     units: [],
   })
+
+  // Load active programs from database so newly created programs appear immediately
+  useEffect(() => {
+    async function loadProgramsList() {
+      try {
+        const res = await getPrograms()
+        if (res.data?.data) {
+          setDbPrograms(res.data.data.map((p) => p.title).filter(Boolean))
+        }
+      } catch (err) {
+        console.warn('Notice: Could not load programs list:', err.message)
+      }
+    }
+    loadProgramsList()
+  }, [])
+
+  // Comprehensive option lists ensuring all semesters and academic years are always available
+  const allSemesterChoices = Array.from(new Set([...semesterList, ...(options.semesters || [])]))
+  const allYearChoices = Array.from(new Set([...defaultYearList, ...(options.academicYears || [])]))
+  const allCourseChoices = Array.from(new Set([...dbPrograms, ...(options.courseNames || [])])).sort((a, b) =>
+    a.localeCompare(b)
+  )
 
   // Fetch filter options based on current selections
   useEffect(() => {
@@ -356,7 +388,7 @@ export default function Library() {
                     }}
                   >
                     <option value="all">All Academic Years</option>
-                    {options.academicYears.map((year) => (
+                    {allYearChoices.map((year) => (
                       <option key={year} value={year}>
                         {year}
                       </option>
@@ -383,7 +415,7 @@ export default function Library() {
                     }}
                   >
                     <option value="all">All Semesters</option>
-                    {(options.semesters && options.semesters.length > 0 ? options.semesters : semesterList).map((sem) => (
+                    {allSemesterChoices.map((sem) => (
                       <option key={sem} value={sem}>
                         {sem}
                       </option>
@@ -410,7 +442,7 @@ export default function Library() {
                     }}
                   >
                     <option value="all">All Courses</option>
-                    {options.courseNames.map((course) => (
+                    {allCourseChoices.map((course) => (
                       <option key={course} value={course}>
                         {course}
                       </option>
@@ -615,12 +647,10 @@ export default function Library() {
                           {book.unit}
                         </span>
                       )}
-                      {book.semester && (
-                        <span className="book-sem-badge">
-                          <FiLayers style={{ display: 'inline', marginRight: '3px' }} />
-                          {book.semester}
-                        </span>
-                      )}
+                      <span className="book-sem-badge">
+                        <FiLayers style={{ display: 'inline', marginRight: '3px' }} />
+                        {book.semester || 'Semester 1'}
+                      </span>
                     </div>
                     <span className="book-year-badge">
                       <FiCalendar style={{ display: 'inline', marginRight: '4px' }} />

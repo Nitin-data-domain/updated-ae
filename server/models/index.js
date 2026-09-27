@@ -47,13 +47,11 @@ async function syncModels() {
     }
 
     // Backfill any books that don't have a semester yet
+    const { Op } = require('sequelize');
     await Book.update(
       { semester: 'Semester 1' },
-      { where: { semester: ['', null] } }
+      { where: { [Op.or]: [{ semester: '' }, { semester: null }] } }
     );
-
-    // Auto-migrate any book records with broken Cloudinary PDF URLs
-    const { Op } = require('sequelize');
     try {
       const brokenBooks = await Book.findAll({
         where: {

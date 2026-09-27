@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { Op } = require('sequelize');
 const Book = require('../models/Book');
+const Program = require('../models/Program');
 const { cloudinary } = require('../middleware/upload');
 
 // Helper to sanitize legacy broken Cloudinary book URLs to local uploads
@@ -72,31 +73,31 @@ exports.getBooks = async (req, res) => {
     const where = { isActive: true };
 
     if (materialType && materialType !== 'all') {
-      where.materialType = materialType;
+      where.materialType = { [Op.like]: materialType.trim() };
     }
 
     if (unit && unit !== 'all') {
-      where.unit = unit;
+      where.unit = { [Op.like]: unit.trim() };
     }
 
     if (semester && semester !== 'all') {
-      where.semester = semester;
+      where.semester = { [Op.like]: semester.trim() };
     }
 
     if (academicYear && academicYear !== 'all') {
-      where.academicYear = academicYear;
+      where.academicYear = { [Op.like]: academicYear.trim() };
     }
 
     if (courseName && courseName !== 'all') {
-      where.courseName = courseName;
+      where.courseName = { [Op.like]: courseName.trim() };
     }
 
     if (subjectCode && subjectCode !== 'all') {
-      where.subjectCode = subjectCode;
+      where.subjectCode = { [Op.like]: subjectCode.trim() };
     }
 
     if (subjectName && subjectName !== 'all') {
-      where.subjectName = subjectName;
+      where.subjectName = { [Op.like]: `%${subjectName.trim()}%` };
     }
 
     if (search && search.trim()) {
@@ -142,51 +143,70 @@ exports.getBookOptions = async (req, res) => {
   try {
     const { academicYear, courseName, subjectCode, semester } = req.query;
 
-    // 1. All distinct academic years
+    // 1. Academic years: standard years + all years in database
+    const standardYears = ['2023-2024', '2024-2025', '2025-2026', '2026-2027', '2027-2028', '2028-2029'];
     const allYears = await Book.findAll({
       where: { isActive: true },
       attributes: ['academicYear'],
       group: ['academicYear'],
     });
-    const academicYears = allYears
-      .map((b) => b.academicYear)
-      .filter(Boolean)
-      .sort();
+    const dbYears = allYears.map((b) => b.academicYear).filter(Boolean);
+    const academicYears = Array.from(new Set([...standardYears, ...dbYears])).sort();
 
-    // 2. Semesters
-    const semWhere = { isActive: true };
-    if (academicYear && academicYear !== 'all') semWhere.academicYear = academicYear;
-    if (courseName && courseName !== 'all') semWhere.courseName = courseName;
+    // 2. Semesters: standard 8 semesters + all semesters in database
+    const standardSemesters = [
+      'Semester 1',
+      'Semester 2',
+      'Semester 3',
+      'Semester 4',
+      'Semester 5',
+      'Semester 6',
+      'Semester 7',
+      'Semester 8',
+    ];
     const allSemesters = await Book.findAll({
-      where: semWhere,
+      where: { isActive: true },
       attributes: ['semester'],
       group: ['semester'],
     });
-    const semesters = allSemesters
-      .map((b) => b.semester)
-      .filter(Boolean)
-      .sort();
+    const dbSemesters = allSemesters.map((b) => b.semester).filter(Boolean);
+    const semesters = Array.from(new Set([...standardSemesters, ...dbSemesters])).sort();
 
-    // 3. Courses (filtered by academicYear if selected)
-    const courseWhere = { isActive: true };
-    if (academicYear && academicYear !== 'all') {
-      courseWhere.academicYear = academicYear;
+    // 3. Courses: all programs from Program table + courses from books + default courses
+    const defaultCourses = [
+      'BBA Aviation & Travel',
+      'B.Tech Aerospace Engineering',
+      'B.Sc Aeronautical Science',
+      'MBA Aviation Management',
+      'BBA Entrepreneurship & Innovation',
+      'BBA Data Analytics & AI',
+      'Bachelor in Fashion Design',
+      'Bachelor in Fine Arts',
+    ];
+    let progTitles = [];
+    try {
+      const allPrograms = await Program.findAll({
+        where: { isActive: true },
+        attributes: ['title'],
+      });
+      progTitles = allPrograms.map((p) => p.title).filter(Boolean);
+    } catch (e) {
+      console.warn('Notice: Could not load programs in getBookOptions:', e.message);
     }
+
     const allCourses = await Book.findAll({
-      where: courseWhere,
+      where: { isActive: true },
       attributes: ['courseName'],
       group: ['courseName'],
     });
-    const courseNames = allCourses
-      .map((b) => b.courseName)
-      .filter(Boolean)
-      .sort();
+    const dbCourses = allCourses.map((b) => b.courseName).filter(Boolean);
+    const courseNames = Array.from(new Set([...defaultCourses, ...progTitles, ...dbCourses])).sort();
 
     // 4. Subject Codes (filtered by academicYear & courseName & semester if selected)
     const codeWhere = { isActive: true };
-    if (academicYear && academicYear !== 'all') codeWhere.academicYear = academicYear;
-    if (courseName && courseName !== 'all') codeWhere.courseName = courseName;
-    if (semester && semester !== 'all') codeWhere.semester = semester;
+    if (academicYear && academicYear !== 'all') codeWhere.academicYear = { [Op.like]: academicYear.trim() };
+    if (courseName && courseName !== 'all') codeWhere.courseName = { [Op.like]: courseName.trim() };
+    if (semester && semester !== 'all') codeWhere.semester = { [Op.like]: semester.trim() };
     const allCodes = await Book.findAll({
       where: codeWhere,
       attributes: ['subjectCode'],
@@ -199,10 +219,10 @@ exports.getBookOptions = async (req, res) => {
 
     // 5. Subject Names (filtered by academicYear, courseName, subjectCode if selected)
     const nameWhere = { isActive: true };
-    if (academicYear && academicYear !== 'all') nameWhere.academicYear = academicYear;
-    if (courseName && courseName !== 'all') nameWhere.courseName = courseName;
-    if (subjectCode && subjectCode !== 'all') nameWhere.subjectCode = subjectCode;
-    if (semester && semester !== 'all') nameWhere.semester = semester;
+    if (academicYear && academicYear !== 'all') nameWhere.academicYear = { [Op.like]: academicYear.trim() };
+    if (courseName && courseName !== 'all') nameWhere.courseName = { [Op.like]: courseName.trim() };
+    if (subjectCode && subjectCode !== 'all') nameWhere.subjectCode = { [Op.like]: subjectCode.trim() };
+    if (semester && semester !== 'all') nameWhere.semester = { [Op.like]: semester.trim() };
     const allNames = await Book.findAll({
       where: nameWhere,
       attributes: ['subjectName'],
@@ -215,10 +235,10 @@ exports.getBookOptions = async (req, res) => {
 
     // 6. Distinct units for notes
     const unitWhere = { isActive: true };
-    if (academicYear && academicYear !== 'all') unitWhere.academicYear = academicYear;
-    if (courseName && courseName !== 'all') unitWhere.courseName = courseName;
-    if (subjectCode && subjectCode !== 'all') unitWhere.subjectCode = subjectCode;
-    if (semester && semester !== 'all') unitWhere.semester = semester;
+    if (academicYear && academicYear !== 'all') unitWhere.academicYear = { [Op.like]: academicYear.trim() };
+    if (courseName && courseName !== 'all') unitWhere.courseName = { [Op.like]: courseName.trim() };
+    if (subjectCode && subjectCode !== 'all') unitWhere.subjectCode = { [Op.like]: subjectCode.trim() };
+    if (semester && semester !== 'all') unitWhere.semester = { [Op.like]: semester.trim() };
     const allUnits = await Book.findAll({
       where: unitWhere,
       attributes: ['unit'],
@@ -413,7 +433,7 @@ exports.createBook = async (req, res) => {
       description: description ? description.trim() : '',
       materialType: isNotes ? 'notes' : 'book',
       unit: unit ? unit.trim() : '',
-      semester: semester ? semester.trim() : '',
+      semester: semester && semester.trim() ? semester.trim() : 'Semester 1',
       fileUrl,
       fileName: fileName || `${subjectCode.trim()}_${isNotes ? unit || 'Notes' : 'Book'}.pdf`,
       fileSize: fileSize || 'PDF Document',
