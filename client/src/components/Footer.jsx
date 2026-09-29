@@ -42,14 +42,13 @@ export default function Footer() {
             <div className="footer-col">
               <h4 className="footer-heading">Our Programs</h4>
               <ul className="footer-links">
-                <li><Link to="/programs">BBA Aviation & Airport Management</Link></li>
+                <li><Link to="/programs">BBA Aviation & Travel</Link></li>
                 <li><Link to="/programs">B.Tech Aerospace Engineering</Link></li>
-                <li><Link to="/programs">MBA (HR & Aviation)</Link></li>
+                <li><Link to="/programs">MBA Aviation Management</Link></li>
                 <li><Link to="/programs">MBA Data Analytics & Artificial Intelligence</Link></li>
                 <li><Link to="/programs">B.Sc Aeronautical Science</Link></li>
                 <li><Link to="/programs">BBA Entrepreneurship & Innovation</Link></li>
                 <li><Link to="/programs">Bachelor in Fashion Design</Link></li>
-                <li><Link to="/programs">Bachelor in Fine Arts</Link></li>
               </ul>
             </div>
 

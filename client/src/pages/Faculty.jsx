@@ -25,7 +25,6 @@ export default function Faculty() {
   const [faculty, setFaculty] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [activeFilter, setActiveFilter] = useState('all')
   const [viewMode, setViewMode] = useState('cards') // 'cards' | 'gallery'
   const [selectedPhotoMember, setSelectedPhotoMember] = useState(null)
 
@@ -46,33 +45,17 @@ export default function Faculty() {
   // Filtered faculty list
   const filteredFaculty = useMemo(() => {
     return faculty.filter(m => {
-      // Filter category
-      let matchCat = true
-      if (activeFilter === 'hod') {
-        matchCat = isHOD(m)
-      } else if (activeFilter === 'engineering') {
-        const text = `${m.designation} ${m.specialization}`.toLowerCase()
-        matchCat = text.includes('aerospace') || text.includes('aeronautical') || text.includes('avionics') || text.includes('simulator')
-      } else if (activeFilter === 'aviation') {
-        const text = `${m.designation} ${m.specialization}`.toLowerCase()
-        matchCat = text.includes('aviation') || text.includes('flight') || text.includes('pilot') || text.includes('airport')
-      } else if (activeFilter === 'management') {
-        const text = `${m.designation} ${m.specialization}`.toLowerCase()
-        matchCat = text.includes('management') || text.includes('entrepreneurship') || text.includes('marketing')
-      }
-
-      // Search term
       const q = search.toLowerCase().trim()
-      if (!q) return matchCat
+      if (!q) return true
 
       const inName = m.name?.toLowerCase().includes(q)
       const inDes = m.designation?.toLowerCase().includes(q)
       const inSpec = m.specialization?.toLowerCase().includes(q)
       const inQual = m.qualification?.toLowerCase().includes(q)
 
-      return matchCat && (inName || inDes || inSpec || inQual)
+      return inName || inDes || inSpec || inQual
     })
-  }, [faculty, activeFilter, search])
+  }, [faculty, search])
 
   if (loading) {
     return (
@@ -116,7 +99,7 @@ export default function Faculty() {
               <FiSearch className="faculty-search-icon" />
               <input
                 type="text"
-                placeholder="Search faculty by name, HOD, specialization..."
+                placeholder="Search faculty by name, designation, specialization..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 className="faculty-search-input"
@@ -128,37 +111,14 @@ export default function Faculty() {
               )}
             </div>
 
-            {/* Filter Pills */}
+            {/* Faculty Count Pill */}
             <div className="faculty-filter-pills">
               <button
-                className={`faculty-pill ${activeFilter === 'all' ? 'active' : ''}`}
-                onClick={() => setActiveFilter('all')}
+                className="faculty-pill active"
+                onClick={() => setSearch('')}
+                title={search ? 'Click to show all faculty' : 'Total faculty members'}
               >
                 All Faculty ({faculty.length})
-              </button>
-              <button
-                className={`faculty-pill hod-pill ${activeFilter === 'hod' ? 'active' : ''}`}
-                onClick={() => setActiveFilter('hod')}
-              >
-                <FiStar size={13} /> Heads of Department (HOD)
-              </button>
-              <button
-                className={`faculty-pill ${activeFilter === 'engineering' ? 'active' : ''}`}
-                onClick={() => setActiveFilter('engineering')}
-              >
-                Aerospace & Engineering
-              </button>
-              <button
-                className={`faculty-pill ${activeFilter === 'aviation' ? 'active' : ''}`}
-                onClick={() => setActiveFilter('aviation')}
-              >
-                Flight & Aviation Science
-              </button>
-              <button
-                className={`faculty-pill ${activeFilter === 'management' ? 'active' : ''}`}
-                onClick={() => setActiveFilter('management')}
-              >
-                Management & Startups
               </button>
             </div>
 
@@ -191,15 +151,12 @@ export default function Faculty() {
             <div className="faculty-empty-state">
               <FiUsers size={48} className="empty-icon" />
               <h3>No faculty members found</h3>
-              <p>Try clearing your search query or choosing another category filter.</p>
+              <p>Try clearing your search query.</p>
               <button
                 className="btn btn-navy btn-sm"
-                onClick={() => {
-                  setSearch('')
-                  setActiveFilter('all')
-                }}
+                onClick={() => setSearch('')}
               >
-                Reset Filters
+                Reset Search
               </button>
             </div>
           ) : viewMode === 'cards' ? (
