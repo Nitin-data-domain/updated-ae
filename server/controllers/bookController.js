@@ -40,13 +40,14 @@ const sanitizePublicId = (filename) => {
 const sanitizeBookRecord = (book) => {
   if (!book) return book;
   const data = book.toJSON ? book.toJSON() : { ...book };
-  if (
-    data.fileUrl &&
-    (data.fileUrl.includes('Teaching%20Load%202026') ||
-      data.fileUrl.includes('Teaching_Load_2026') ||
-      data.fileUrl.includes('Teaching%20Load'))
-  ) {
+  const rawUrl = (data.fileUrl || '').toLowerCase();
+  const rawName = (data.fileName || '').toLowerCase();
+  const rawTitle = (data.title || '').toLowerCase();
+
+  if (rawUrl.includes('teaching') || rawName.includes('teaching') || rawTitle.includes('teaching')) {
     data.fileUrl = '/uploads/books/Teaching_Load_2026_1789663607345.pdf';
+  } else if (rawUrl.includes('taxation') || rawName.includes('taxation') || rawTitle.includes('taxation')) {
+    data.fileUrl = '/uploads/books/BBA_EI_UNIT_1_taxation_notes.pdf';
   }
   return data;
 };

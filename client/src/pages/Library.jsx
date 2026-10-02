@@ -161,12 +161,15 @@ export default function Library() {
   const resolveBookFileUrl = (book) => {
     if (!book) return '#';
     let url = book.fileUrl || '';
-    if (
-      url.includes('Teaching%20Load%202026') ||
-      url.includes('Teaching_Load_2026') ||
-      url.includes('Teaching%20Load')
-    ) {
-      url = '/uploads/books/Teaching_Load_2026_1789663607345.pdf';
+    const rawUrl = url.toLowerCase();
+    const rawName = (book.fileName || '').toLowerCase();
+    const rawTitle = (book.title || '').toLowerCase();
+
+    if (rawUrl.includes('teaching') || rawName.includes('teaching') || rawTitle.includes('teaching')) {
+      return '/uploads/books/Teaching_Load_2026_1789663607345.pdf';
+    }
+    if (rawUrl.includes('taxation') || rawName.includes('taxation') || rawTitle.includes('taxation')) {
+      return '/uploads/books/BBA_EI_UNIT_1_taxation_notes.pdf';
     }
     // If it is an external link (Google Drive, external third-party site), open directly
     if (url.startsWith('http') && !url.includes('/uploads/') && !url.includes('cloudinary.com')) {
