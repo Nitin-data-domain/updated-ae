@@ -405,8 +405,9 @@ exports.serveBookFile = async (req, res) => {
     const contentType = getContentType(downloadFileName);
 
     // 1. Check local file on disk in uploads/books
-    if (targetUrl && targetUrl.startsWith('/uploads/')) {
-      const fullPath = path.join(__dirname, '..', targetUrl.replace(/^\//, ''));
+    if (targetUrl && targetUrl.includes('/uploads/')) {
+      const relPath = targetUrl.substring(targetUrl.indexOf('/uploads/')).replace(/^\//, '');
+      const fullPath = path.join(__dirname, '..', relPath);
       if (fs.existsSync(fullPath)) {
         res.setHeader('Content-Type', contentType);
         res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(downloadFileName)}"`);
@@ -418,11 +419,18 @@ exports.serveBookFile = async (req, res) => {
     const uploadsDir = path.join(__dirname, '../uploads/books');
     if (fs.existsSync(uploadsDir)) {
       const files = fs.readdirSync(uploadsDir);
-      const matched = files.find(
-        (f) =>
-          (book.fileName && f.toLowerCase().includes(book.fileName.replace(/\.[^/.]+$/, '').toLowerCase())) ||
+      const cleanTarget = (book.fileName || '')
+        .replace(/\.[^/.]+$/, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '');
+
+      const matched = files.find((f) => {
+        const cleanF = f.toLowerCase().replace(/[^a-z0-9]/g, '');
+        return (
+          (cleanTarget && cleanF.includes(cleanTarget)) ||
           (targetUrl && targetUrl.toLowerCase().includes('teaching') && f.toLowerCase().includes('teaching'))
-      );
+        );
+      });
       if (matched) {
         const fullPath = path.join(uploadsDir, matched);
         res.setHeader('Content-Type', contentType);
@@ -515,14 +523,12 @@ exports.createBook = async (req, res) => {
 
     // Handle file upload if sent via multer
     if (req.file) {
-      // 1. Upload to Cloudinary with safe sanitized public_id (permanent cloud backup)
-      const uploadRes = await uploadToCloudinary(req.file.buffer, req.file.originalname);
-
-      // 2. Save locally in uploads/books (local disk cache)
-      const saved = saveBookLocally(req.file.buffer, req.file.originalname);
-
-      // Prefer Cloudinary secure URL so it persists across container restarts, fallback to local URL
-      fileUrl = uploadRes?.secure_url || saved.localUrl;
+      if (req.file.filename) {
+        fileUrl = `/uploads/books/${req.file.filename}`;
+      } else if (req.file.buffer) {
+        const saved = saveBookLocally(req.file.buffer, req.file.originalname);
+        fileUrl = saved.localUrl;
+      }
       fileName = req.file.originalname;
       const sizeMB = (req.file.size / (1024 * 1024)).toFixed(2);
       fileSize = `${sizeMB} MB`;
@@ -582,10 +588,12 @@ exports.updateBook = async (req, res) => {
 
     // Handle file upload if new file provided
     if (req.file) {
-      const uploadRes = await uploadToCloudinary(req.file.buffer, req.file.originalname);
-      const saved = saveBookLocally(req.file.buffer, req.file.originalname);
-
-      updateData.fileUrl = uploadRes?.secure_url || saved.localUrl;
+      if (req.file.filename) {
+        updateData.fileUrl = `/uploads/books/${req.file.filename}`;
+      } else if (req.file.buffer) {
+        const saved = saveBookLocally(req.file.buffer, req.file.originalname);
+        updateData.fileUrl = saved.localUrl;
+      }
       updateData.fileName = req.file.originalname;
       const sizeMB = (req.file.size / (1024 * 1024)).toFixed(2);
       updateData.fileSize = `${sizeMB} MB`;

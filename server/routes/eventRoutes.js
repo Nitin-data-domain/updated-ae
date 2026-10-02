@@ -4,7 +4,7 @@ const {
   getEvents, getAllEvents, createEvent, updateEvent, deleteEvent
 } = require('../controllers/eventController');
 const { protect } = require('../middleware/auth');
-const { uploadImage, cloudinary } = require('../middleware/upload');
+const { uploadImage, downloadExternalImage } = require('../middleware/upload');
 
 router.get('/', getEvents);
 router.get('/admin', protect, getAllEvents);
@@ -12,33 +12,23 @@ router.post('/', protect, createEvent);
 router.put('/:id', protect, updateEvent);
 router.delete('/:id', protect, deleteEvent);
 
-// Upload event photo → Cloudinary
+// Upload event photo → GoDaddy Local Storage
 router.post('/upload-image', protect, uploadImage.single('image'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ success: false, message: 'No image provided' });
   }
-  // Cloudinary returns the permanent URL in req.file.path
-  res.json({ success: true, url: req.file.path });
+  const fileUrl = req.file.filename ? `/uploads/images/${req.file.filename}` : req.file.path;
+  res.json({ success: true, url: fileUrl });
 });
 
-// Fetch image from external URL (Google Drive, etc.) → upload to Cloudinary
+// Fetch image from external URL (Google Drive, etc.) → GoDaddy Local Storage
 router.post('/fetch-image', protect, async (req, res) => {
   try {
-    let { url } = req.body;
+    const { url } = req.body;
     if (!url) return res.status(400).json({ success: false, message: 'URL required' });
 
-    const m1 = url.match(/drive\.google\.com\/file\/d\/([^/?\s]+)/);
-    const m2 = url.match(/drive\.google\.com\/open\?id=([^&\s]+)/);
-    const fileId = (m1 && m1[1]) || (m2 && m2[1]);
-    if (fileId) url = `https://drive.google.com/uc?export=download&id=${fileId}`;
-
-    // Upload directly from URL to Cloudinary (no local disk needed)
-    const result = await cloudinary.uploader.upload(url, {
-      folder: 'aharada-education',
-      transformation: [{ width: 1200, height: 800, crop: 'limit', quality: 'auto' }],
-    });
-
-    res.json({ success: true, url: result.secure_url });
+    const localUrl = await downloadExternalImage(url);
+    res.json({ success: true, url: localUrl });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

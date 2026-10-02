@@ -2,7 +2,7 @@ const express = require('express');
 const router  = express.Router();
 const { CampusPhoto, CompanyPartner } = require('../models/SiteContent');
 const { protect }  = require('../middleware/auth');
-const { uploadImage, cloudinary } = require('../middleware/upload');
+const { uploadImage, downloadExternalImage } = require('../middleware/upload');
 
 // ══════════════════════════════════════════════════════════════════════════════
 // SHARED IMAGE UPLOAD (reused by both sections)
@@ -10,26 +10,18 @@ const { uploadImage, cloudinary } = require('../middleware/upload');
 // ══════════════════════════════════════════════════════════════════════════════
 router.post('/upload-image', protect, uploadImage.single('image'), (req, res) => {
   if (!req.file) return res.status(400).json({ success: false, message: 'No image file provided' });
-  res.json({ success: true, url: req.file.path });
+  const fileUrl = req.file.filename ? `/uploads/images/${req.file.filename}` : req.file.path;
+  res.json({ success: true, url: fileUrl });
 });
 
-// Fetch from external URL (e.g. Google Drive) → Cloudinary
+// Fetch from external URL (e.g. Google Drive) → GoDaddy Local Storage
 router.post('/fetch-image', protect, async (req, res) => {
   try {
-    let { url } = req.body;
+    const { url } = req.body;
     if (!url) return res.status(400).json({ success: false, message: 'URL is required' });
 
-    const match1 = url.match(/drive\.google\.com\/file\/d\/([^/?\s]+)/);
-    const match2 = url.match(/drive\.google\.com\/open\?id=([^&\s]+)/);
-    const match3 = url.match(/drive\.google\.com\/uc\?.*id=([^&\s]+)/);
-    const fileId = (match1 && match1[1]) || (match2 && match2[1]) || (match3 && match3[1]);
-    if (fileId) url = `https://drive.google.com/uc?export=download&id=${fileId}`;
-
-    const result = await cloudinary.uploader.upload(url, {
-      folder: 'aharada-education',
-      transformation: [{ width: 1200, height: 800, crop: 'limit', quality: 'auto' }],
-    });
-    res.json({ success: true, url: result.secure_url });
+    const localUrl = await downloadExternalImage(url);
+    res.json({ success: true, url: localUrl });
   } catch (err) {
     console.error('fetch-image error:', err);
     res.status(500).json({ success: false, message: 'Failed to fetch image: ' + err.message });
