@@ -49,6 +49,7 @@ export default function Footer() {
                 <li><Link to="/programs">B.Sc Aeronautical Science</Link></li>
                 <li><Link to="/programs">BBA Entrepreneurship & Innovation</Link></li>
                 <li><Link to="/programs">Bachelor in Fashion Design</Link></li>
+                <li><Link to="/programs">BBA Data Analytics & Artificial Intelligence</Link></li>
               </ul>
             </div>
 
