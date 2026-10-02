@@ -111,16 +111,6 @@ export default function Faculty() {
               )}
             </div>
 
-            {/* Faculty Count Pill */}
-            <div className="faculty-filter-pills">
-              <button
-                className="faculty-pill active"
-                onClick={() => setSearch('')}
-                title={search ? 'Click to show all faculty' : 'Total faculty members'}
-              >
-                All Faculty ({faculty.length})
-              </button>
-            </div>
 
             {/* View Mode Toggle (Option to show full photographs) */}
             <div className="faculty-view-toggle">
