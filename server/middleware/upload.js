@@ -104,17 +104,6 @@ const uploadBook = multer({
   limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB
 });
 
-// Cloudinary client exported for backward compatibility / legacy assets
-let cloudinary;
-try {
-  cloudinary = require('cloudinary').v2;
-  cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'dprlzu2ns',
-    api_key: String(process.env.CLOUDINARY_API_KEY || '124785717795421'),
-    api_secret: process.env.CLOUDINARY_API_SECRET || 'MrOGGkP7c9Lqome6_uZQoPNf8HA',
-  });
-} catch (_) {}
-
 // Helper to download an image from an external URL (Google Drive, direct link) and save locally to GoDaddy
 async function downloadExternalImage(imageUrl) {
   let url = imageUrl;
@@ -133,42 +122,30 @@ async function downloadExternalImage(imageUrl) {
     url = `https://drive.google.com/uc?export=download&id=${fileId}`;
   }
 
-  try {
-    const response = await fetch(url, { redirect: 'follow' });
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-    const contentType = response.headers.get('content-type') || '';
-    let ext = '.jpg';
-    if (contentType.includes('png')) ext = '.png';
-    else if (contentType.includes('webp')) ext = '.webp';
-    else if (contentType.includes('gif')) ext = '.gif';
-    else if (contentType.includes('svg')) ext = '.svg';
-    else if (contentType.includes('jpeg') || contentType.includes('jpg')) ext = '.jpg';
-
-    const arrayBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const filename = `img_${Date.now()}${ext}`;
-    const filePath = path.join(imagesDir, filename);
-    fs.writeFileSync(filePath, buffer);
-    return `/uploads/images/${filename}`;
-  } catch (err) {
-    if (cloudinary) {
-      const result = await cloudinary.uploader.upload(url, {
-        folder: 'aharada-education',
-        transformation: [{ width: 1200, height: 800, crop: 'limit', quality: 'auto' }],
-      });
-      return result.secure_url;
-    }
-    throw err;
+  const response = await fetch(url, { redirect: 'follow' });
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
   }
+  const contentType = response.headers.get('content-type') || '';
+  let ext = '.jpg';
+  if (contentType.includes('png')) ext = '.png';
+  else if (contentType.includes('webp')) ext = '.webp';
+  else if (contentType.includes('gif')) ext = '.gif';
+  else if (contentType.includes('svg')) ext = '.svg';
+  else if (contentType.includes('jpeg') || contentType.includes('jpg')) ext = '.jpg';
+
+  const arrayBuffer = await response.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+  const filename = `img_${Date.now()}${ext}`;
+  const filePath = path.join(imagesDir, filename);
+  fs.writeFileSync(filePath, buffer);
+  return `/uploads/images/${filename}`;
 }
 
 module.exports = {
   uploadBrochure,
   uploadImage,
   uploadBook,
-  cloudinary,
   downloadExternalImage,
   imagesDir,
   booksDir,

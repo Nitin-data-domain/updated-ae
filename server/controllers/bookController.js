@@ -5,7 +5,6 @@ const http = require('http');
 const { Op } = require('sequelize');
 const Book = require('../models/Book');
 const Program = require('../models/Program');
-const { cloudinary } = require('../middleware/upload');
 
 // Helper to determine Content-Type header from file extension
 const getContentType = (filename) => {
@@ -26,7 +25,7 @@ const getContentType = (filename) => {
   }
 };
 
-// Helper to sanitize filename into safe Cloudinary public_id (alphanumeric and underscores only)
+// Helper to sanitize filename into safe name
 const sanitizePublicId = (filename) => {
   const base = (filename || 'document')
     .replace(/\.[^/.]+$/, '')
@@ -68,85 +67,6 @@ const saveBookLocally = (buffer, filename) => {
     uniqueName,
   };
 };
-
-// Helper to upload buffer to Cloudinary with safe public_id
-const uploadToCloudinary = (buffer, filename) => {
-  return new Promise((resolve) => {
-    try {
-      const cleanPublicId = sanitizePublicId(filename);
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          folder: 'aharada-education/books',
-          resource_type: 'raw',
-          public_id: cleanPublicId,
-        },
-        (error, result) => {
-          if (error) {
-            console.warn('Cloudinary upload warning:', error.message);
-            resolve(null);
-          } else {
-            console.log('✅ Cloudinary upload succeeded:', result.public_id);
-            resolve(result);
-          }
-        }
-      );
-      uploadStream.end(buffer);
-    } catch (e) {
-      console.warn('Cloudinary upload stream exception:', e.message);
-      resolve(null);
-    }
-  });
-};
-
-// Helper to find matching Cloudinary asset for a book (even if local disk was wiped on server restart)
-async function findCloudinaryAsset(book) {
-  try {
-    // 1. Direct match if fileUrl contains aharada-education/books/
-    const urlMatch = (book.fileUrl || '').match(/aharada-education\/books\/([^.\/?#]+)/);
-    if (urlMatch) {
-      return { publicId: `aharada-education/books/${decodeURIComponent(urlMatch[1])}`, resourceType: 'raw' };
-    }
-
-    // 2. Query Cloudinary raw assets in books folder
-    const rawRes = await cloudinary.api.resources({
-      type: 'upload',
-      prefix: 'aharada-education/books',
-      resource_type: 'raw',
-      max_results: 100,
-    });
-
-    const cleanTarget = (book.fileName || book.title || '')
-      .replace(/\.[^/.]+$/, '')
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, '');
-
-    if (rawRes.resources && rawRes.resources.length > 0) {
-      const match = rawRes.resources.find((r) => {
-        const cleanPub = r.public_id.toLowerCase().replace(/[^a-z0-9]/g, '');
-        return cleanPub.includes(cleanTarget) || cleanTarget.includes(cleanPub.replace('aharadaeducationbooks', ''));
-      });
-      if (match) return { publicId: match.public_id, resourceType: 'raw' };
-    }
-
-    // 3. Query Cloudinary image assets (e.g. legacy Teaching Load PDF)
-    const imgRes = await cloudinary.api.resources({
-      type: 'upload',
-      prefix: 'aharada-education/books',
-      resource_type: 'image',
-      max_results: 50,
-    });
-    if (imgRes.resources && imgRes.resources.length > 0) {
-      const match = imgRes.resources.find((r) => {
-        const cleanPub = r.public_id.toLowerCase().replace(/[^a-z0-9]/g, '');
-        return cleanPub.includes(cleanTarget) || cleanTarget.includes(cleanPub.replace('aharadaeducationbooks', ''));
-      });
-      if (match) return { publicId: match.public_id, resourceType: 'image' };
-    }
-  } catch (err) {
-    console.warn('findCloudinaryAsset lookup error:', err.message);
-  }
-  return null;
-}
 
 // @desc    Get books with cascading filters and search
 // @route   GET /api/books
@@ -440,36 +360,7 @@ exports.serveBookFile = async (req, res) => {
       }
     }
 
-    // 2. Fetch/stream from Cloudinary using authenticated private_download_url
-    const cloudinaryAsset = await findCloudinaryAsset(book);
-    if (cloudinaryAsset) {
-      const dlUrl = cloudinary.utils.private_download_url(
-        cloudinaryAsset.publicId,
-        cloudinaryAsset.resourceType === 'image' ? 'pdf' : '',
-        {
-          resource_type: cloudinaryAsset.resourceType,
-          type: 'upload',
-          attachment: true,
-        }
-      );
-
-      res.setHeader('Content-Type', contentType);
-      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(downloadFileName)}"`);
-
-      const client = dlUrl.startsWith('https') ? https : http;
-      return client.get(dlUrl, (stream) => {
-        if (stream.statusCode === 200) {
-          stream.pipe(res);
-        } else {
-          res.redirect(dlUrl);
-        }
-      }).on('error', (err) => {
-        console.error('Cloudinary stream pipe error:', err);
-        res.redirect(dlUrl);
-      });
-    }
-
-    // 3. Fallback: If targetUrl is an external link (http:// or https://)
+    // 2. Fallback: If targetUrl is an external link (http:// or https://)
     if (targetUrl && (targetUrl.startsWith('http://') || targetUrl.startsWith('https://'))) {
       return res.redirect(targetUrl);
     }

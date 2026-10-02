@@ -71,6 +71,25 @@ async function syncModels() {
         });
         console.log(`Repaired book #${b.id} (${b.title}) fileUrl to local uploads`);
       }
+
+      const brokenTaxationBooks = await Book.findAll({
+        where: {
+          [Op.or]: [
+            { fileUrl: { [Op.like]: '%taxation%' } },
+            { fileName: { [Op.like]: '%taxation%' } },
+            { title: { [Op.like]: '%taxation%' } },
+          ],
+        },
+      });
+      for (const b of brokenTaxationBooks) {
+        if (!b.fileUrl || !b.fileUrl.startsWith('/uploads/')) {
+          await b.update({
+            fileUrl: '/uploads/books/BBA_EI_UNIT_1_taxation_notes.pdf',
+            fileName: 'BBA_EI_UNIT_1_taxation_notes.pdf',
+          });
+          console.log(`Repaired taxation book #${b.id} (${b.title}) to local GoDaddy storage`);
+        }
+      }
     } catch (migErr) {
       console.warn('Book URL migration check:', migErr.message);
     }
