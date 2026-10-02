@@ -168,10 +168,12 @@ export default function Library() {
     ) {
       url = '/uploads/books/Teaching_Load_2026_1789663607345.pdf';
     }
-    if (url.startsWith('/uploads')) {
-      return `${window.location.origin}${url}`;
+    // If it is an external link (Google Drive, external third-party site), open directly
+    if (url.startsWith('http') && !url.includes('/uploads/') && !url.includes('cloudinary.com')) {
+      return url;
     }
-    return url;
+    // Route through backend streaming endpoint ensuring persistence even across server reboots
+    return `/api/books/file/${book.id}`;
   };
 
   // Handle book download
@@ -179,14 +181,14 @@ export default function Library() {
     setDownloadingId(book.id);
     try {
       // Record download count on server
-      await recordBookDownload(book.id);
+      await recordBookDownload(book.id).catch(() => {});
 
       // Update local download count
       setBooks((prev) =>
         prev.map((b) => (b.id === book.id ? { ...b, downloadCount: (b.downloadCount || 0) + 1 } : b))
       );
 
-      toast.success(`Accessing: ${book.title}`, {
+      toast.success(`Downloading: ${book.title}`, {
         duration: 3000,
       });
 
@@ -197,9 +199,10 @@ export default function Library() {
       link.href = targetUrl;
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
-      link.download =
+      const cleanFileName =
         book.fileName ||
-        `${book.subjectCode}_${book.materialType === 'notes' ? (book.unit ? book.unit.replace(/\s+/g, '_') : 'Notes') : 'Book'}.pdf`;
+        `${book.subjectCode || 'document'}_${book.materialType === 'notes' ? (book.unit ? book.unit.replace(/\s+/g, '_') : 'Notes') : 'Book'}.pdf`;
+      link.download = cleanFileName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

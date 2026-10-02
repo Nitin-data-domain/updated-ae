@@ -1,9 +1,40 @@
 const fs = require('fs');
 const path = require('path');
+const https = require('https');
+const http = require('http');
 const { Op } = require('sequelize');
 const Book = require('../models/Book');
 const Program = require('../models/Program');
 const { cloudinary } = require('../middleware/upload');
+
+// Helper to determine Content-Type header from file extension
+const getContentType = (filename) => {
+  const ext = (path.extname(filename || '') || '').toLowerCase();
+  switch (ext) {
+    case '.pdf':
+      return 'application/pdf';
+    case '.docx':
+      return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    case '.doc':
+      return 'application/msword';
+    case '.epub':
+      return 'application/epub+zip';
+    case '.zip':
+      return 'application/zip';
+    default:
+      return 'application/octet-stream';
+  }
+};
+
+// Helper to sanitize filename into safe Cloudinary public_id (alphanumeric and underscores only)
+const sanitizePublicId = (filename) => {
+  const base = (filename || 'document')
+    .replace(/\.[^/.]+$/, '')
+    .replace(/[^a-zA-Z0-9_-]/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^_|_$/g, '') || 'document';
+  return `${base}_${Date.now()}`;
+};
 
 // Helper to sanitize legacy broken Cloudinary book URLs to local uploads
 const sanitizeBookRecord = (book) => {
@@ -20,7 +51,7 @@ const sanitizeBookRecord = (book) => {
   return data;
 };
 
-// Helper to save book/notes file locally in server/uploads/books
+// Helper to save book/notes file locally in server/uploads/books (as fast cache)
 const saveBookLocally = (buffer, filename) => {
   const uploadDir = path.join(__dirname, '../uploads/books');
   if (!fs.existsSync(uploadDir)) {
@@ -37,32 +68,84 @@ const saveBookLocally = (buffer, filename) => {
   };
 };
 
-// Helper to upload buffer to Cloudinary for raw/PDF files (non-blocking backup)
+// Helper to upload buffer to Cloudinary with safe public_id
 const uploadToCloudinary = (buffer, filename) => {
   return new Promise((resolve) => {
     try {
+      const cleanPublicId = sanitizePublicId(filename);
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: 'aharada-education/books',
           resource_type: 'raw',
-          public_id: filename ? filename.replace(/\.[^/.]+$/, '') + '_' + Date.now() : undefined,
+          public_id: cleanPublicId,
         },
         (error, result) => {
           if (error) {
-            console.warn('Cloudinary raw upload notice:', error.message);
+            console.warn('Cloudinary upload warning:', error.message);
             resolve(null);
           } else {
+            console.log('✅ Cloudinary upload succeeded:', result.public_id);
             resolve(result);
           }
         }
       );
       uploadStream.end(buffer);
     } catch (e) {
-      console.warn('Cloudinary upload stream notice:', e.message);
+      console.warn('Cloudinary upload stream exception:', e.message);
       resolve(null);
     }
   });
 };
+
+// Helper to find matching Cloudinary asset for a book (even if local disk was wiped on server restart)
+async function findCloudinaryAsset(book) {
+  try {
+    // 1. Direct match if fileUrl contains aharada-education/books/
+    const urlMatch = (book.fileUrl || '').match(/aharada-education\/books\/([^.\/?#]+)/);
+    if (urlMatch) {
+      return { publicId: `aharada-education/books/${decodeURIComponent(urlMatch[1])}`, resourceType: 'raw' };
+    }
+
+    // 2. Query Cloudinary raw assets in books folder
+    const rawRes = await cloudinary.api.resources({
+      type: 'upload',
+      prefix: 'aharada-education/books',
+      resource_type: 'raw',
+      max_results: 100,
+    });
+
+    const cleanTarget = (book.fileName || book.title || '')
+      .replace(/\.[^/.]+$/, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '');
+
+    if (rawRes.resources && rawRes.resources.length > 0) {
+      const match = rawRes.resources.find((r) => {
+        const cleanPub = r.public_id.toLowerCase().replace(/[^a-z0-9]/g, '');
+        return cleanPub.includes(cleanTarget) || cleanTarget.includes(cleanPub.replace('aharadaeducationbooks', ''));
+      });
+      if (match) return { publicId: match.public_id, resourceType: 'raw' };
+    }
+
+    // 3. Query Cloudinary image assets (e.g. legacy Teaching Load PDF)
+    const imgRes = await cloudinary.api.resources({
+      type: 'upload',
+      prefix: 'aharada-education/books',
+      resource_type: 'image',
+      max_results: 50,
+    });
+    if (imgRes.resources && imgRes.resources.length > 0) {
+      const match = imgRes.resources.find((r) => {
+        const cleanPub = r.public_id.toLowerCase().replace(/[^a-z0-9]/g, '');
+        return cleanPub.includes(cleanTarget) || cleanTarget.includes(cleanPub.replace('aharadaeducationbooks', ''));
+      });
+      if (match) return { publicId: match.public_id, resourceType: 'image' };
+    }
+  } catch (err) {
+    console.warn('findCloudinaryAsset lookup error:', err.message);
+  }
+  return null;
+}
 
 // @desc    Get books with cascading filters and search
 // @route   GET /api/books
@@ -278,19 +361,20 @@ exports.downloadBook = async (req, res) => {
     // Increment download count
     await book.increment('downloadCount', { by: 1 }).catch(() => {});
 
-    const sanitized = sanitizeBookRecord(book);
-
-    // If query ?redirect=true, redirect directly to file
-    if (req.query.redirect === 'true') {
-      return res.redirect(sanitized.fileUrl);
+    // If query ?redirect=true or ?download=true, delegate directly to stream the file
+    if (req.query.redirect === 'true' || req.query.download === 'true') {
+      return exports.serveBookFile(req, res);
     }
+
+    const sanitized = sanitizeBookRecord(book);
+    const downloadEndpoint = `/api/books/file/${book.id}`;
 
     res.json({
       success: true,
       data: {
         id: book.id,
         title: book.title,
-        downloadUrl: sanitized.fileUrl,
+        downloadUrl: downloadEndpoint,
         fileName: book.fileName,
         downloadCount: (book.downloadCount || 0) + 1,
       },
@@ -315,18 +399,22 @@ exports.serveBookFile = async (req, res) => {
 
     const sanitized = sanitizeBookRecord(book);
     let targetUrl = sanitized.fileUrl;
+    const downloadFileName =
+      book.fileName ||
+      `${book.subjectCode || 'document'}_${book.materialType === 'notes' ? (book.unit ? book.unit.replace(/\s+/g, '_') : 'Notes') : 'Book'}.pdf`;
+    const contentType = getContentType(downloadFileName);
 
-    // Check if targetUrl is a local /uploads/ path
+    // 1. Check local file on disk in uploads/books
     if (targetUrl && targetUrl.startsWith('/uploads/')) {
       const fullPath = path.join(__dirname, '..', targetUrl.replace(/^\//, ''));
       if (fs.existsSync(fullPath)) {
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(book.fileName || 'document.pdf')}"`);
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(downloadFileName)}"`);
         return res.sendFile(fullPath);
       }
     }
 
-    // Check uploads/books directory for matching file
+    // 1b. Check local uploads/books directory for matching file
     const uploadsDir = path.join(__dirname, '../uploads/books');
     if (fs.existsSync(uploadsDir)) {
       const files = fs.readdirSync(uploadsDir);
@@ -337,17 +425,47 @@ exports.serveBookFile = async (req, res) => {
       );
       if (matched) {
         const fullPath = path.join(uploadsDir, matched);
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(book.fileName || 'document.pdf')}"`);
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(downloadFileName)}"`);
         return res.sendFile(fullPath);
       }
     }
 
-    if (targetUrl) {
+    // 2. Fetch/stream from Cloudinary using authenticated private_download_url
+    const cloudinaryAsset = await findCloudinaryAsset(book);
+    if (cloudinaryAsset) {
+      const dlUrl = cloudinary.utils.private_download_url(
+        cloudinaryAsset.publicId,
+        cloudinaryAsset.resourceType === 'image' ? 'pdf' : '',
+        {
+          resource_type: cloudinaryAsset.resourceType,
+          type: 'upload',
+          attachment: true,
+        }
+      );
+
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(downloadFileName)}"`);
+
+      const client = dlUrl.startsWith('https') ? https : http;
+      return client.get(dlUrl, (stream) => {
+        if (stream.statusCode === 200) {
+          stream.pipe(res);
+        } else {
+          res.redirect(dlUrl);
+        }
+      }).on('error', (err) => {
+        console.error('Cloudinary stream pipe error:', err);
+        res.redirect(dlUrl);
+      });
+    }
+
+    // 3. Fallback: If targetUrl is an external link (http:// or https://)
+    if (targetUrl && (targetUrl.startsWith('http://') || targetUrl.startsWith('https://'))) {
       return res.redirect(targetUrl);
     }
 
-    return res.status(404).send('File not found');
+    return res.status(404).send('Document file not found on server. Please re-upload it from the Admin Panel.');
   } catch (error) {
     console.error('serveBookFile error:', error);
     res.status(500).send('Internal server error');
@@ -397,14 +515,17 @@ exports.createBook = async (req, res) => {
 
     // Handle file upload if sent via multer
     if (req.file) {
+      // 1. Upload to Cloudinary with safe sanitized public_id (permanent cloud backup)
+      const uploadRes = await uploadToCloudinary(req.file.buffer, req.file.originalname);
+
+      // 2. Save locally in uploads/books (local disk cache)
       const saved = saveBookLocally(req.file.buffer, req.file.originalname);
-      fileUrl = saved.localUrl;
+
+      // Prefer Cloudinary secure URL so it persists across container restarts, fallback to local URL
+      fileUrl = uploadRes?.secure_url || saved.localUrl;
       fileName = req.file.originalname;
       const sizeMB = (req.file.size / (1024 * 1024)).toFixed(2);
       fileSize = `${sizeMB} MB`;
-
-      // Non-blocking background upload to Cloudinary as raw backup
-      uploadToCloudinary(req.file.buffer, req.file.originalname).catch(() => {});
     }
 
     if (!fileUrl) {
@@ -461,14 +582,13 @@ exports.updateBook = async (req, res) => {
 
     // Handle file upload if new file provided
     if (req.file) {
+      const uploadRes = await uploadToCloudinary(req.file.buffer, req.file.originalname);
       const saved = saveBookLocally(req.file.buffer, req.file.originalname);
-      updateData.fileUrl = saved.localUrl;
+
+      updateData.fileUrl = uploadRes?.secure_url || saved.localUrl;
       updateData.fileName = req.file.originalname;
       const sizeMB = (req.file.size / (1024 * 1024)).toFixed(2);
       updateData.fileSize = `${sizeMB} MB`;
-
-      // Non-blocking background upload to Cloudinary as raw backup
-      uploadToCloudinary(req.file.buffer, req.file.originalname).catch(() => {});
     }
 
     if (updateData.subjectCode) {
