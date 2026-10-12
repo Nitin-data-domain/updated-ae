@@ -17,8 +17,11 @@ const { uploadBook } = require('../middleware/upload');
 router.get('/', getBooks);
 router.get('/options', getBookOptions);
 router.get('/download/:id', downloadBook);
+router.head('/download/:id', downloadBook);
 router.get('/file/:id', serveBookFile);
+router.head('/file/:id', serveBookFile);
 router.get('/view/:id', serveBookFile);
+router.head('/view/:id', serveBookFile);
 
 // Admin routes
 router.get('/admin', protect, getAllBooks);

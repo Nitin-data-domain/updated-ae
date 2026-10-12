@@ -295,6 +295,43 @@ export default function AdminBooks() {
     }
   }
 
+  const handleAdminDownload = async (book) => {
+    const apiBase = import.meta.env.VITE_API_URL || '';
+    const downloadEndpoint = `${apiBase}/api/books/file/${book.id}`;
+
+    // If external link like Google Drive, open directly
+    if (
+      book.fileUrl &&
+      book.fileUrl.startsWith('http') &&
+      !book.fileUrl.includes('/uploads/') &&
+      !book.fileUrl.includes('cloudinary.com')
+    ) {
+      window.open(book.fileUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    try {
+      const checkRes = await fetch(downloadEndpoint, { method: 'HEAD' });
+      if (!checkRes.ok) {
+        toast.error(`"${book.title}" is currently unavailable on server. Please click Edit to re-upload the file.`, {
+          duration: 5000,
+        });
+        return;
+      }
+
+      const link = document.createElement('a');
+      link.href = downloadEndpoint;
+      link.download = book.fileName || `${book.title}.pdf`;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      window.open(downloadEndpoint, '_blank', 'noopener,noreferrer');
+    }
+  }
+
   // Filter books & notes list
   const filteredBooks = books.filter((b) => {
     if (selectedCourse !== 'all' && (b.courseName || '').trim().toLowerCase() !== selectedCourse.trim().toLowerCase()) return false
@@ -602,25 +639,15 @@ export default function AdminBooks() {
                       </td>
                       <td>
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                          <a
-                            href={
-                              book.fileUrl &&
-                              (book.fileUrl.includes('Teaching%20Load%202026') ||
-                                book.fileUrl.includes('Teaching_Load_2026') ||
-                                book.fileUrl.includes('Teaching%20Load'))
-                                ? `${window.location.origin}/uploads/books/Teaching_Load_2026_1789663607345.pdf`
-                                : book.fileUrl?.startsWith('/uploads')
-                                ? `${window.location.origin}${book.fileUrl}`
-                                : book.fileUrl || '#'
-                            }
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <button
+                            type="button"
+                            onClick={() => handleAdminDownload(book)}
                             className="admin-btn-icon"
                             title="Open / Download"
                             style={{ color: 'var(--info)' }}
                           >
                             <FiDownload />
-                          </a>
+                          </button>
                           <button
                             className="admin-btn-icon"
                             onClick={() => openEditModal(book)}

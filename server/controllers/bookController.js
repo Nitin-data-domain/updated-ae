@@ -325,47 +325,106 @@ exports.serveBookFile = async (req, res) => {
       `${book.subjectCode || 'document'}_${book.materialType === 'notes' ? (book.unit ? book.unit.replace(/\s+/g, '_') : 'Notes') : 'Book'}.pdf`;
     const contentType = getContentType(downloadFileName);
 
-    // 1. Check local file on disk in uploads/books
+    // List of possible directory locations for uploads/books on GoDaddy
+    const possibleUploadDirs = [
+      path.join(__dirname, '../uploads/books'),
+      path.join(__dirname, 'uploads/books'),
+      path.join(process.cwd(), 'uploads/books'),
+      path.join(process.cwd(), 'server/uploads/books'),
+    ];
+
+    // 1. Direct path check if targetUrl contains /uploads/
     if (targetUrl && targetUrl.includes('/uploads/')) {
       const relPath = targetUrl.substring(targetUrl.indexOf('/uploads/')).replace(/^\//, '');
-      const fullPath = path.join(__dirname, '..', relPath);
-      if (fs.existsSync(fullPath)) {
-        res.setHeader('Content-Type', contentType);
-        res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(downloadFileName)}"`);
-        return res.sendFile(fullPath);
+      const candidates = [
+        path.join(__dirname, '..', relPath),
+        path.join(__dirname, '../..', relPath),
+        path.join(process.cwd(), relPath),
+      ];
+      for (const p of candidates) {
+        if (fs.existsSync(p)) {
+          res.setHeader('Content-Type', contentType);
+          res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(downloadFileName)}"`);
+          return res.sendFile(p);
+        }
       }
     }
 
-    // 1b. Check local uploads/books directory for matching file
-    const uploadsDir = path.join(__dirname, '../uploads/books');
-    if (fs.existsSync(uploadsDir)) {
-      const files = fs.readdirSync(uploadsDir);
-      const cleanTarget = (book.fileName || '')
-        .replace(/\.[^/.]+$/, '')
-        .toLowerCase()
-        .replace(/[^a-z0-9]/g, '');
+    // 2. Fuzzy match in uploads/books directories by cleaned stem or subjectCode
+    const cleanTarget = (book.fileName || book.title || '')
+      .replace(/(\.docx|\.pdf|\.doc|\.epub|\.zip)+$/gi, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '');
 
-      const matched = files.find((f) => {
-        const cleanF = f.toLowerCase().replace(/[^a-z0-9]/g, '');
-        return (
-          (cleanTarget && cleanF.includes(cleanTarget)) ||
-          (targetUrl && targetUrl.toLowerCase().includes('teaching') && f.toLowerCase().includes('teaching'))
-        );
-      });
-      if (matched) {
-        const fullPath = path.join(uploadsDir, matched);
-        res.setHeader('Content-Type', contentType);
-        res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(downloadFileName)}"`);
-        return res.sendFile(fullPath);
+    for (const dir of possibleUploadDirs) {
+      if (fs.existsSync(dir)) {
+        const files = fs.readdirSync(dir);
+        const matched = files.find((f) => {
+          const cleanF = f.toLowerCase().replace(/[^a-z0-9]/g, '');
+          return (
+            (cleanTarget.length > 4 && cleanF.includes(cleanTarget)) ||
+            (cleanTarget.length > 4 && cleanTarget.includes(cleanF.replace(/17\d{10}/g, ''))) ||
+            (targetUrl && targetUrl.toLowerCase().includes('teaching') && f.toLowerCase().includes('teaching')) ||
+            (targetUrl && targetUrl.toLowerCase().includes('taxation') && f.toLowerCase().includes('taxation'))
+          );
+        });
+        if (matched) {
+          const fullPath = path.join(dir, matched);
+          res.setHeader('Content-Type', contentType);
+          res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(downloadFileName)}"`);
+          return res.sendFile(fullPath);
+        }
       }
     }
 
-    // 2. Fallback: If targetUrl is an external link (http:// or https://)
+    // 3. Fallback: If targetUrl is a Google Drive link, redirect to direct export download
+    if (targetUrl && targetUrl.includes('drive.google.com')) {
+      const match = targetUrl.match(/[-\w]{25,}/);
+      if (match) {
+        return res.redirect(`https://drive.google.com/uc?export=download&id=${match[0]}`);
+      }
+      return res.redirect(targetUrl);
+    }
+
+    // 4. Fallback: If targetUrl is any external link (http:// or https://)
     if (targetUrl && (targetUrl.startsWith('http://') || targetUrl.startsWith('https://'))) {
       return res.redirect(targetUrl);
     }
 
-    return res.status(404).send('Document file not found on server. Please re-upload it from the Admin Panel.');
+    // 5. Clean, informative 404 response
+    if (req.accepts('html')) {
+      return res.status(404).send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <title>Document Not Found - Aharada Education</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #0f172a; color: #f8fafc; }
+            .card { background: #1e293b; padding: 40px; border-radius: 16px; border: 1px solid #334155; max-width: 480px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); }
+            .badge { display: inline-block; padding: 6px 14px; background: #f43f5e20; color: #f43f5e; border-radius: 9999px; font-weight: 600; font-size: 0.85rem; margin-bottom: 16px; }
+            h2 { margin: 0 0 12px; font-size: 1.4rem; }
+            p { color: #94a3b8; font-size: 0.95rem; line-height: 1.5; margin: 0 0 24px; }
+            .btn { display: inline-block; padding: 12px 24px; background: #0284c7; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; }
+          </style>
+        </head>
+        <body>
+          <div class="card">
+            <span class="badge">Document Unavailable</span>
+            <h2>File Not Found on Server</h2>
+            <p>The study material <strong>"${book.title}"</strong> (${downloadFileName}) is not currently available on the GoDaddy server disk. Please edit the entry in the Admin Panel to upload the file.</p>
+            <a href="/library" class="btn">Return to Digital Library</a>
+          </div>
+        </body>
+        </html>
+      `);
+    }
+
+    return res.status(404).json({
+      success: false,
+      message: `File for "${book.title}" was not found on the server. Please re-upload it from the Admin Panel.`,
+    });
   } catch (error) {
     console.error('serveBookFile error:', error);
     res.status(500).send('Internal server error');
@@ -518,4 +577,63 @@ exports.deleteBook = async (req, res) => {
     console.error('deleteBook error:', error);
     res.status(500).json({ success: false, message: 'Failed to delete book' });
   }
+};
+
+// @desc    Fallback for direct /uploads/books/:filename GET requests if file missing on disk
+// @route   GET /uploads/books/:filename
+exports.handleStaticUploadFallback = async (req, res, next) => {
+  const filename = req.params.filename;
+  if (!filename) return next();
+
+  try {
+    const cleanStem = filename
+      .replace(/(\.docx|\.pdf|\.doc|\.epub|\.zip)+$/gi, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '');
+
+    const books = await Book.findAll();
+    const matchedBook = books.find((b) => {
+      const fUrl = (b.fileUrl || '').toLowerCase();
+      const fName = (b.fileName || '').toLowerCase();
+      const q = filename.toLowerCase();
+      return (
+        fUrl.includes(q) ||
+        fName.includes(q) ||
+        (cleanStem.length > 4 && fUrl.includes(cleanStem)) ||
+        (cleanStem.length > 4 && fName.includes(cleanStem))
+      );
+    });
+
+    if (matchedBook) {
+      req.params.id = matchedBook.id;
+      return exports.serveBookFile(req, res);
+    }
+  } catch (err) {
+    console.warn('handleStaticUploadFallback error:', err.message);
+  }
+
+  res.status(404).send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <title>File Not Found - Aharada Education</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #0f172a; color: #f8fafc; }
+        .card { background: #1e293b; padding: 40px; border-radius: 16px; border: 1px solid #334155; max-width: 480px; text-align: center; }
+        h2 { margin: 0 0 12px; color: #f43f5e; font-size: 1.4rem; }
+        p { color: #94a3b8; font-size: 0.95rem; line-height: 1.5; margin: 0 0 24px; }
+        .btn { display: inline-block; padding: 12px 24px; background: #0284c7; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; }
+      </style>
+    </head>
+    <body>
+      <div class="card">
+        <h2>File Not Found</h2>
+        <p>The file <code>${filename}</code> does not exist on the server disk. Please re-upload it from the Admin Panel.</p>
+        <a href="/admin/books" class="btn">Go to Admin Library</a>
+      </div>
+    </body>
+    </html>
+  `);
 };

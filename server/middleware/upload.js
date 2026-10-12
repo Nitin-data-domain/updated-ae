@@ -61,12 +61,15 @@ const brochureFilter = (req, file, cb) => {
 const bookStorage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, booksDir),
   filename: (req, file, cb) => {
-    const clean = (file.originalname || 'document.pdf')
-      .replace(/[^a-zA-Z0-9._-]/g, '_')
-      .replace(/_+/g, '_');
-    const ext = path.extname(clean) || '.pdf';
-    const base = path.basename(clean, ext);
-    cb(null, `${base}_${Date.now()}${ext}`);
+    const rawName = file.originalname || 'document.pdf';
+    const ext = path.extname(rawName).toLowerCase() || '.pdf';
+    const cleanBase = path
+      .basename(rawName, path.extname(rawName))
+      .replace(/(\.docx|\.pdf|\.doc|\.epub|\.zip)+$/gi, '')
+      .replace(/[^a-zA-Z0-9_-]/g, '_')
+      .replace(/_+/g, '_')
+      .replace(/^_|_$/g, '') || 'document';
+    cb(null, `${cleanBase}_${Date.now()}${ext}`);
   },
 });
 

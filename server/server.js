@@ -68,6 +68,11 @@ const uploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 app.use('/uploads', express.static(uploadsDir));
 
+// Fallback for direct /uploads/books/:filename access if physical file is missing
+const { handleStaticUploadFallback } = require('./controllers/bookController');
+app.get('/uploads/books/:filename', handleStaticUploadFallback);
+app.head('/uploads/books/:filename', handleStaticUploadFallback);
+
 // API Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/programs', require('./routes/programRoutes'));

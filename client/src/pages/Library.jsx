@@ -183,6 +183,22 @@ export default function Library() {
   const handleDownload = async (book) => {
     setDownloadingId(book.id);
     try {
+      const targetUrl = resolveBookFileUrl(book);
+
+      // Pre-flight check to verify file availability before triggering browser download
+      if (targetUrl.startsWith('/') || targetUrl.startsWith(window.location.origin)) {
+        try {
+          const checkRes = await fetch(targetUrl, { method: 'HEAD' });
+          if (!checkRes.ok) {
+            toast.error(
+              `"${book.title}" is temporarily unavailable. Please ask the administrator to re-upload it.`,
+              { duration: 5000 }
+            );
+            return;
+          }
+        } catch (_) {}
+      }
+
       // Record download count on server
       await recordBookDownload(book.id).catch(() => {});
 
@@ -194,8 +210,6 @@ export default function Library() {
       toast.success(`Downloading: ${book.title}`, {
         duration: 3000,
       });
-
-      const targetUrl = resolveBookFileUrl(book);
 
       // Initiate download or open link in new tab
       const link = document.createElement('a');
