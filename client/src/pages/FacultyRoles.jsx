@@ -26,7 +26,6 @@ import './FacultyRoles.css'
 export default function FacultyRoles() {
   const [faculty, setFaculty] = useState([])
   const [loading, setLoading] = useState(true)
-  const [activeFilter, setActiveFilter] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedPhoto, setSelectedPhoto] = useState(null)
 
@@ -80,36 +79,20 @@ export default function FacultyRoles() {
       .filter(Boolean)
   }
 
-  // Filtered faculty list
+  // Filtered faculty list by search term
   const filteredFaculty = useMemo(() => {
+    const q = searchTerm.toLowerCase().trim()
+    if (!q) return faculty
+
     return faculty.filter(member => {
-      // Category filter
-      let matchCat = true
-      if (activeFilter === 'hod') {
-        matchCat = isHOD(member)
-      } else if (activeFilter === 'aerospace') {
-        const text = `${member.designation} ${member.specialization} ${member.rolesAndResponsibilities || ''}`.toLowerCase()
-        matchCat = text.includes('aerospace') || text.includes('aeronautical') || text.includes('avionics') || text.includes('propulsion')
-      } else if (activeFilter === 'aviation') {
-        const text = `${member.designation} ${member.specialization} ${member.rolesAndResponsibilities || ''}`.toLowerCase()
-        matchCat = text.includes('aviation') || text.includes('flight') || text.includes('pilot') || text.includes('simulator')
-      } else if (activeFilter === 'operations') {
-        const text = `${member.designation} ${member.specialization} ${member.rolesAndResponsibilities || ''}`.toLowerCase()
-        matchCat = text.includes('airport') || text.includes('management') || text.includes('cargo') || text.includes('ground')
-      }
-
-      // Search term
-      const q = searchTerm.toLowerCase().trim()
-      if (!q) return matchCat
-
       const inName = member.name?.toLowerCase().includes(q)
       const inDes = member.designation?.toLowerCase().includes(q)
       const inSpec = member.specialization?.toLowerCase().includes(q)
       const inRoles = (member.rolesAndResponsibilities || '').toLowerCase().includes(q)
 
-      return matchCat && (inName || inDes || inSpec || inRoles)
+      return inName || inDes || inSpec || inRoles
     })
-  }, [faculty, activeFilter, searchTerm])
+  }, [faculty, searchTerm])
 
   const pillars = [
     {
@@ -207,40 +190,6 @@ export default function FacultyRoles() {
                   &times;
                 </button>
               )}
-            </div>
-
-            {/* Filter Pills */}
-            <div className="fr-categories-pills">
-              <button
-                className={`fr-cat-btn ${activeFilter === 'all' ? 'active' : ''}`}
-                onClick={() => setActiveFilter('all')}
-              >
-                All Faculty Profiles ({faculty.length})
-              </button>
-              <button
-                className={`fr-cat-btn hod-pill ${activeFilter === 'hod' ? 'active' : ''}`}
-                onClick={() => setActiveFilter('hod')}
-              >
-                <FiStar size={13} /> Heads of Department (HOD)
-              </button>
-              <button
-                className={`fr-cat-btn ${activeFilter === 'aerospace' ? 'active' : ''}`}
-                onClick={() => setActiveFilter('aerospace')}
-              >
-                Aerospace & Aeronautical
-              </button>
-              <button
-                className={`fr-cat-btn ${activeFilter === 'aviation' ? 'active' : ''}`}
-                onClick={() => setActiveFilter('aviation')}
-              >
-                Flight Operations & Pilot Science
-              </button>
-              <button
-                className={`fr-cat-btn ${activeFilter === 'operations' ? 'active' : ''}`}
-                onClick={() => setActiveFilter('operations')}
-              >
-                Airport Management & Operations
-              </button>
             </div>
           </div>
 
@@ -500,7 +449,7 @@ export default function FacultyRoles() {
                 <div className="fr-modal-info">
                   <h3 className="modal-fac-name">{selectedPhoto.name}</h3>
                   <p className="modal-fac-desig">{selectedPhoto.designation}</p>
-                  <p className="modal-fac-qual">{selectedPhoto.qualification} • {selectedPhoto.experience}</p>
+                  <p className="modal-fac-qual">{selectedPhoto.qualification}</p>
                   {selectedPhoto.specialization && (
                     <p className="modal-fac-spec"><strong>Specialization:</strong> {selectedPhoto.specialization}</p>
                   )}

@@ -430,7 +430,6 @@ export default function AdminFacultyRoles() {
                           {hod && <span className="afr-hod-badge">HOD</span>}
                         </div>
                         <div className="afr-desig">{f.designation}</div>
-                        <div className="afr-exp">{f.experience}</div>
                       </div>
                     </td>
 
@@ -569,16 +568,6 @@ export default function AdminFacultyRoles() {
                       value={form.qualification}
                       onChange={e => setForm({ ...form, qualification: e.target.value })}
                       placeholder="e.g. Ph.D. IIT Bombay, M.Tech"
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Experience *</label>
-                    <input
-                      className="form-input"
-                      value={form.experience}
-                      onChange={e => setForm({ ...form, experience: e.target.value })}
-                      placeholder="e.g. 22 years"
                       required
                     />
                   </div>

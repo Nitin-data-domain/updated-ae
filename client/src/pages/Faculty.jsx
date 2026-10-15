@@ -216,10 +216,6 @@ export default function Faculty() {
                           <FiAward className="detail-icon" />
                           <span>{member.qualification}</span>
                         </div>
-                        <div className="faculty-detail">
-                          <FiBriefcase className="detail-icon" />
-                          <span>{member.experience}</span>
-                        </div>
                         {member.specialization && (
                           <div className="faculty-detail">
                             <FiBook className="detail-icon" />
@@ -370,13 +366,7 @@ export default function Faculty() {
                       </div>
                     </div>
 
-                    <div className="modal-detail-row">
-                      <FiBriefcase className="modal-icon" />
-                      <div>
-                        <strong>Industry & Academic Experience:</strong>
-                        <p>{selectedPhotoMember.experience}</p>
-                      </div>
-                    </div>
+
 
                     {selectedPhotoMember.specialization && (
                       <div className="modal-detail-row">

@@ -39,10 +39,8 @@ Faculty.init(
     },
     experience: {
       type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: { msg: 'Experience is required' },
-      },
+      defaultValue: '',
+      allowNull: true,
     },
     specialization: {
       type: DataTypes.STRING,

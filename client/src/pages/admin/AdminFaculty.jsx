@@ -102,7 +102,7 @@ export default function AdminFaculty() {
       toast.error('Photo is still uploading or failed. Please re-upload or paste a link.')
       return
     }
-    if (!form.name || !form.designation || !form.qualification || !form.experience) {
+    if (!form.name || !form.designation || !form.qualification) {
       toast.error('Please fill all required fields'); return
     }
     setSaving(true)
@@ -150,7 +150,6 @@ export default function AdminFaculty() {
               <th>Name</th>
               <th>Designation</th>
               <th>Qualification</th>
-              <th>Experience</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -252,7 +251,6 @@ export default function AdminFaculty() {
                 </td>
                 <td>{f.designation}</td>
                 <td style={{ fontSize: '0.85rem' }}>{f.qualification}</td>
-                <td style={{ fontSize: '0.85rem' }}>{f.experience}</td>
                 <td>
                   <div className="admin-actions">
                     {f.image && (
@@ -310,15 +308,9 @@ export default function AdminFaculty() {
                 <label className="form-label">Qualification *</label>
                 <input className="form-input" value={form.qualification} onChange={e => setForm({...form, qualification: e.target.value})} placeholder="Ph.D., MBA, B.Tech" />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                <div className="form-group">
-                  <label className="form-label">Experience *</label>
-                  <input className="form-input" value={form.experience} onChange={e => setForm({...form, experience: e.target.value})} placeholder="15+ years" />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Order</label>
-                  <input className="form-input" type="number" value={form.order} onChange={e => setForm({...form, order: parseInt(e.target.value) || 0})} />
-                </div>
+              <div className="form-group">
+                <label className="form-label">Display Order</label>
+                <input className="form-input" type="number" value={form.order} onChange={e => setForm({...form, order: parseInt(e.target.value) || 0})} />
               </div>
               <div className="form-group">
                 <label className="form-label">Specialization</label>
@@ -439,7 +431,7 @@ export default function AdminFaculty() {
 
             <h4 style={{ margin: '0 0 4px', fontSize: '1.1rem', color: '#111827' }}>{photoModalMember.name}</h4>
             <p style={{ margin: '0 0 8px', fontSize: '0.85rem', color: '#6366f1', fontWeight: 600 }}>{photoModalMember.designation}</p>
-            <p style={{ margin: '0 0 16px', fontSize: '0.8rem', color: '#6b7280' }}>{photoModalMember.qualification} • {photoModalMember.experience}</p>
+            <p style={{ margin: '0 0 16px', fontSize: '0.8rem', color: '#6b7280' }}>{photoModalMember.qualification}</p>
 
             <div style={{ display: 'flex', justifyContent: 'center', gap: 10 }}>
               <a
