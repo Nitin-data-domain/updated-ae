@@ -111,6 +111,106 @@ async function syncModels() {
   } catch (colErr) {
     console.warn('Notice: Faculty column migration check:', colErr.message);
   }
+
+  // Automatic photo and notes sync: Link faculty to their real uploaded photographs if currently using unsplash or empty
+  try {
+    const facultyPhotoMap = [
+      { name: 'Amitabh Sen', image: '/uploads/images/image_1791742584901.png' },
+      { name: 'Rajesh Kumar Singh', image: '/uploads/images/image_2__1791742867586.png' },
+      { name: 'Priya Sharma', image: '/uploads/images/image_3__1791743520039.png' },
+      { name: 'Amit Verma', image: '/uploads/images/image_4__1791743506680.png' },
+      { name: 'Vikram Malhotra', image: '/uploads/images/image_5__1791743620169.png' },
+      { name: 'Meenakshi Sundaram', image: '/uploads/images/image_6__1791743751518.png' },
+      { name: 'Arvind Swaminathan', image: '/uploads/images/image_8__1791743926342.png' },
+    ];
+    for (const item of facultyPhotoMap) {
+      const { Op } = require('sequelize');
+      const member = await Faculty.findOne({
+        where: {
+          name: { [Op.like]: `%${item.name}%` }
+        }
+      });
+      if (member && (!member.image || member.image.includes('unsplash.com') || member.image.startsWith('blob:'))) {
+        await member.update({ image: item.image });
+        console.log(`✅ Synced real photograph for faculty: ${member.name} → ${item.image}`);
+      }
+    }
+
+    // Auto-sync real study notes files if currently using dummy w3.org links
+    const realNotesMap = [
+      {
+        keyword: 'Civil Aviation',
+        fileUrl: '/uploads/books/FOBM_-_UNIT_-_II_NOTES__1791703168515.pdf',
+        fileName: 'FOBM_Unit_II_Civil_Aviation_Notes.pdf',
+      },
+      {
+        keyword: 'Airport Infrastructure',
+        fileUrl: '/uploads/books/Statistics_for_business_economics_unit_1.docx_1791703458844.pdf',
+        fileName: 'Business_Economics_Unit_1_Notes.pdf',
+      },
+      {
+        keyword: 'Airline Business Models',
+        fileUrl: '/uploads/books/MBA_DA_UNIT_1_Business_Statistics_Probability_Notes.pdf',
+        fileName: 'Business_Statistics_Probability_Notes.pdf',
+      },
+      {
+        keyword: 'Aerodynamic Forces',
+        fileUrl: '/uploads/books/Foundation_of_Artificial_Intelligence_Unit_1st_1790559102118.pdf',
+        fileName: 'Aerodynamics_Engineering_Unit_1_Notes.pdf',
+      },
+      {
+        keyword: 'Airfoil Geometry',
+        fileUrl: '/uploads/books/Gen_AI_-_Unit_1_1790561355115.pdf',
+        fileName: 'Gen_AI_Unit_1_Study_Notes.pdf',
+      },
+      {
+        keyword: 'Introduction to Aviation Management',
+        fileUrl: '/uploads/books/BBA_EI_UNIT_1_taxation_notes.pdf',
+        fileName: 'BBA_EI_Unit_1_Taxation_Notes.pdf',
+      },
+      {
+        keyword: 'Introduction to C language',
+        fileUrl: '/uploads/books/Teaching_Load_2026_1789663607345.pdf',
+        fileName: 'Teaching_Load_2026.pdf',
+      },
+    ];
+    for (const item of realNotesMap) {
+      const { Op } = require('sequelize');
+      const book = await Book.findOne({
+        where: {
+          title: { [Op.like]: `%${item.keyword}%` },
+          fileUrl: { [Op.like]: '%w3.org%' }
+        }
+      });
+      if (book) {
+        await book.update({
+          fileUrl: item.fileUrl,
+          fileName: item.fileName,
+          materialType: 'notes'
+        });
+        console.log(`✅ Synced real notes file for: ${book.title} → ${item.fileUrl}`);
+      }
+    }
+
+    // Auto-sync event photos if currently empty
+    const defaultEventPhotos = [
+      ['/uploads/images/img-1777890335417-901289897.jpeg', '/uploads/images/img-1777891756812-948163918.jpg'],
+      ['/uploads/images/img-1777893379826-937202450.jpeg', '/uploads/images/img-1777893616975-678406666.jpg'],
+      ['/uploads/images/img-1777893661160-283492928.jpg', '/uploads/images/img-1778169723972-785046803.jpeg'],
+      ['/uploads/images/img-1778350914660-148905992.jpeg'],
+    ];
+    const allEvents = await Event.findAll();
+    for (let i = 0; i < allEvents.length; i++) {
+      const ev = allEvents[i];
+      if (!ev.images || ev.images.length === 0) {
+        const assignedPhotos = defaultEventPhotos[i % defaultEventPhotos.length];
+        await ev.update({ images: assignedPhotos });
+        console.log(`✅ Synced campus photos for event: ${ev.title}`);
+      }
+    }
+  } catch (syncErr) {
+    console.warn('Notice: Asset synchronization check:', syncErr.message);
+  }
 }
 
 // Function to seed initial data
@@ -291,7 +391,7 @@ async function seedInitialData() {
         qualification: 'Ph.D. in Aeronautical Engineering (IIT Bombay), M.Tech (Aerospace), DGCA Certified',
         experience: '22 years in Aerospace Engineering & Academic Administration',
         specialization: 'Hypersonic Aerodynamics, Aircraft Structural Dynamics & Space Propulsion',
-        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&auto=format&fit=crop&q=80',
+        image: '/uploads/images/image_1791742584901.png',
         bio: 'Leading the Aerospace & Aeronautical Engineering Department at Aharada Education. Former senior scientist at DRDO and advisor for commercial aerospace research initiatives.',
         rolesAndResponsibilities: `• Academic & Strategic Leadership of the Department of Aerospace Engineering
 • Oversight of DGCA & AICTE compliant aeronautical curriculum development and laboratory upgrades
@@ -307,7 +407,7 @@ async function seedInitialData() {
         qualification: 'Ph.D. in Aviation Management, MBA',
         experience: '18 years in Aviation Industry & Academia',
         specialization: 'Airline Operations & Airport Management',
-        image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=800&auto=format&fit=crop&q=80',
+        image: '/uploads/images/image_2__1791742867586.png',
         bio: 'Former operations manager at a major Indian airline with extensive experience in airport ground operations and airline strategy.',
         rolesAndResponsibilities: `• Department Head for Aviation Management, Airport Economics, and Air Cargo Studies
 • Academic coordination of undergraduate and postgraduate aviation management programs
@@ -322,7 +422,7 @@ async function seedInitialData() {
         qualification: 'Ph.D. in Aerospace Engineering, M.Tech',
         experience: '15 years in Aerospace R&D & Teaching',
         specialization: 'Aerodynamics & Propulsion Systems',
-        image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80',
+        image: '/uploads/images/image_3__1791743520039.png',
         bio: 'Research scientist with publications in leading aerospace journals and experience at DRDO and NAL.',
         rolesAndResponsibilities: `• Course coordinator for Aerodynamics, Flight Dynamics, and Gas Turbine Propulsion
 • Laboratory In-Charge for Subsonic Wind Tunnel and Flow Visualization facilities
@@ -336,7 +436,7 @@ async function seedInitialData() {
         qualification: 'MBA, Certified Business Coach',
         experience: '12 years in Startups & Business Mentoring',
         specialization: 'Startup Strategy & Venture Capital',
-        image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&auto=format&fit=crop&q=80',
+        image: '/uploads/images/image_4__1791743506680.png',
         bio: 'Founded two successful startups and mentored over 50 student ventures. Angel investor and TEDx speaker.',
         rolesAndResponsibilities: `• Director of the Aharada Aviation & Aerospace Incubation Hub
 • Mentoring student startups in drone delivery, aviation tech, and charter services
@@ -350,7 +450,7 @@ async function seedInitialData() {
         qualification: 'ATPL, B.Sc Aviation, DGCA Certified',
         experience: '22 years as Commercial Airline Pilot',
         specialization: 'Flight Operations & Aviation Safety',
-        image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=800&auto=format&fit=crop&q=80',
+        image: '/uploads/images/image_5__1791743620169.png',
         bio: 'Retired captain with 15,000+ flying hours. Specialist in flight safety, CRM, and aviation regulations.',
         rolesAndResponsibilities: `• Lead Ground Instructor for Commercial Pilot License (CPL) and Instrument Rating (IR)
 • Instruction in DGCA Air Regulations, Aviation Meteorology, and Radio Telephony
@@ -364,7 +464,7 @@ async function seedInitialData() {
         qualification: 'ATPL (Airline Transport Pilot License), B.Sc Aviation Science, DGCA Ground Instructor',
         experience: '16 years in Commercial Aviation (Ex-Air India Commander, 12,000+ flight hours)',
         specialization: 'Multi-Crew Cooperation (MCC), Cockpit Resource Management (CRM) & Flight Navigation',
-        image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop&q=80',
+        image: '/uploads/images/image_6__1791743751518.png',
         bio: 'Senior airline commander and certified DGCA ground instructor guiding aspiring aviators through instrument rating, navigation, and commercial pilot licensure.',
         rolesAndResponsibilities: `• Department Leadership for Pilot Ground School and Aviation Flight Sciences
 • In-charge of Multi-Engine & Instrument Rating syllabus alignment with DGCA standards
@@ -392,7 +492,7 @@ async function seedInitialData() {
         qualification: 'Ph.D. in Avionics & Telecommunications, M.Tech (Satellite Communications)',
         experience: '14 years in Radar Telemetry & NextGen Avionics',
         specialization: 'Fly-By-Wire Flight Controls, ADS-B Systems, Radar & Satellite Navigation',
-        image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&auto=format&fit=crop&q=80',
+        image: '/uploads/images/image_8__1791743926342.png',
         bio: 'Former satellite telemetry specialist with ISRO payload teams. Conducts research and practical training on modern CNS/ATM systems and glass cockpit avionics.',
         rolesAndResponsibilities: `• Academic coordinator for Aircraft Avionics, Fly-By-Wire systems, and Radar Telemetry
 • Managing NextGen CNS/ATM (Communication, Navigation, Surveillance / Air Traffic Management) lab

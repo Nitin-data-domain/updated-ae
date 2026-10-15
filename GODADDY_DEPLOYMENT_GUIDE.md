@@ -1,14 +1,37 @@
-# 🚀 GoDaddy Node.js Hosting & MySQL Deployment Guide
+# 🚀 GoDaddy Complete Unified Website & MySQL Deployment Guide
 
-This guide will walk you step-by-step through deploying your **Aharada Education Backend API** to **GoDaddy cPanel (Linux Hosting with Node.js support)** using **MySQL Database**, while keeping your React frontend on **Vercel**.
+This guide explains how your **entire Aharada Education Platform** (React Frontend + Node.js Backend API + MySQL Database + All Uploaded Media & Notes) runs as a single, unified high-performance application on **GoDaddy cPanel (Linux Hosting with Node.js support)**.
 
 ---
 
-## 📋 Overview of the Setup
+## 📋 Architecture Overview: Why This Solves the "Reflecting Only to My System" Problem
 
-- **Frontend**: Hosted on [Vercel](https://vercel.com) (Live)
-- **Backend**: Hosted on **GoDaddy cPanel** (Node.js Application Manager)
-- **Database**: **GoDaddy MySQL Server** (managed via cPanel MySQL Wizard / phpMyAdmin)
+Previously:
+1. Uploads were performed on your local development machine (`localhost:3000` / `localhost:5000`), storing files in local folders and local SQLite.
+2. The live site on GoDaddy/Vercel had no knowledge of your local laptop's files or local database records.
+3. When external visitors opened the live website, their browsers requested images from URLs that didn't exist on the production server.
+
+**The Unified GoDaddy Solution**:
+- **Domain**: `https://aharadaedu.com` (or your GoDaddy domain)
+- **Frontend SPA**: React bundle located in `public/`, served directly by Express.
+- **Backend API**: REST API at `/api/*` on the exact same origin.
+- **Static Assets & Uploads**: `/uploads/*` served directly from the GoDaddy persistent disk.
+- **Database**: GoDaddy MySQL server (`localhost:3306`).
+- **Result**: Whenever an administrator uploads notes, faculty photos, or event photos via the `/admin` portal on GoDaddy, the files save directly to GoDaddy's disk and database. Every user on any phone, laptop, or network in the world sees the changes instantly with zero delay and zero CORS/domain issues.
+
+---
+
+## 📦 What is Inside `godaddy-deploy.zip`?
+
+The pre-built `godaddy-deploy.zip` (30.2 MB) in the project root already contains:
+- `server.js` & `app.js`: Unified production entry points.
+- `public/`: The compiled React frontend (ready to serve instantly).
+- `uploads/`: All active faculty photographs, event images, digital library notes (PDFs), and brochures.
+- `models/`, `controllers/`, `routes/`, `middleware/`, `config/`: Complete backend logic.
+- `package.json` & `package-lock.json`: Dependencies list for Linux installation.
+- `.env.example`: Sample configuration template.
+
+*(Notice: `node_modules` is excluded to avoid OS binary mismatches. You will install them cleanly on GoDaddy with one click).*
 
 ---
 
@@ -17,136 +40,140 @@ This guide will walk you step-by-step through deploying your **Aharada Education
 1. Log into your **GoDaddy Account** and open **cPanel**.
 2. Under the **Databases** section, click **MySQL® Database Wizard**.
 3. **Step 1 - Create A Database**:
-   - Enter a database name (e.g. `aharada_db` or `ae_db`).
-   - *Note down the full database name* (it will look like `cpanelusername_aharada_db`).
+   - Enter a database name (e.g. `aharada_db`).
+   - Note down the full name: e.g., `cpaneluser_aharada_db`.
    - Click **Next Step**.
 4. **Step 2 - Create Database Users**:
-   - Enter a username (e.g. `db_user`).
-   - Enter a strong password (or generate one).
-   - *Note down the full username and password*!
+   - Enter a username (e.g. `db_user` -> `cpaneluser_db_user`).
+   - Enter a strong password and note it down.
    - Click **Create User**.
 5. **Step 3 - Add User to Database**:
-   - Check the box **ALL PRIVILEGES**.
+   - Check **ALL PRIVILEGES**.
    - Click **Make Changes**.
 
-> 💡 **Database Connection Details to note:**
+> 💡 **Database Details Summary:**
 > - **Host**: `localhost` (In GoDaddy cPanel, MySQL is always `localhost`)
 > - **Port**: `3306`
-> - **Database Name**: e.g., `cpanelusername_aharada_db`
-> - **Username**: e.g., `cpanelusername_db_user`
-> - **Password**: `your_password`
+> - **Database Name**: `cpaneluser_aharada_db`
+> - **User**: `cpaneluser_db_user`
+> - **Password**: `your_strong_password`
 
 ---
 
-## Step 2: Set Up the Node.js App in GoDaddy cPanel
+## Step 2: Set Up the Node.js Application in GoDaddy cPanel
 
-1. In cPanel, find the **Software** section and click **Setup Node.js App** (or *Node.js Selector*).
+1. In cPanel, find **Software** and click **Setup Node.js App** (or *Node.js Selector*).
 2. Click **Create Application**:
    - **Node.js version**: Select `20.x` (or `18.x` / `22.x`).
-   - **Application mode**: Select `Production`.
-   - **Application root**: Enter the folder name where your backend will live (e.g. `api` or `backend`).
-   - **Application URL**: Select your subdomain or path (e.g., `api.yourdomain.com` or `yourdomain.com/api`).
-   - **Application startup file**: Enter `server.js` (or `app.js` — both work!).
-3. Click **Create** at the top right.
-4. Once created, cPanel will show a command at the top to enter the virtual environment, for example:
-   ```bash
-   source /home/cpanelusername/nodevenv/api/20/bin/activate && cd /home/cpanelusername/api
+   - **Application mode**: `Production`.
+   - **Application root**: Enter `public_html` (if deploying on main domain) or `api` (if using a subfolder/subdomain).
+   - **Application URL**: Select your root domain `aharadaedu.com` (or `www.aharadaedu.com`).
+   - **Application startup file**: `server.js` (or `app.js`).
+3. Click **Create** at top right.
+
+---
+
+## Step 3: Upload & Extract `godaddy-deploy.zip`
+
+1. In cPanel, open **File Manager**.
+2. Navigate to your Application root folder (e.g. `public_html` or the folder you set in Step 2).
+3. Click **Upload** at the top bar and upload `godaddy-deploy.zip`.
+4. Right-click `godaddy-deploy.zip` in File Manager and select **Extract** -> **Extract Files**.
+5. If the extracted files are inside a nested `server/` folder, open the `server` folder, select all files/folders (`public`, `uploads`, `server.js`, `package.json`, etc.), click **Move**, and move them directly to the Application root (`public_html/`).
+6. Ensure your Application root folder contains:
+   ```text
+   public_html/
+   ├── app.js
+   ├── server.js
+   ├── package.json
+   ├── package-lock.json
+   ├── .env
+   ├── config/
+   ├── controllers/
+   ├── middleware/
+   ├── models/
+   ├── portal/
+   ├── public/
+   │   ├── index.html
+   │   └── assets/
+   ├── routes/
+   ├── scripts/
+   └── uploads/
+       ├── books/
+       ├── brochures/
+       └── images/
    ```
 
 ---
 
-## Step 3: Upload Backend Files to GoDaddy
+## Step 4: Configure Production `.env` on GoDaddy
 
-1. In cPanel, open **File Manager** and navigate to your Application root folder (e.g. `public_html/api` or `api`).
-2. Upload the contents of your local `server/` directory:
-   - `server.js`
-   - `app.js`
-   - `package.json`
-   - `package-lock.json`
-   - `config/` (contains `db.js`)
-   - `controllers/`
-   - `middleware/`
-   - `models/`
-   - `routes/`
-   - `seed.js`
-   - `reset-admin.js`
-   - `.env`
-3. *(Do not upload `node_modules` or `.git` — you will install packages on the server in the next step!)*
-
----
-
-## Step 4: Configure Environment Variables in GoDaddy
-
-Create or edit the `.env` file in your application root folder on GoDaddy:
+In cPanel File Manager, create or edit the `.env` file in the application folder:
 
 ```env
 PORT=5000
 NODE_ENV=production
 
-# MySQL Database Details (from Step 1)
+# GoDaddy MySQL Database Details (from Step 1)
 DB_HOST=localhost
 DB_PORT=3306
-DB_NAME=cpanelusername_aharada_db
-DB_USER=cpanelusername_db_user
-DB_PASSWORD=your_mysql_password
+DB_NAME=cpaneluser_aharada_db
+DB_USER=cpaneluser_db_user
+DB_PASSWORD=your_actual_mysql_password
+FORCE_MYSQL=true
 
 # Authentication
 JWT_SECRET=aharada_edu_jwt_secret_key_2024_secure
 JWT_EXPIRE=7d
 
-# Frontend Live URL (for CORS allowance)
-CLIENT_URL=https://your-frontend-project.vercel.app
+# Unified Domain
+CLIENT_URL=https://aharadaedu.com
 
-# Cloudinary - Image Storage
-CLOUDINARY_CLOUD_NAME=dprlzu2ns
-CLOUDINARY_API_KEY=124785717795421
-CLOUDINARY_API_SECRET=MrOGGkP7c9Lqome6_uZQoPNf8HA
-
-# Fast2SMS (optional - leave blank to log OTPs to console)
-FAST2SMS_API_KEY=
+# Grievance Portal Configuration (Neon PostgreSQL)
+DATABASE_URL=postgresql://neondb_owner:npg_oFGbWMI2P9sr@ep-quiet-cherry-ahbx45cl.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require
+COLLEGE_NAME=Aharada Education
+WEBHOOK_SECRET=COLLEGE_GRIEVANCE_SECRET_2026
+SMTP_HOST=smtp.gmail.com
+SMTP_USER=girdharnitin4@gmail.com
+SMTP_PASS=bejgpyevkplblqaf
 ```
 
-*(You can also set these environment variables directly in cPanel's **Setup Node.js App > Environment variables** section).*
+---
+
+## Step 5: Install Dependencies & Launch
+
+1. Go back to cPanel -> **Setup Node.js App**.
+2. Click the edit icon (pencil) next to your application.
+3. Scroll down to **Detected configuration files** and click **Run NPM Install**.
+   *(Alternatively, open Terminal in cPanel, paste the virtualenv command shown at the top of the Node.js page, and run `npm install --production`).*
+4. Click **Restart** on the application.
+
+### Automatic Migration & Asset Synchronization:
+The moment the server boots on GoDaddy:
+1. Sequelize automatically creates all MySQL tables.
+2. It auto-migrates and synchronizes all active faculty photographs (`/uploads/images/*`), notes PDFs (`/uploads/books/*`), and campus event images directly into your GoDaddy MySQL database!
+3. Check health endpoint:
+   ```text
+   https://aharadaedu.com/api/health
+   ```
+   Returns: `{"status": "OK", "message": "Aharada Education API is running"}`.
+4. Open the website:
+   ```text
+   https://aharadaedu.com
+   ```
+   The complete website loads instantly with all faculty photos, study notes, events, and programs!
 
 ---
 
-## Step 5: Install Dependencies and Start the App
+## Step 6: Log Into the Production Admin Panel
 
-1. In **Setup Node.js App**, scroll down to the **Detected configuration files** section.
-2. Click **Run NPM Install** (or open Terminal in cPanel, run the virtual environment command from Step 2, and type `npm install --production`).
-3. Click **Restart** on your application.
-4. **Auto-Migration & Seeding**:
-   - The moment the server starts, Sequelize will automatically **create all MySQL tables**!
-   - If the database is fresh, it will also automatically **seed default admin accounts, programs, faculty, events, and placements**.
-5. Test your API by opening:
-   ```
-   https://api.yourdomain.com/api/health
-   ```
-   You should see:
-   ```json
-   { "status": "OK", "message": "Aharada Education API is running" }
-   ```
+- **Admin Login URL**: `https://aharadaedu.com/admin/login`
+- **Default Superadmin Credentials**:
+  - Email: `admin@aharada.edu` *(or `md@aharadaedu.in`)*
+  - Password: `admin123` *(or `Aharada@Prabhu`)*
 
----
-
-## Step 6: Connect Vercel Frontend to GoDaddy Backend
-
-1. Open your project on [Vercel Dashboard](https://vercel.com).
-2. Go to **Settings > Environment Variables**.
-3. Add or update the variable:
-   - **Key**: `VITE_API_URL`
-   - **Value**: `https://api.yourdomain.com` *(your GoDaddy API URL, without trailing slash)*
-4. Go to **Deployments** and click **Redeploy** on the latest deployment so it picks up the new backend URL.
-
----
-
-## 🔑 Default Admin Credentials
-
-- **Email**: `admin@aharada.edu` *(or `md@aharadaedu.in`)*
-- **Password**: `admin123` *(or `Aharada@Prabhu`)*
-- **Login URL**: `https://your-frontend-domain.vercel.app/admin/login`
-
-To reset or add admin credentials on the server at any time, run:
-```bash
-node reset-admin.js
-```
+### Testing Uploads from Admin:
+1. Go to `https://aharadaedu.com/admin/faculty`. Edit or add a faculty photo.
+2. Go to `https://aharadaedu.com/admin/events`. Upload event pictures.
+3. Go to `https://aharadaedu.com/admin/books`. Upload new PDF study notes or textbooks.
+4. **Open the website on another phone or computer** -> The uploaded photos, notes, and events reflect immediately for everyone!

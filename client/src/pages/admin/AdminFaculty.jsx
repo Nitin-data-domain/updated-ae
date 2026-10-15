@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import toast from 'react-hot-toast'
 import { FiPlus, FiEdit2, FiTrash2, FiUpload, FiX, FiEye, FiStar } from 'react-icons/fi'
 import { getFaculty, createFaculty, updateFaculty, deleteFaculty, uploadFacultyImage, fetchFacultyImage } from '../../api'
+import { getMediaUrl } from '../../utils/mediaUrl'
 
 const emptyFaculty = {
   name: '', designation: '', qualification: '', experience: '',
@@ -93,6 +94,14 @@ export default function AdminFaculty() {
 
   const handleSave = async (e) => {
     e.preventDefault()
+    if (uploading || fetching) {
+      toast.error('Please wait for the photo upload/fetch to complete')
+      return
+    }
+    if (form.image && form.image.startsWith('blob:')) {
+      toast.error('Photo is still uploading or failed. Please re-upload or paste a link.')
+      return
+    }
     if (!form.name || !form.designation || !form.qualification || !form.experience) {
       toast.error('Please fill all required fields'); return
     }
@@ -163,8 +172,12 @@ export default function AdminFaculty() {
                       title="Click to view photograph"
                     >
                       <img
-                        src={f.image}
+                        src={getMediaUrl(f.image)}
                         alt={f.name}
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(f.name) + '&background=6366f1&color=fff';
+                        }}
                         style={{
                           width: 46,
                           height: 46,
@@ -413,7 +426,7 @@ export default function AdminFaculty() {
 
             <div style={{ position: 'relative', borderRadius: 12, overflow: 'hidden', border: '1px solid #e5e7eb', marginBottom: 16, backgroundColor: '#f8fafc' }}>
               <img
-                src={photoModalMember.image}
+                src={getMediaUrl(photoModalMember.image)}
                 alt={photoModalMember.name}
                 style={{ width: '100%', maxHeight: 380, objectFit: 'cover', display: 'block' }}
               />

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import toast from 'react-hot-toast'
 import { FiPlus, FiEdit2, FiTrash2, FiUpload, FiX, FiImage } from 'react-icons/fi'
 import { getEvents, createEvent, updateEvent, deleteEvent, uploadEventImage, fetchEventImage } from '../../api'
+import { getMediaUrl } from '../../utils/mediaUrl'
 
 const emptyEvent = {
   title: '', description: '', date: '', location: '', category: 'other', isUpcoming: true, images: []
@@ -74,6 +75,10 @@ export default function AdminEvents() {
 
   const handleSave = async (e) => {
     e.preventDefault()
+    if (uploading || fetching) {
+      toast.error('Please wait for photo upload/fetch to finish')
+      return
+    }
     if (!form.title || !form.description || !form.date) {
       toast.error('Please fill all required fields'); return
     }
@@ -125,7 +130,13 @@ export default function AdminEvents() {
                 <td>
                   <div style={{ display: 'flex', gap: 4 }}>
                     {(ev.images || []).slice(0, 2).map((img, i) => (
-                      <img key={i} src={img} alt="event" style={{ width: 36, height: 36, borderRadius: 6, objectFit: 'cover', border: '1px solid var(--gray-200)' }} />
+                      <img
+                        key={i}
+                        src={getMediaUrl(img)}
+                        alt="event"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                        style={{ width: 36, height: 36, borderRadius: 6, objectFit: 'cover', border: '1px solid var(--gray-200)' }}
+                      />
                     ))}
                     {(!ev.images || ev.images.length === 0) && <span style={{ fontSize: 12, color: 'var(--gray-400)' }}>—</span>}
                   </div>
@@ -200,7 +211,11 @@ export default function AdminEvents() {
                   <div style={{ display: 'flex', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
                     {form.images.map((img, idx) => (
                       <div key={idx} style={{ position: 'relative' }}>
-                        <img src={img} alt={`event ${idx + 1}`} style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 8, border: '2px solid var(--gray-200)' }} />
+                        <img
+                          src={getMediaUrl(img)}
+                          alt={`event ${idx + 1}`}
+                          style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 8, border: '2px solid var(--gray-200)' }}
+                        />
                         <button type="button" onClick={() => removeImage(idx)}
                           style={{ position: 'absolute', top: -6, right: -6, background: '#ef4444', color: '#fff', border: 'none', borderRadius: '50%', width: 20, height: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, padding: 0 }}>
                           <FiX size={11} />

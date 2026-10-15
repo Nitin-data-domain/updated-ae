@@ -18,6 +18,7 @@ import {
 } from 'react-icons/fi'
 import { HiAcademicCap } from 'react-icons/hi'
 import { getFaculty } from '../api'
+import { getMediaUrl, getFallbackAvatar } from '../utils/mediaUrl'
 import BrochureButton from '../components/BrochureButton'
 import './Faculty.css'
 
@@ -178,7 +179,14 @@ export default function Faculty() {
                     >
                       {member.image ? (
                         <div className="faculty-avatar-wrap">
-                          <img src={member.image} alt={member.name} />
+                          <img
+                            src={getMediaUrl(member.image)}
+                            alt={member.name}
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = getFallbackAvatar(member.name);
+                            }}
+                          />
                           <div className="avatar-zoom-overlay">
                             <FiMaximize2 size={18} />
                             <span>View Photo</span>
@@ -254,7 +262,14 @@ export default function Faculty() {
                   >
                     <div className="gallery-img-box">
                       {member.image ? (
-                        <img src={member.image} alt={member.name} />
+                        <img
+                          src={getMediaUrl(member.image)}
+                          alt={member.name}
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = getFallbackAvatar(member.name);
+                          }}
+                        />
                       ) : (
                         <div className="gallery-placeholder">
                           {member.name.slice(0, 2)}
@@ -312,9 +327,13 @@ export default function Faculty() {
                 <div className="faculty-modal-photo-pane">
                   {selectedPhotoMember.image ? (
                     <img
-                      src={selectedPhotoMember.image}
+                      src={getMediaUrl(selectedPhotoMember.image)}
                       alt={selectedPhotoMember.name}
                       className="faculty-modal-img"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = getFallbackAvatar(selectedPhotoMember.name);
+                      }}
                     />
                   ) : (
                     <div className="faculty-modal-no-img">

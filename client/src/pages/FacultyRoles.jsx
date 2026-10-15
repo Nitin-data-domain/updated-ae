@@ -19,6 +19,7 @@ import {
 } from 'react-icons/fi'
 import { HiAcademicCap } from 'react-icons/hi'
 import { getFaculty } from '../api'
+import { getMediaUrl, getFallbackAvatar } from '../utils/mediaUrl'
 import BrochureButton from '../components/BrochureButton'
 import './FacultyRoles.css'
 
@@ -311,9 +312,13 @@ export default function FacultyRoles() {
                       >
                         {member.image ? (
                           <img
-                            src={member.image}
+                            src={getMediaUrl(member.image)}
                             alt={member.name}
                             className="fr-large-photo"
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = getFallbackAvatar(member.name);
+                            }}
                           />
                         ) : (
                           <div className="fr-large-photo-placeholder">
@@ -477,9 +482,13 @@ export default function FacultyRoles() {
               <div className="fr-modal-inner">
                 <div className="fr-modal-img-wrap">
                   <img
-                    src={selectedPhoto.image}
+                    src={getMediaUrl(selectedPhoto.image)}
                     alt={selectedPhoto.name}
                     className="fr-modal-large-img"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = getFallbackAvatar(selectedPhoto.name);
+                    }}
                   />
                   {isHOD(selectedPhoto) && (
                     <div className="fr-modal-hod-tag">

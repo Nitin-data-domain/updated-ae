@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FiBriefcase, FiAward, FiChevronLeft, FiChevronRight, FiArrowRight } from 'react-icons/fi'
 import { getPlacements } from '../api'
+import { getMediaUrl, getFallbackAvatar } from '../utils/mediaUrl'
 import BrochureButton from '../components/BrochureButton'
 import './Placement.css'
 
@@ -80,7 +81,14 @@ export default function Placement() {
                   >
                     <div className="placement-avatar">
                       {placement.image && placement.image !== 'https://via.placeholder.com/150' ? (
-                        <img src={placement.image} alt={placement.studentName} />
+                        <img
+                          src={getMediaUrl(placement.image)}
+                          alt={placement.studentName}
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = getFallbackAvatar(placement.studentName);
+                          }}
+                        />
                       ) : (
                         <div className="placement-avatar-placeholder">
                           {placement.studentName.split(' ').map(n => n[0]).join('').slice(0, 2)}

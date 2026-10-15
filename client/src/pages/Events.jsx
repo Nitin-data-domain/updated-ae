@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FiCalendar, FiMapPin, FiTag, FiArrowRight, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import { getEvents } from '../api'
+import { getMediaUrl } from '../utils/mediaUrl'
 import BrochureButton from '../components/BrochureButton'
 import './Events.css'
 
@@ -127,7 +128,14 @@ export default function Events() {
                   <div className={`event-photos event-photos-${Math.min(event.images.length, 2)}`}>
                     {event.images.slice(0, 2).map((img, idx) => (
                       <div key={idx} className="event-photo-wrap">
-                        <img src={img} alt={`${event.title} photo ${idx + 1}`} className="event-photo" />
+                        <img
+                          src={getMediaUrl(img)}
+                          alt={`${event.title} photo ${idx + 1}`}
+                          className="event-photo"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
                       </div>
                     ))}
                   </div>

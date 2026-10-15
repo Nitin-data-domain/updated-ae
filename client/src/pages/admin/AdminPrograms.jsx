@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import toast from 'react-hot-toast'
 import { FiPlus, FiEdit2, FiTrash2, FiUpload, FiX } from 'react-icons/fi'
 import { getPrograms, createProgram, updateProgram, deleteProgram, uploadProgramImage, fetchProgramImage } from '../../api'
+import { getMediaUrl } from '../../utils/mediaUrl'
 
 const ALL_CATEGORIES = [
   { value: 'aviation', label: 'Aviation' },
@@ -132,6 +133,10 @@ export default function AdminPrograms() {
 
   const handleSave = async (e) => {
     e.preventDefault()
+    if (uploading || fetching) {
+      toast.error('Please wait for the image upload/fetch to complete')
+      return
+    }
     if (!form.title || !form.overview) { toast.error('Title and overview are required'); return }
     const cats = Array.isArray(form.category) ? form.category : [form.category]
     if (cats.length === 0) { toast.error('Please select at least one category'); return }
@@ -200,7 +205,7 @@ export default function AdminPrograms() {
               <tr key={p._id}>
                 <td>
                   {p.image
-                    ? <img src={p.image} alt={p.title} style={{ width: 52, height: 40, borderRadius: 6, objectFit: 'cover', border: '1.5px solid var(--gray-200)' }} />
+                    ? <img src={getMediaUrl(p.image)} alt={p.title} style={{ width: 52, height: 40, borderRadius: 6, objectFit: 'cover', border: '1.5px solid var(--gray-200)' }} />
                     : <div style={{ width: 52, height: 40, borderRadius: 6, background: 'var(--gray-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>🖼️</div>
                   }
                 </td>

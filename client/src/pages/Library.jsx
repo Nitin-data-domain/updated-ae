@@ -20,6 +20,7 @@ import {
 } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 import { getBooks, getBookOptions, recordBookDownload, getPrograms } from '../api'
+import { getMediaUrl } from '../utils/mediaUrl'
 import './Library.css'
 
 export default function Library() {
@@ -166,17 +167,21 @@ export default function Library() {
     const rawTitle = (book.title || '').toLowerCase();
 
     if (rawUrl.includes('teaching') || rawName.includes('teaching') || rawTitle.includes('teaching')) {
-      return '/uploads/books/Teaching_Load_2026_1789663607345.pdf';
+      return getMediaUrl('/uploads/books/Teaching_Load_2026_1789663607345.pdf');
     }
     if (rawUrl.includes('taxation') || rawName.includes('taxation') || rawTitle.includes('taxation')) {
-      return '/uploads/books/BBA_EI_UNIT_1_taxation_notes.pdf';
+      return getMediaUrl('/uploads/books/BBA_EI_UNIT_1_taxation_notes.pdf');
     }
     // If it is an external link (Google Drive, external third-party site), open directly
     if (url.startsWith('http') && !url.includes('/uploads/') && !url.includes('cloudinary.com')) {
       return url;
     }
+    if (url.startsWith('/uploads/') || url.startsWith('uploads/')) {
+      return getMediaUrl(url);
+    }
     // Route through backend streaming endpoint ensuring persistence even across server reboots
-    return `/api/books/file/${book.id}`;
+    const apiBase = (import.meta.env.VITE_API_URL || '').replace(/\/api\/?$/, '');
+    return `${apiBase}/api/books/file/${book.id}`;
   };
 
   // Handle book download

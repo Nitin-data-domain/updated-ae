@@ -296,7 +296,7 @@ export default function AdminBooks() {
   }
 
   const handleAdminDownload = async (book) => {
-    const apiBase = import.meta.env.VITE_API_URL || '';
+    const apiBase = (import.meta.env.VITE_API_URL || '').replace(/\/api\/?$/, '');
     const downloadEndpoint = `${apiBase}/api/books/file/${book.id}`;
 
     // If external link like Google Drive, open directly

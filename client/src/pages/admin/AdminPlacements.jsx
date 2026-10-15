@@ -5,6 +5,7 @@ import {
   getAllPlacementsAdmin, createPlacement, updatePlacement, deletePlacement,
   uploadPlacementImage, fetchPlacementImage
 } from '../../api'
+import { getMediaUrl } from '../../utils/mediaUrl'
 
 const currentYear = new Date().getFullYear()
 const emptyPlacement = {
@@ -89,6 +90,10 @@ export default function AdminPlacements() {
 
   const handleSave = async (e) => {
     e.preventDefault()
+    if (uploading || fetching) {
+      toast.error('Please wait for the image upload to complete')
+      return
+    }
     if (!form.studentName || !form.companyName || !form.role || !form.program || !form.year) {
       toast.error('Please fill all required fields'); return
     }
@@ -143,7 +148,7 @@ export default function AdminPlacements() {
               <tr key={p._id}>
                 <td>
                   {p.image && p.image !== 'https://via.placeholder.com/150'
-                    ? <img src={p.image} alt={p.studentName} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--primary-100, #e0e7ff)' }} />
+                    ? <img src={getMediaUrl(p.image)} alt={p.studentName} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--primary-100, #e0e7ff)' }} />
                     : <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--gray-200)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: 'var(--gray-500)', fontSize: 14 }}>{p.studentName.split(' ').map(n => n[0]).join('').slice(0, 2)}</div>
                   }
                 </td>

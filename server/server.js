@@ -73,6 +73,15 @@ const { handleStaticUploadFallback } = require('./controllers/bookController');
 app.get('/uploads/books/:filename', handleStaticUploadFallback);
 app.head('/uploads/books/:filename', handleStaticUploadFallback);
 
+// Fallback for direct /uploads/images/:filename if file is missing on disk
+app.get('/uploads/images/:filename', (req, res) => {
+  const filePath = path.join(uploadsDir, 'images', req.params.filename);
+  if (fs.existsSync(filePath)) {
+    return res.sendFile(filePath);
+  }
+  return res.redirect('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&auto=format&fit=crop&q=80');
+});
+
 // API Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/programs', require('./routes/programRoutes'));
