@@ -197,15 +197,12 @@ export default function FacultyRoles() {
             <span>
               Showing <strong>{filteredFaculty.length}</strong> of {faculty.length} faculty profiles with assigned roles
             </span>
-            {(activeFilter !== 'all' || searchTerm) && (
+            {searchTerm && (
               <button
                 className="btn-reset-filters"
-                onClick={() => {
-                  setActiveFilter('all')
-                  setSearchTerm('')
-                }}
+                onClick={() => setSearchTerm('')}
               >
-                Clear Filters
+                Clear Search
               </button>
             )}
           </div>
@@ -219,15 +216,12 @@ export default function FacultyRoles() {
             <div className="fr-empty-state">
               <FiUsers size={48} className="empty-icon" />
               <h3>No matching faculty profiles found</h3>
-              <p>Try clearing your search query or choosing another category filter.</p>
+              <p>Try clearing your search query.</p>
               <button
                 className="btn btn-navy btn-sm"
-                onClick={() => {
-                  setSearchTerm('')
-                  setActiveFilter('all')
-                }}
+                onClick={() => setSearchTerm('')}
               >
-                Reset All Filters
+                Reset Search
               </button>
             </div>
           ) : (
