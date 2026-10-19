@@ -11,6 +11,7 @@ const Book = require('./Book');
 const Feedback = require('./Feedback');
 const FacultyRole = require('./FacultyRole');
 const { CampusPhoto, CompanyPartner } = require('./SiteContent');
+const { syncBundledAssetsToPersistent, persistentUploadsRoot, booksDir } = require('../utils/storageConfig');
 
 // Define Associations
 Brochure.belongsTo(Program, { foreignKey: 'linkedProgramId', as: 'linkedProgram' });
@@ -19,6 +20,13 @@ Program.hasMany(Brochure, { foreignKey: 'linkedProgramId', as: 'brochures' });
 // Function to sync all models
 async function syncModels() {
   await sequelize.sync({ alter: false });
+
+  // Sync bundled assets to persistent storage on startup (e.g. GoDaddy /private)
+  try {
+    syncBundledAssetsToPersistent();
+  } catch (syncErr) {
+    console.warn('Notice: Persistent storage sync:', syncErr.message);
+  }
 
   // Ensure columns exist on books table
   try {
@@ -144,7 +152,8 @@ async function syncModels() {
       if (member) {
         const p1 = path.join(__dirname, '../..', member.image || '');
         const p2 = path.join(__dirname, '..', member.image || '');
-        const fileExists = member.image && member.image.startsWith('/uploads/') && (fs.existsSync(p1) || fs.existsSync(p2));
+        const p3 = member.image ? path.join(persistentUploadsRoot, member.image.replace(/^\/?uploads\//, '')) : '';
+        const fileExists = member.image && member.image.startsWith('/uploads/') && (fs.existsSync(p1) || fs.existsSync(p2) || (p3 && fs.existsSync(p3)));
         if (!fileExists || !member.image || member.image.includes('unsplash.com') || member.image.startsWith('blob:')) {
           await member.update({ image: item.image });
           console.log(`✅ Synced real photograph for faculty: ${member.name} → ${item.image}`);
@@ -223,7 +232,8 @@ async function syncModels() {
           if (!img || !img.startsWith('/uploads/')) return false;
           const p1 = path.join(__dirname, '../..', img);
           const p2 = path.join(__dirname, '..', img);
-          return fs.existsSync(p1) || fs.existsSync(p2);
+          const p3 = path.join(persistentUploadsRoot, img.replace(/^\/?uploads\//, ''));
+          return fs.existsSync(p1) || fs.existsSync(p2) || fs.existsSync(p3);
         });
       }
       if (!hasValidPhotos) {
@@ -251,15 +261,16 @@ async function syncModels() {
       }
     }
 
-    // 5. Ensure missing notes PDFs exist on disk for all books
-    const notesDir = path.join(__dirname, '../uploads/books');
+    // 5. Ensure missing notes PDFs exist on disk for all books (in persistent booksDir)
+    const notesDir = booksDir;
     if (!fs.existsSync(notesDir)) fs.mkdirSync(notesDir, { recursive: true });
     const allNotesBooks = await Book.findAll({ where: { materialType: 'notes' } });
     for (const b of allNotesBooks) {
       if (b.fileUrl && b.fileUrl.startsWith('/uploads/books/')) {
         const p1 = path.join(__dirname, '../..', b.fileUrl);
         const p2 = path.join(__dirname, '..', b.fileUrl);
-        if (!fs.existsSync(p1) && !fs.existsSync(p2)) {
+        const p3 = path.join(persistentUploadsRoot, b.fileUrl.replace(/^\/?uploads\//, ''));
+        if (!fs.existsSync(p1) && !fs.existsSync(p2) && !fs.existsSync(p3)) {
           try {
             const { generateStudyNotesPdf } = require('../scripts/generate-notes-pdf');
             const targetPath = path.join(notesDir, path.basename(b.fileUrl));

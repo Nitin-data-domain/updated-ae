@@ -5,6 +5,7 @@ const http = require('http');
 const { Op } = require('sequelize');
 const Book = require('../models/Book');
 const Program = require('../models/Program');
+const { booksDir, persistentUploadsRoot, getAllSubDirs } = require('../utils/storageConfig');
 
 // Helper to determine Content-Type header from file extension
 const getContentType = (filename) => {
@@ -325,8 +326,10 @@ exports.serveBookFile = async (req, res) => {
       `${book.subjectCode || 'document'}_${book.materialType === 'notes' ? (book.unit ? book.unit.replace(/\s+/g, '_') : 'Notes') : 'Book'}.pdf`;
     const contentType = getContentType(downloadFileName);
 
-    // List of possible directory locations for uploads/books on GoDaddy
+    // List of possible directory locations for uploads/books on GoDaddy (persistent /private/uploads first)
     const possibleUploadDirs = [
+      booksDir,
+      ...getAllSubDirs('books'),
       path.join(__dirname, '../uploads/books'),
       path.join(__dirname, 'uploads/books'),
       path.join(process.cwd(), 'uploads/books'),
@@ -337,6 +340,8 @@ exports.serveBookFile = async (req, res) => {
     if (targetUrl && targetUrl.includes('/uploads/')) {
       const relPath = targetUrl.substring(targetUrl.indexOf('/uploads/')).replace(/^\//, '');
       const candidates = [
+        path.join(persistentUploadsRoot, relPath.replace(/^uploads\//, '')),
+        path.join('/private', relPath),
         path.join(__dirname, '..', relPath),
         path.join(__dirname, '../..', relPath),
         path.join(process.cwd(), relPath),
@@ -394,7 +399,7 @@ exports.serveBookFile = async (req, res) => {
     // 5. Automatic on-the-fly study notes generation if physical file was lost
     try {
       const { generateStudyNotesPdf } = require('../scripts/generate-notes-pdf');
-      const targetDir = path.join(__dirname, '../uploads/books');
+      const targetDir = booksDir;
       if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
 
       const genFileName = (book.fileName || `${book.subjectCode || 'notes'}_${Date.now()}.pdf`).replace(/[^a-zA-Z0-9._-]/g, '_');
@@ -643,18 +648,20 @@ exports.handleStaticUploadFallback = async (req, res, next) => {
       return exports.serveBookFile(req, res);
     }
 
-    // Direct check in uploads/books for any alias matching the stem or dbms/sql
-    const booksDir = path.join(__dirname, '../uploads/books');
-    if (fs.existsSync(booksDir)) {
-      const files = fs.readdirSync(booksDir);
-      const matchedFile = files.find((f) => {
-        const cleanF = f.toLowerCase().replace(/[^a-z0-9]/g, '');
-        return cleanStem.length > 4 && (cleanF.includes(cleanStem) || cleanStem.includes(cleanF));
-      });
-      if (matchedFile) {
-        res.setHeader('Content-Type', getContentType(matchedFile));
-        res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(matchedFile)}"`);
-        return res.sendFile(path.join(booksDir, matchedFile));
+    // Direct check in uploads/books for any alias matching the stem or dbms/sql across all storage roots
+    const candidateDirs = [booksDir, ...getAllSubDirs('books')];
+    for (const bDir of candidateDirs) {
+      if (fs.existsSync(bDir)) {
+        const files = fs.readdirSync(bDir);
+        const matchedFile = files.find((f) => {
+          const cleanF = f.toLowerCase().replace(/[^a-z0-9]/g, '');
+          return cleanStem.length > 4 && (cleanF.includes(cleanStem) || cleanStem.includes(cleanF));
+        });
+        if (matchedFile) {
+          res.setHeader('Content-Type', getContentType(matchedFile));
+          res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(matchedFile)}"`);
+          return res.sendFile(path.join(bDir, matchedFile));
+        }
       }
     }
   } catch (err) {

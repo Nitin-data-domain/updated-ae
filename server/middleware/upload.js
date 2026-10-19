@@ -2,17 +2,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Ensure upload directories exist on GoDaddy hosting
-const ensureDir = (dir) => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-  return dir;
-};
-
-const imagesDir = ensureDir(path.join(__dirname, '../uploads/images'));
-const booksDir = ensureDir(path.join(__dirname, '../uploads/books'));
-const brochuresDir = ensureDir(path.join(__dirname, '../uploads/brochures'));
+const { imagesDir, booksDir, brochuresDir } = require('../utils/storageConfig');
 
 // ── Disk storage for images (saved directly on GoDaddy) ──────────────────────
 const imageStorage = multer.diskStorage({

@@ -63,59 +63,74 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-// Static uploads directory
-const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-app.use('/uploads', express.static(uploadsDir));
+// Static uploads directories (supports GoDaddy persistent /private/uploads and local repo uploads)
+const { getAllUploadRoots, getAllSubDirs } = require('./utils/storageConfig');
+getAllUploadRoots().forEach((dir) => {
+  app.use('/uploads', express.static(dir));
+});
 
 // Fallback for direct /uploads/books/:filename access if physical file is missing
 const { handleStaticUploadFallback } = require('./controllers/bookController');
 app.get('/uploads/books/:filename', handleStaticUploadFallback);
 app.head('/uploads/books/:filename', handleStaticUploadFallback);
 
-// Smart image resolver for /uploads/images/:filename
+// Smart image resolver for /uploads/images/:filename across all upload storage locations
 app.get('/uploads/images/:filename', (req, res) => {
   const filename = req.params.filename;
   if (!filename) return res.status(404).send('Not found');
 
-  const imagesDir = path.join(uploadsDir, 'images');
-  const filePath = path.join(imagesDir, filename);
+  const imageDirs = getAllSubDirs('images');
 
   // 1. Direct physical file match
-  if (fs.existsSync(filePath)) {
-    return res.sendFile(filePath);
+  for (const dir of imageDirs) {
+    const filePath = path.join(dir, filename);
+    if (fs.existsSync(filePath)) {
+      return res.sendFile(filePath);
+    }
   }
 
   // 2. Intelligent prefix / stem match for renamed or timestamped uploads (e.g. image_8__1791834574030.png -> image_8__1791743926342.png)
-  if (fs.existsSync(imagesDir)) {
-    const files = fs.readdirSync(imagesDir);
-    const basePrefix = filename.split('__')[0].replace(/_\d{10,}.*$/, '');
-    if (basePrefix && basePrefix.length >= 4) {
-      const matched = files.find(f => f.startsWith(basePrefix));
-      if (matched) {
-        return res.sendFile(path.join(imagesDir, matched));
+  const basePrefix = filename.split('__')[0].replace(/_\d{10,}.*$/, '');
+  for (const dir of imageDirs) {
+    try {
+      const files = fs.readdirSync(dir);
+      if (basePrefix && basePrefix.length >= 4) {
+        const matched = files.find(f => f.startsWith(basePrefix));
+        if (matched) {
+          return res.sendFile(path.join(dir, matched));
+        }
       }
-    }
+    } catch (_) {}
+  }
 
-    // 3. Placement photo resolution
-    if (/placement|student|verma|sharma|kumar|gupta|singh/i.test(filename)) {
-      const placementPhotos = files.filter(f => f.startsWith('placement_'));
-      if (placementPhotos.length > 0) {
-        let hash = 0;
-        for (let i = 0; i < filename.length; i++) hash = (hash + filename.charCodeAt(i)) % placementPhotos.length;
-        return res.sendFile(path.join(imagesDir, placementPhotos[hash]));
-      }
+  // 3. Placement photo resolution
+  if (/placement|student|verma|sharma|kumar|gupta|singh/i.test(filename)) {
+    for (const dir of imageDirs) {
+      try {
+        const files = fs.readdirSync(dir);
+        const placementPhotos = files.filter(f => f.startsWith('placement_'));
+        if (placementPhotos.length > 0) {
+          let hash = 0;
+          for (let i = 0; i < filename.length; i++) hash = (hash + filename.charCodeAt(i)) % placementPhotos.length;
+          return res.sendFile(path.join(dir, placementPhotos[hash]));
+        }
+      } catch (_) {}
     }
+  }
 
-    // 4. Authentic college campus photo fallback for event images
-    const isEventImage = /SaveClip|WhatsApp|Untitled|Screenshot|event|banner|IMG|photo/i.test(filename);
-    if (isEventImage) {
-      const campusPhotos = files.filter(f => f.startsWith('img-') && /\.(jpg|jpeg|png|webp)$/i.test(f));
-      if (campusPhotos.length > 0) {
-        let hash = 0;
-        for (let i = 0; i < filename.length; i++) hash = (hash + filename.charCodeAt(i)) % campusPhotos.length;
-        return res.sendFile(path.join(imagesDir, campusPhotos[hash]));
-      }
+  // 4. Authentic college campus photo fallback for event images
+  const isEventImage = /SaveClip|WhatsApp|Untitled|Screenshot|event|banner|IMG|photo/i.test(filename);
+  if (isEventImage) {
+    for (const dir of imageDirs) {
+      try {
+        const files = fs.readdirSync(dir);
+        const campusPhotos = files.filter(f => f.startsWith('img-') && /\.(jpg|jpeg|png|webp)$/i.test(f));
+        if (campusPhotos.length > 0) {
+          let hash = 0;
+          for (let i = 0; i < filename.length; i++) hash = (hash + filename.charCodeAt(i)) % campusPhotos.length;
+          return res.sendFile(path.join(dir, campusPhotos[hash]));
+        }
+      } catch (_) {}
     }
   }
 
@@ -123,9 +138,6 @@ app.get('/uploads/images/:filename', (req, res) => {
   return res.status(404).json({ success: false, message: 'Image asset not found' });
 });
 app.head('/uploads/images/:filename', (req, res) => {
-  const filename = req.params.filename;
-  const filePath = path.join(uploadsDir, 'images', filename);
-  if (fs.existsSync(filePath)) return res.sendStatus(200);
   return res.sendStatus(200); // Return 200 so preflight checks succeed gracefully
 });
 

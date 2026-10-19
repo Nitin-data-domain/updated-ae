@@ -6,7 +6,8 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-const uploadsDir = path.join(__dirname, '../../uploads');
+const { persistentUploadsRoot } = require('../../utils/storageConfig');
+const uploadsDir = persistentUploadsRoot;
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
