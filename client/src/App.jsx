@@ -1,4 +1,5 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import Layout from './components/Layout'
 import AdminLayout from './components/admin/AdminLayout'
 import Home from './pages/Home'
@@ -64,6 +65,19 @@ function PortalDashboardRouter() {
 }
 
 function App() {
+  const location = useLocation()
+
+  // Track page views in Google Analytics on SPA route navigation
+  useEffect(() => {
+    if (typeof window.gtag === 'function') {
+      window.gtag('config', 'G-7WR2H3YYKW', {
+        page_path: location.pathname + location.search,
+        page_location: window.location.href,
+        page_title: document.title,
+      })
+    }
+  }, [location])
+
   return (
     <AuthProvider>
       <Routes>
