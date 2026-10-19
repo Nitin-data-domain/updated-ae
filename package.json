@@ -6,8 +6,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server/server.js",
-    "build": "npm --prefix server install",
-    "postinstall": "npm --prefix server install"
+    "build": "npm --prefix server install --no-package-lock",
+    "postinstall": "npm --prefix server install --no-package-lock"
   },
   "engines": {
     "node": ">=18.0.0"
