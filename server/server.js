@@ -166,6 +166,54 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Aharada Education API is running' });
 });
 
+// Storage Diagnostic & Verification endpoint
+app.get('/api/storage/status', (req, res) => {
+  const { persistentUploadsRoot, imagesDir, booksDir, brochuresDir, getAllUploadRoots } = require('./utils/storageConfig');
+  const getDirInfo = (dir) => {
+    try {
+      if (!fs.existsSync(dir)) return { exists: false, count: 0, recent: [] };
+      const files = fs.readdirSync(dir);
+      const recent = files
+        .map((f) => {
+          try {
+            const stat = fs.statSync(path.join(dir, f));
+            return { name: f, size: stat.size, mtime: stat.mtime };
+          } catch (_) {
+            return { name: f };
+          }
+        })
+        .sort((a, b) => new Date(b.mtime || 0) - new Date(a.mtime || 0))
+        .slice(0, 10);
+      return { exists: true, count: files.length, recent };
+    } catch (e) {
+      return { exists: false, error: e.message };
+    }
+  };
+
+  const books = getDirInfo(booksDir);
+  const images = getDirInfo(imagesDir);
+  const brochures = getDirInfo(brochuresDir);
+  const isPrivate = persistentUploadsRoot.startsWith('/private') || persistentUploadsRoot.includes('private');
+
+  res.json({
+    success: true,
+    platform: process.platform,
+    persistentUploadsRoot,
+    isPrivateStorageActive: isPrivate,
+    storageType: isPrivate ? 'GoDaddy Persistent Volume (/private/uploads)' : 'Local File Storage',
+    allStorageRoots: getAllUploadRoots(),
+    totalStoredFiles: (books.count || 0) + (images.count || 0) + (brochures.count || 0),
+    categories: {
+      books: { path: booksDir, ...books },
+      images: { path: imagesDir, ...images },
+      brochures: { path: brochuresDir, ...brochures },
+    },
+    message: isPrivate
+      ? 'Durable /private persistent storage is ACTIVE. All uploads survive container redeployments and rebuilds.'
+      : 'Local storage active (development mode).',
+  });
+});
+
 // ── Serve Frontend SPA & Static Assets ────────────────────────────────────────
 const possibleDistPaths = [
   path.join(__dirname, 'public'),

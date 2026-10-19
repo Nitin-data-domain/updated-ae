@@ -159,5 +159,9 @@ export const createFacultyRole = (data) => api.post('/faculty-roles', data);
 export const updateFacultyRole = (id, data) => api.put(`/faculty-roles/${id}`, data);
 export const deleteFacultyRole = (id) => api.delete(`/faculty-roles/${id}`);
 
+// Storage Diagnostic
+export const getStorageStatus = () => api.get('/storage/status');
+
 export default api;
+
 
