@@ -35,14 +35,14 @@ export function getMediaUrl(url) {
 /**
  * Fallback avatar generator using UI Avatars for faculty / students when image fails or is missing
  */
-export function getFallbackAvatar(name = 'Faculty Member') {
-  const cleanName = encodeURIComponent(name || 'Aharada Faculty');
-  return `https://ui-avatars.com/api/?name=${cleanName}&background=0284c7&color=ffffff&size=256&bold=true`;
+export function getFallbackAvatar(name = 'Aharada Member') {
+  const cleanName = encodeURIComponent(name || 'Aharada Member');
+  return `https://ui-avatars.com/api/?name=${cleanName}&background=0f172a&color=38bdf8&size=256&bold=true`;
 }
 
 /**
  * Fallback event banner when event image is missing
  */
 export function getFallbackEventImage(category = 'event') {
-  return 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop&q=80';
+  return getMediaUrl('/uploads/images/img-1777890335417-901289897.jpeg');
 }

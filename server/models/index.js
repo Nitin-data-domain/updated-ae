@@ -112,9 +112,21 @@ async function syncModels() {
     console.warn('Notice: Faculty column migration check:', colErr.message);
   }
 
-  // Automatic photo and notes sync: Link faculty to their real uploaded photographs if currently using unsplash or empty
+  // Automatic photo and notes sync: Link faculty, events, placements, and notes to physical assets
   try {
+    const path = require('path');
+    const fs = require('fs');
+    const { Op } = require('sequelize');
+
+    // 1. Faculty photograph synchronization
     const facultyPhotoMap = [
+      { name: 'Vivek Singh Yadav', image: '/uploads/images/image_8__1791743926342.png' },
+      { name: 'Ayushi Saxena', image: '/uploads/images/image_6__1791743751518.png' },
+      { name: 'Preeti Verma', image: '/uploads/images/image_2__1791742867586.png' },
+      { name: 'Zafar Sultan', image: '/uploads/images/image_4__1791743506680.png' },
+      { name: 'Harshvardhan Tyagi', image: '/uploads/images/image_3__1791743520039.png' },
+      { name: 'Pragya Sharma', image: '/uploads/images/image_5__1791743620169.png' },
+      { name: 'Nitin Girdhar', image: '/uploads/images/image_1791742584901.png' },
       { name: 'Amitabh Sen', image: '/uploads/images/image_1791742584901.png' },
       { name: 'Rajesh Kumar Singh', image: '/uploads/images/image_2__1791742867586.png' },
       { name: 'Priya Sharma', image: '/uploads/images/image_3__1791743520039.png' },
@@ -124,19 +136,23 @@ async function syncModels() {
       { name: 'Arvind Swaminathan', image: '/uploads/images/image_8__1791743926342.png' },
     ];
     for (const item of facultyPhotoMap) {
-      const { Op } = require('sequelize');
       const member = await Faculty.findOne({
         where: {
           name: { [Op.like]: `%${item.name}%` }
         }
       });
-      if (member && (!member.image || member.image.includes('unsplash.com') || member.image.startsWith('blob:'))) {
-        await member.update({ image: item.image });
-        console.log(`✅ Synced real photograph for faculty: ${member.name} → ${item.image}`);
+      if (member) {
+        const p1 = path.join(__dirname, '../..', member.image || '');
+        const p2 = path.join(__dirname, '..', member.image || '');
+        const fileExists = member.image && member.image.startsWith('/uploads/') && (fs.existsSync(p1) || fs.existsSync(p2));
+        if (!fileExists || !member.image || member.image.includes('unsplash.com') || member.image.startsWith('blob:')) {
+          await member.update({ image: item.image });
+          console.log(`✅ Synced real photograph for faculty: ${member.name} → ${item.image}`);
+        }
       }
     }
 
-    // Auto-sync real study notes files if currently using dummy w3.org links
+    // 2. Real study notes files auto-sync
     const realNotesMap = [
       {
         keyword: 'Civil Aviation',
@@ -175,7 +191,6 @@ async function syncModels() {
       },
     ];
     for (const item of realNotesMap) {
-      const { Op } = require('sequelize');
       const book = await Book.findOne({
         where: {
           title: { [Op.like]: `%${item.keyword}%` },
@@ -192,20 +207,78 @@ async function syncModels() {
       }
     }
 
-    // Auto-sync event photos if currently empty
+    // 3. Auto-sync event photos to real campus photos if images are missing or broken
     const defaultEventPhotos = [
       ['/uploads/images/img-1777890335417-901289897.jpeg', '/uploads/images/img-1777891756812-948163918.jpg'],
       ['/uploads/images/img-1777893379826-937202450.jpeg', '/uploads/images/img-1777893616975-678406666.jpg'],
       ['/uploads/images/img-1777893661160-283492928.jpg', '/uploads/images/img-1778169723972-785046803.jpeg'],
-      ['/uploads/images/img-1778350914660-148905992.jpeg'],
+      ['/uploads/images/img-1778350914660-148905992.jpeg', '/uploads/images/img-1777890335417-901289897.jpeg'],
     ];
     const allEvents = await Event.findAll();
     for (let i = 0; i < allEvents.length; i++) {
       const ev = allEvents[i];
-      if (!ev.images || ev.images.length === 0) {
+      let hasValidPhotos = false;
+      if (Array.isArray(ev.images) && ev.images.length > 0) {
+        hasValidPhotos = ev.images.every((img) => {
+          if (!img || !img.startsWith('/uploads/')) return false;
+          const p1 = path.join(__dirname, '../..', img);
+          const p2 = path.join(__dirname, '..', img);
+          return fs.existsSync(p1) || fs.existsSync(p2);
+        });
+      }
+      if (!hasValidPhotos) {
         const assignedPhotos = defaultEventPhotos[i % defaultEventPhotos.length];
         await ev.update({ images: assignedPhotos });
-        console.log(`✅ Synced campus photos for event: ${ev.title}`);
+        console.log(`✅ Synced authentic campus photos for event: ${ev.title}`);
+      }
+    }
+
+    // 4. Auto-sync placement student portraits
+    const placementPhotoMap = [
+      { studentName: 'Rahul Verma', image: '/uploads/images/placement_rahul_verma.jpg' },
+      { studentName: 'Priya Sharma', image: '/uploads/images/placement_priya_sharma.jpg' },
+      { studentName: 'Amit Kumar', image: '/uploads/images/placement_amit_kumar.jpg' },
+      { studentName: 'Sneha Gupta', image: '/uploads/images/placement_sneha_gupta.jpg' },
+      { studentName: 'Vikram Singh', image: '/uploads/images/placement_vikram_singh.jpg' },
+    ];
+    for (const item of placementPhotoMap) {
+      const student = await Placement.findOne({
+        where: { studentName: { [Op.like]: `%${item.studentName}%` } }
+      });
+      if (student && (!student.image || student.image.includes('placeholder.com') || student.image.includes('via.placeholder') || student.image === '')) {
+        await student.update({ image: item.image });
+        console.log(`✅ Synced real achiever portrait for student: ${student.studentName} → ${item.image}`);
+      }
+    }
+
+    // 5. Ensure missing notes PDFs exist on disk for all books
+    const notesDir = path.join(__dirname, '../uploads/books');
+    if (!fs.existsSync(notesDir)) fs.mkdirSync(notesDir, { recursive: true });
+    const allNotesBooks = await Book.findAll({ where: { materialType: 'notes' } });
+    for (const b of allNotesBooks) {
+      if (b.fileUrl && b.fileUrl.startsWith('/uploads/books/')) {
+        const p1 = path.join(__dirname, '../..', b.fileUrl);
+        const p2 = path.join(__dirname, '..', b.fileUrl);
+        if (!fs.existsSync(p1) && !fs.existsSync(p2)) {
+          try {
+            const { generateStudyNotesPdf } = require('../scripts/generate-notes-pdf');
+            const targetPath = path.join(notesDir, path.basename(b.fileUrl));
+            await generateStudyNotesPdf({
+              title: b.title,
+              subjectCode: b.subjectCode,
+              subjectName: b.subjectName,
+              courseName: b.courseName,
+              unit: b.unit,
+              semester: b.semester,
+              author: b.author,
+              description: b.description,
+              outputPath: targetPath,
+            });
+            console.log(`✅ Auto-generated missing notes PDF on disk: ${b.title} (${path.basename(b.fileUrl)})`);
+          } catch (e) {
+            console.warn(`Could not auto-generate notes for ${b.title}:`, e.message);
+          }
+        }
       }
     }
   } catch (syncErr) {

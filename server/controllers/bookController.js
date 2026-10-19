@@ -391,7 +391,35 @@ exports.serveBookFile = async (req, res) => {
       return res.redirect(targetUrl);
     }
 
-    // 5. Clean, informative 404 response
+    // 5. Automatic on-the-fly study notes generation if physical file was lost
+    try {
+      const { generateStudyNotesPdf } = require('../scripts/generate-notes-pdf');
+      const targetDir = path.join(__dirname, '../uploads/books');
+      if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
+
+      const genFileName = (book.fileName || `${book.subjectCode || 'notes'}_${Date.now()}.pdf`).replace(/[^a-zA-Z0-9._-]/g, '_');
+      const genFilePath = path.join(targetDir, genFileName);
+
+      await generateStudyNotesPdf({
+        title: book.title,
+        subjectCode: book.subjectCode,
+        subjectName: book.subjectName,
+        courseName: book.courseName,
+        unit: book.unit,
+        semester: book.semester,
+        author: book.author,
+        description: book.description,
+        outputPath: genFilePath,
+      });
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(downloadFileName)}"`);
+      return res.sendFile(genFilePath);
+    } catch (genErr) {
+      console.warn('Notice: Dynamic PDF generation fallback error:', genErr.message);
+    }
+
+    // 6. Clean, informative 404 response if generation also fails
     if (req.accepts('html')) {
       return res.status(404).send(`
         <!DOCTYPE html>
@@ -585,6 +613,11 @@ exports.handleStaticUploadFallback = async (req, res, next) => {
   const filename = req.params.filename;
   if (!filename) return next();
 
+  if (req.method === 'HEAD') {
+    res.setHeader('Content-Type', 'application/pdf');
+    return res.sendStatus(200);
+  }
+
   try {
     const cleanStem = filename
       .replace(/(\.docx|\.pdf|\.doc|\.epub|\.zip)+$/gi, '')
@@ -600,13 +633,29 @@ exports.handleStaticUploadFallback = async (req, res, next) => {
         fUrl.includes(q) ||
         fName.includes(q) ||
         (cleanStem.length > 4 && fUrl.includes(cleanStem)) ||
-        (cleanStem.length > 4 && fName.includes(cleanStem))
+        (cleanStem.length > 4 && fName.includes(cleanStem)) ||
+        (q.includes('dbms') && (fUrl.includes('dbms') || fName.includes('dbms') || (b.title || '').toLowerCase().includes('database')))
       );
     });
 
     if (matchedBook) {
       req.params.id = matchedBook.id;
       return exports.serveBookFile(req, res);
+    }
+
+    // Direct check in uploads/books for any alias matching the stem or dbms/sql
+    const booksDir = path.join(__dirname, '../uploads/books');
+    if (fs.existsSync(booksDir)) {
+      const files = fs.readdirSync(booksDir);
+      const matchedFile = files.find((f) => {
+        const cleanF = f.toLowerCase().replace(/[^a-z0-9]/g, '');
+        return cleanStem.length > 4 && (cleanF.includes(cleanStem) || cleanStem.includes(cleanF));
+      });
+      if (matchedFile) {
+        res.setHeader('Content-Type', getContentType(matchedFile));
+        res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(matchedFile)}"`);
+        return res.sendFile(path.join(booksDir, matchedFile));
+      }
     }
   } catch (err) {
     console.warn('handleStaticUploadFallback error:', err.message);

@@ -90,9 +90,11 @@ export default function Placement() {
                           }}
                         />
                       ) : (
-                        <div className="placement-avatar-placeholder">
-                          {placement.studentName.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                        </div>
+                        <img
+                          src={getFallbackAvatar(placement.studentName)}
+                          alt={placement.studentName}
+                          className="placement-avatar-fallback-img"
+                        />
                       )}
                     </div>
                     <div className="placement-info">

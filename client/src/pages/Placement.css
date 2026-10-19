@@ -38,6 +38,14 @@
   object-fit: cover;
 }
 
+.placement-avatar .placement-avatar-fallback-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 .placement-avatar-placeholder {
   width: 80px;
   height: 80px;

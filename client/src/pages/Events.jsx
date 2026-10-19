@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FiCalendar, FiMapPin, FiTag, FiArrowRight, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import { getEvents } from '../api'
-import { getMediaUrl } from '../utils/mediaUrl'
+import { getMediaUrl, getFallbackEventImage } from '../utils/mediaUrl'
 import BrochureButton from '../components/BrochureButton'
 import './Events.css'
 
@@ -124,7 +124,7 @@ export default function Events() {
                 transition={{ delay: i * 0.05 }}
               >
                 {/* Event Photos (up to 2) */}
-                {event.images && event.images.length > 0 && (
+                {event.images && event.images.length > 0 ? (
                   <div className={`event-photos event-photos-${Math.min(event.images.length, 2)}`}>
                     {event.images.slice(0, 2).map((img, idx) => (
                       <div key={idx} className="event-photo-wrap">
@@ -133,11 +133,22 @@ export default function Events() {
                           alt={`${event.title} photo ${idx + 1}`}
                           className="event-photo"
                           onError={(e) => {
-                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = getFallbackEventImage(event.category);
                           }}
                         />
                       </div>
                     ))}
+                  </div>
+                ) : (
+                  <div className="event-photos event-photos-1">
+                    <div className="event-photo-wrap">
+                      <img
+                        src={getFallbackEventImage(event.category)}
+                        alt={event.title}
+                        className="event-photo"
+                      />
+                    </div>
                   </div>
                 )}
 

@@ -188,20 +188,20 @@ export default function Library() {
   const handleDownload = async (book) => {
     setDownloadingId(book.id);
     try {
-      const targetUrl = resolveBookFileUrl(book);
+      let targetUrl = resolveBookFileUrl(book);
+      const apiBase = (import.meta.env.VITE_API_URL || '').replace(/\/api\/?$/, '');
+      const streamingUrl = `${apiBase}/api/books/file/${book.id}`;
 
       // Pre-flight check to verify file availability before triggering browser download
       if (targetUrl.startsWith('/') || targetUrl.startsWith(window.location.origin)) {
         try {
           const checkRes = await fetch(targetUrl, { method: 'HEAD' });
           if (!checkRes.ok) {
-            toast.error(
-              `"${book.title}" is temporarily unavailable. Please ask the administrator to re-upload it.`,
-              { duration: 5000 }
-            );
-            return;
+            targetUrl = streamingUrl;
           }
-        } catch (_) {}
+        } catch (_) {
+          targetUrl = streamingUrl;
+        }
       }
 
       // Record download count on server
@@ -230,8 +230,8 @@ export default function Library() {
       document.body.removeChild(link);
     } catch (err) {
       console.error('Download error:', err);
-      const targetUrl = resolveBookFileUrl(book);
-      window.open(targetUrl, '_blank', 'noopener,noreferrer');
+      const apiBase = (import.meta.env.VITE_API_URL || '').replace(/\/api\/?$/, '');
+      window.open(`${apiBase}/api/books/file/${book.id}`, '_blank', 'noopener,noreferrer');
     } finally {
       setDownloadingId(null);
     }
