@@ -4,6 +4,7 @@
 // ============================================================
 const pool = require('../config/db');
 const notify = require('../services/notifications');
+const { saveRecordToPrivateStorage } = require('../../utils/storageConfig');
 
 // ─── Helper: get student name/email from grievance ───────────
 function getStudentInfo(grievance) {
@@ -15,11 +16,25 @@ function getStudentInfo(grievance) {
 
 // ─── Helper: log to grievance_history ────────────────────────
 async function logHistory(grievanceId, action, actorId, actorName, remark = null) {
-  await pool.query(
-    `INSERT INTO grievance_history (grievance_id, action, actor_id, actor_name, remark)
-     VALUES ($1, $2, $3, $4, $5)`,
-    [grievanceId, action, actorId, actorName, remark]
-  );
+  try {
+    await pool.query(
+      `INSERT INTO grievance_history (grievance_id, action, actor_id, actor_name, remark)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [grievanceId, action, actorId, actorName, remark]
+    );
+  } catch (err) {
+    console.error('logHistory DB notice:', err.message);
+  }
+
+  // Also persist history event directly into GoDaddy private storage
+  saveRecordToPrivateStorage('grievance_history', `${grievanceId}_${Date.now()}`, {
+    grievance_id: grievanceId,
+    action,
+    actor_id: actorId,
+    actor_name: actorName,
+    remark,
+    logged_at: new Date().toISOString(),
+  });
 }
 
 // ─── Helper: get all Deans & HODs ────────────────────────────
@@ -42,7 +57,7 @@ async function createGrievance(req, res) {
       return res.status(400).json({ error: 'Title and description are required.' });
     }
 
-    const fileUrl = req.file ? `/uploads/${req.file.filename}` : null;
+    const fileUrl = req.file ? `/uploads/grievances/${req.file.filename}` : null;
 
     // Get student details from DB
     const studentRow = await pool.query(
@@ -69,6 +84,9 @@ async function createGrievance(req, res) {
     );
 
     const grievance = result.rows[0];
+
+    // Store grievance form data to GoDaddy private storage
+    saveRecordToPrivateStorage('grievances', grievance.grievance_id, grievance);
 
     // Log history
     await logHistory(grievance.grievance_id, 'Submitted via Portal', student.user_id, student.name);
@@ -435,15 +453,15 @@ async function updateGrievance(req, res) {
     if (req.files) {
       if (req.files['faculty_file'] && req.files['faculty_file'].length > 0) {
         updates.push(`faculty_file_url = $${idx++}`);
-        params.push(`/uploads/${req.files['faculty_file'][0].filename}`);
+        params.push(`/uploads/grievances/${req.files['faculty_file'][0].filename}`);
       }
       if (req.files['internal_file'] && req.files['internal_file'].length > 0) {
         updates.push(`internal_file_url = $${idx++}`);
-        params.push(`/uploads/${req.files['internal_file'][0].filename}`);
+        params.push(`/uploads/grievances/${req.files['internal_file'][0].filename}`);
       }
     } else if (req.file) {
       updates.push(`faculty_file_url = $${idx++}`);
-      params.push(`/uploads/${req.file.filename}`);
+      params.push(`/uploads/grievances/${req.file.filename}`);
     }
 
     if (updates.length === 0) return res.status(400).json({ error: 'No update data provided.' });
@@ -456,6 +474,9 @@ async function updateGrievance(req, res) {
       params
     );
     const updated = result.rows[0];
+
+    // Store updated grievance in GoDaddy private storage
+    saveRecordToPrivateStorage('grievances', updated.grievance_id, updated);
 
     // Log history
     const actionDesc = status ? `Status changed to ${status}` : 'Remarks updated';
@@ -577,6 +598,9 @@ async function createInternalTask(req, res) {
       ]
     );
     const grievance = result.rows[0];
+
+    // Store internal task grievance in GoDaddy private storage
+    saveRecordToPrivateStorage('grievances', grievance.grievance_id, grievance);
 
     await logHistory(grievance.grievance_id, `Internal task created by ${name}`, user_id, name);
 

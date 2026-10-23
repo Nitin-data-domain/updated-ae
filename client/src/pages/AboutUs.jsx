@@ -73,7 +73,7 @@ export default function AboutUs() {
                 <p>Placement Assistance</p>
               </div>
               <div className="stat-card">
-                <h3>1000+</h3>
+                <h3>250+</h3>
                 <p>Alumni Network</p>
               </div>
             </motion.div>

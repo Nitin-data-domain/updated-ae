@@ -1,5 +1,6 @@
 const { Op } = require('sequelize');
 const Feedback = require('../models/Feedback');
+const { saveRecordToPrivateStorage } = require('../utils/storageConfig');
 
 // @desc    Submit student feedback
 // @route   POST /api/feedback
@@ -36,6 +37,9 @@ exports.submitFeedback = async (req, res) => {
       message: message.trim(),
       status: 'new',
     });
+
+    // Persist all student feedback directly into GoDaddy private storage
+    saveRecordToPrivateStorage('feedback', feedback.id || Date.now(), feedback.toJSON ? feedback.toJSON() : feedback);
 
     res.status(201).json({
       success: true,

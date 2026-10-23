@@ -1,5 +1,6 @@
 const Enquiry = require('../models/Enquiry');
 const { sequelize } = require('../config/db');
+const { saveRecordToPrivateStorage } = require('../utils/storageConfig');
 
 // ── TeleCRM Config ──────────────────────────────────────────────────────────
 const ENTERPRISE_ID = '69d0d3b277280f7160851462';
@@ -101,6 +102,9 @@ exports.createEnquiry = async (req, res) => {
     if (leadType === 'admission_lead') {
       pushToTeleCRM({ name, email, phone, program, university, message });
     }
+
+    // Persist all enquiry/admission leads directly into GoDaddy private storage
+    saveRecordToPrivateStorage('enquiries', enquiry.id || Date.now(), enquiry.toJSON ? enquiry.toJSON() : enquiry);
 
     res.status(201).json({
       success: true,

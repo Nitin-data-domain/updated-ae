@@ -28,7 +28,7 @@ import subhartiLogo from '../assets/subharti-logo.png'
 import './Home.css'
 
 const stats = [
-  { icon: <FiUsers size={22} />, value: '1000+', label: 'Students Placed' },
+  { icon: <FiUsers size={22} />, value: '250+', label: 'Students Placed' },
   { icon: <FiAward size={22} />, value: '6+', label: 'Years of Excellence' },
   { icon: <FiBriefcase size={22} />, value: '25+', label: 'Industry Partners' },
   { icon: <FiGlobe size={22} />, value: '2', label: 'Partner Universities' },
@@ -286,7 +286,7 @@ export default function Home() {
             <div className="hero-trust-badges">
               <div className="trust-badge"><FiShield size={14} /> NAAC Accredited</div>
               <div className="trust-badge"><FiZap size={14} /> 100% Placement</div>
-              <div className="trust-badge"><FiHeart size={14} /> 1000+ Alumni</div>
+              <div className="trust-badge"><FiHeart size={14} /> 250+ Alumni</div>
             </div>
           </motion.div>
 

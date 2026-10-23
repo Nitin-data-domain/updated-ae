@@ -21,7 +21,8 @@ $filesToZip = @(
     "server\public",
     "server\routes",
     "server\scripts",
-    "server\uploads"
+    "server\uploads",
+    "server\utils"
 )
 
 Write-Host "Creating $destZip with production assets..."

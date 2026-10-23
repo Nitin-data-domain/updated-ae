@@ -49,7 +49,7 @@ const CITIES = {
 const BENEFITS = [
   { icon: <FiShield size={20}/>, text: 'NAAC Accredited Programs' },
   { icon: <FiAward  size={20}/>, text: '100% Placement Guarantee' },
-  { icon: <FiUsers  size={20}/>, text: '1000+ Alumni Placed' },
+  { icon: <FiUsers  size={20}/>, text: '250+ Alumni Placed' },
   { icon: <FiBriefcase size={20}/>, text: '25+ Industry Partners' },
 ]
 

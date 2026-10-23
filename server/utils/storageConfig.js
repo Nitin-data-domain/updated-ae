@@ -31,33 +31,70 @@ function resolveWritableDir(candidates, defaultDir) {
   return defaultDir;
 }
 
-// 1. Resolve root persistent uploads directory
-// In cloud/Linux production (such as GoDaddy PaaS), checks /private/uploads.
-// In local Windows development, defaults cleanly to local server/uploads unless PRIVATE_STORAGE_PATH is explicitly set.
+// 1. Resolve root persistent private and uploads directory
+// In cloud/Linux production (such as GoDaddy PaaS/cPanel), checks:
+// - process.env.PRIVATE_STORAGE_PATH
+// - /home/<user>/private or /home/<user>/private/uploads
+// - path.resolve(process.cwd(), '../private') or '../../private'
+// - /private/uploads or /private
+// In local Windows development, defaults cleanly to local server/uploads unless PRIVATE_STORAGE_PATH is set.
 const isCloudOrLinux = process.platform !== 'win32' || !!process.env.PRIVATE_STORAGE_PATH;
-const persistentUploadsRoot = isCloudOrLinux
-  ? resolveWritableDir(
-      [
-        process.env.PRIVATE_STORAGE_PATH ? path.resolve(process.env.PRIVATE_STORAGE_PATH) : null,
-        '/private/uploads',
-        process.env.HOME ? path.join(process.env.HOME, 'private', 'uploads') : null,
-      ],
-      localUploadsDir
-    )
-  : localUploadsDir;
 
-// 2. Subdirectories
+const homeDir = process.env.HOME || process.env.USERPROFILE || '';
+const cwd = process.cwd();
+
+const candidatePrivateRoots = [
+  process.env.PRIVATE_STORAGE_PATH ? path.resolve(process.env.PRIVATE_STORAGE_PATH) : null,
+  homeDir ? path.join(homeDir, 'private') : null,
+  path.resolve(cwd, '../private'),
+  path.resolve(cwd, '../../private'),
+  path.resolve(__dirname, '../../private'),
+  '/private',
+  path.join(__dirname, '../private'),
+];
+
+const candidateUploadRoots = [
+  process.env.PRIVATE_STORAGE_PATH ? path.join(path.resolve(process.env.PRIVATE_STORAGE_PATH), 'uploads') : null,
+  '/private/uploads',
+  homeDir ? path.join(homeDir, 'private', 'uploads') : null,
+  path.resolve(cwd, '../private/uploads'),
+  path.resolve(cwd, '../../private/uploads'),
+  path.resolve(__dirname, '../../private/uploads'),
+];
+
+let persistentPrivateRoot = localUploadsDir;
+if (isCloudOrLinux) {
+  persistentPrivateRoot = resolveWritableDir(candidatePrivateRoots, path.join(__dirname, '../private'));
+}
+
+let persistentUploadsRoot = localUploadsDir;
+if (isCloudOrLinux) {
+  persistentUploadsRoot = resolveWritableDir(
+    [
+      ...candidateUploadRoots,
+      path.join(persistentPrivateRoot, 'uploads'),
+    ],
+    localUploadsDir
+  );
+}
+
+// 2. Persistent subdirectories for uploads
 const imagesDir = path.join(persistentUploadsRoot, 'images');
 const booksDir = path.join(persistentUploadsRoot, 'books');
 const brochuresDir = path.join(persistentUploadsRoot, 'brochures');
+const grievancesDir = path.join(persistentUploadsRoot, 'grievances');
 
-for (const dir of [imagesDir, booksDir, brochuresDir]) {
+// 3. Persistent directory for structured data (forms, grievances, enquiries, SQLite database)
+const persistentDataDir = path.join(persistentPrivateRoot, 'data');
+const databaseDir = path.join(persistentDataDir, 'database');
+
+for (const dir of [imagesDir, booksDir, brochuresDir, grievancesDir, persistentDataDir, databaseDir]) {
   try {
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   } catch (_) {}
 }
 
-// 3. Return all root directories that exist to serve files from (persistent first, then local repo)
+// 4. Return all root directories that exist to serve files from (persistent first, then local repo)
 function getAllUploadRoots() {
   const roots = [
     persistentUploadsRoot,
@@ -68,14 +105,58 @@ function getAllUploadRoots() {
   return Array.from(new Set(roots.filter((r) => r && fs.existsSync(r))));
 }
 
-// 4. Return all possible subdirectories for a given subfolder (e.g. 'books', 'images')
+// 5. Return all possible subdirectories for a given subfolder (e.g. 'books', 'images', 'grievances')
 function getAllSubDirs(sub) {
   return getAllUploadRoots()
     .map((root) => path.join(root, sub))
     .filter((d) => fs.existsSync(d));
 }
 
-// 5. One-time startup sync from local repo bundled assets to persistent storage
+// 6. Helper: save submission record (grievances, enquiries, feedback) to GoDaddy private storage
+function saveRecordToPrivateStorage(category, id, record) {
+  try {
+    const categoryDir = path.join(persistentDataDir, category);
+    if (!fs.existsSync(categoryDir)) {
+      fs.mkdirSync(categoryDir, { recursive: true });
+    }
+
+    const timestamp = new Date().toISOString();
+    const payload = {
+      ...record,
+      _saved_at: timestamp,
+      _storage_destination: 'godaddy_private_storage',
+    };
+
+    // 1. Save individual JSON record snapshot
+    const safeId = String(id || Date.now()).replace(/[^a-zA-Z0-9_-]/g, '_');
+    const jsonPath = path.join(categoryDir, `${safeId}.json`);
+    fs.writeFileSync(jsonPath, JSON.stringify(payload, null, 2), 'utf8');
+
+    // 2. Append to line-delimited JSON log for easy querying / streaming
+    const jsonlPath = path.join(persistentDataDir, `${category}.jsonl`);
+    fs.appendFileSync(jsonlPath, JSON.stringify(payload) + '\n', 'utf8');
+
+    console.log(`💾 GoDaddy Private Storage: Stored ${category} #${id} at ${jsonPath}`);
+    return true;
+  } catch (err) {
+    console.error(`Failed to store ${category} #${id} to private storage:`, err.message);
+    return false;
+  }
+}
+
+// 7. Helper: get persistent SQLite database file path
+function getDatabaseStoragePath(filename = 'aharada_dev.sqlite') {
+  try {
+    if (!fs.existsSync(databaseDir)) {
+      fs.mkdirSync(databaseDir, { recursive: true });
+    }
+    return path.join(databaseDir, filename);
+  } catch (_) {
+    return path.join(__dirname, '..', filename);
+  }
+}
+
+// 8. One-time startup sync from local repo bundled assets to persistent storage
 function syncBundledAssetsToPersistent() {
   if (persistentUploadsRoot === localUploadsDir) {
     console.log(`📁 Storage: Using local uploads directory (${localUploadsDir})`);
@@ -83,7 +164,8 @@ function syncBundledAssetsToPersistent() {
   }
 
   console.log(`📁 Persistent Storage Active: ${persistentUploadsRoot}`);
-  for (const sub of ['books', 'images', 'brochures']) {
+  console.log(`📁 Persistent Data Active: ${persistentDataDir}`);
+  for (const sub of ['books', 'images', 'brochures', 'grievances']) {
     const srcDir = path.join(localUploadsDir, sub);
     const destDir = path.join(persistentUploadsRoot, sub);
     if (!fs.existsSync(srcDir)) continue;
@@ -116,11 +198,17 @@ function syncBundledAssetsToPersistent() {
 
 module.exports = {
   localUploadsDir,
+  persistentPrivateRoot,
   persistentUploadsRoot,
+  persistentDataDir,
+  databaseDir,
   imagesDir,
   booksDir,
   brochuresDir,
+  grievancesDir,
   getAllUploadRoots,
   getAllSubDirs,
+  saveRecordToPrivateStorage,
+  getDatabaseStoragePath,
   syncBundledAssetsToPersistent,
 };

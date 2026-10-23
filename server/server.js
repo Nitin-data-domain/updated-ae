@@ -74,6 +74,26 @@ const { handleStaticUploadFallback } = require('./controllers/bookController');
 app.get('/uploads/books/:filename', handleStaticUploadFallback);
 app.head('/uploads/books/:filename', handleStaticUploadFallback);
 
+// Grievance attachments resolver across GoDaddy persistent storage and upload roots
+app.get('/uploads/grievances/:filename', (req, res) => {
+  const filename = req.params.filename;
+  if (!filename) return res.status(404).send('Not found');
+
+  const grievanceDirs = [
+    ...getAllSubDirs('grievances'),
+    ...getAllUploadRoots(),
+  ];
+
+  for (const dir of grievanceDirs) {
+    const filePath = path.join(dir, filename);
+    if (fs.existsSync(filePath)) {
+      return res.sendFile(filePath);
+    }
+  }
+  return res.status(404).json({ success: false, message: 'Grievance attachment not found' });
+});
+app.head('/uploads/grievances/:filename', (req, res) => res.sendStatus(200));
+
 // Smart image resolver for /uploads/images/:filename across all upload storage locations
 app.get('/uploads/images/:filename', (req, res) => {
   const filename = req.params.filename;

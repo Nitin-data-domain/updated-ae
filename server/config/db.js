@@ -1,6 +1,7 @@
 const { Sequelize } = require('sequelize');
 const mysql = require('mysql2/promise');
 const path = require('path');
+const { getDatabaseStoragePath } = require('../utils/storageConfig');
 require('dotenv').config();
 
 const dbName     = process.env.DB_NAME     || 'aharada_education';
@@ -33,9 +34,9 @@ if (useMySQL) {
     },
   });
 } else {
-  // Local development SQLite fallback (when local MySQL credentials are not yet configured)
-  const storagePath = path.join(__dirname, '..', 'aharada_dev.sqlite');
-  console.log(`ℹ️  Using SQLite for local development: ${storagePath}`);
+  // Local development / fallback SQLite storage (stored in GoDaddy persistent storage if in cloud)
+  const storagePath = getDatabaseStoragePath('aharada_dev.sqlite');
+  console.log(`ℹ️  Using SQLite storage: ${storagePath}`);
   sequelize = new Sequelize({
     dialect: 'sqlite',
     storage: storagePath,
