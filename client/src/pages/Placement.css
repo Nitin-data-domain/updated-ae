@@ -1,128 +1,487 @@
-.placement-page .placement-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 2rem;
-  margin-top: 3rem;
+/* ============================================
+   AHARADA EDUCATION - PLACEMENTS REDESIGN
+   Executive Achievers Showcase & Portrait Layout
+   ============================================ */
+
+.placement-main-section {
+  padding-top: 50px;
+  padding-bottom: 90px;
 }
 
+/* ── Key Placement Stats Bar ────────────────────── */
+.placement-stats-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: #ffffff;
+  border: 1px solid rgba(28, 53, 87, 0.1);
+  border-radius: 18px;
+  padding: 24px 30px;
+  margin-bottom: 50px;
+  box-shadow: 0 10px 30px -5px rgba(28, 53, 87, 0.08), 0 2px 6px -1px rgba(28, 53, 87, 0.04);
+}
+
+.stat-card {
+  text-align: center;
+  flex: 1;
+}
+
+.stat-num {
+  font-size: 2.2rem;
+  font-weight: 800;
+  font-family: var(--font-primary);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 60%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+.stat-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--gray-500);
+  letter-spacing: 0.3px;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 48px;
+  background: var(--gray-200);
+}
+
+/* ── Header & Search Row ────────────────────────── */
+.placement-header-wrapper {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 36px;
+  flex-wrap: wrap;
+}
+
+.placement-header-wrapper .section-head {
+  margin-bottom: 0;
+  max-width: 650px;
+}
+
+.placement-search-box {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 50px;
+  padding: 10px 20px;
+  min-width: 320px;
+  box-shadow: 0 4px 16px rgba(28, 53, 87, 0.05);
+  transition: all 0.25s ease;
+}
+
+.placement-search-box:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 4px 20px rgba(28, 53, 87, 0.12);
+}
+
+.placement-search-box .search-icon {
+  color: var(--gray-400);
+  font-size: 1.15rem;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.placement-search-box input {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-size: 0.95rem;
+  color: var(--navy);
+  font-family: inherit;
+}
+
+.placement-search-box input::placeholder {
+  color: var(--gray-400);
+}
+
+.search-clear-btn {
+  background: transparent;
+  border: none;
+  color: var(--gray-400);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  font-size: 1rem;
+  transition: color 0.2s;
+}
+
+.search-clear-btn:hover {
+  color: var(--danger);
+}
+
+/* ── Achievers Grid ─────────────────────────────── */
+.placement-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 2.25rem;
+}
+
+/* ── Achiever Card ──────────────────────────────── */
 .placement-card {
-  background: var(--bg-primary);
-  border-radius: 1rem;
+  background: #ffffff;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-  transition: all 0.3s ease;
-  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 25px -5px rgba(28, 53, 87, 0.07), 0 2px 6px -1px rgba(28, 53, 87, 0.04);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(28, 53, 87, 0.08);
   display: flex;
   flex-direction: column;
+  position: relative;
+  cursor: pointer;
 }
 
 .placement-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  border-color: var(--primary);
+  transform: translateY(-8px);
+  box-shadow: 0 24px 50px -12px rgba(28, 53, 87, 0.16), 0 0 0 1px rgba(201, 150, 12, 0.35);
+  border-color: rgba(201, 150, 12, 0.35);
 }
 
-.placement-avatar {
-  background: var(--bg-secondary);
-  height: 180px;
+/* ── Generous Portrait Photo Container ──────────── */
+/* Height increased to 330px with top-center object position */
+/* so student heads, faces, and posture are completely visible */
+.placement-avatar-container {
+  background: #0f2237;
+  height: 330px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  position: relative;
 }
 
-.placement-avatar img {
+.placement-avatar-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: top center; /* CRITICAL: Keeps face & head fully in frame */
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.placement-avatar .placement-avatar-fallback-img {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+.placement-card:hover .placement-avatar-img {
+  transform: scale(1.05);
 }
 
-.placement-avatar-placeholder {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: var(--primary-light);
-  color: var(--primary);
+/* Subtle dark gradient overlay at bottom of photo */
+.placement-avatar-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 130px;
+  background: linear-gradient(180deg, rgba(15, 34, 55, 0) 0%, rgba(15, 34, 55, 0.6) 55%, rgba(15, 34, 55, 0.92) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Top floating badges */
+.avatar-top-badges {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 3;
+}
+
+.badge-placed {
+  background: rgba(30, 138, 74, 0.92);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 50px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  font-weight: 700;
-  letter-spacing: -1px;
+  gap: 5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  letter-spacing: 0.5px;
 }
 
+.badge-package {
+  background: linear-gradient(135deg, #C9960C 0%, #e0aa15 100%);
+  color: #0f2237;
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 5px 13px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 4px 14px rgba(201, 150, 12, 0.4);
+}
+
+.badge-year {
+  background: rgba(15, 34, 55, 0.8);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.badge-icon {
+  font-size: 0.9rem;
+}
+
+/* Hover Zoom Hint */
+.avatar-zoom-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -40%);
+  opacity: 0;
+  z-index: 4;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.zoom-btn-inner {
+  background: rgba(15, 34, 55, 0.88);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 9px 18px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  letter-spacing: 0.3px;
+}
+
+.placement-card:hover .avatar-zoom-hint {
+  opacity: 1;
+  transform: translate(-50%, -50%);
+}
+
+/* Floating Company Pill on Photo Base */
+.placement-company-pill {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 3;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  padding: 9px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  transition: all 0.25s ease;
+}
+
+.placement-card:hover .placement-company-pill {
+  background: #ffffff;
+  border-color: var(--accent);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+}
+
+.company-pill-icon {
+  color: var(--accent);
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.company-name-text {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Card Content Body ──────────────────────────── */
 .placement-info {
-  padding: 2rem;
+  padding: 22px 22px 20px;
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-.placement-student {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 0.25rem;
+.placement-student-name {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 16px;
+  line-height: 1.25;
+  letter-spacing: -0.2px;
+  transition: color 0.2s ease;
 }
 
-.placement-company {
-  color: var(--primary);
-  font-weight: 600;
-  font-size: 1rem;
-  margin-bottom: 1.5rem;
+.placement-card:hover .placement-student-name {
+  color: var(--primary-light);
 }
 
-.placement-details {
+/* ── Meta Info Items ────────────────────────────── */
+.placement-meta-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 10px;
+  margin-bottom: 18px;
 }
 
-.placement-detail {
+.placement-meta-item {
   display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  color: var(--text-secondary);
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-
-.placement-detail.highlight {
-  color: #ffffff;
-  background: var(--primary);
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  margin-top: 0.5rem;
   align-items: center;
+  gap: 12px;
+  background: var(--gray-50);
+  border-radius: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(28, 53, 87, 0.05);
+  transition: all 0.2s ease;
 }
 
-.detail-icon {
-  margin-top: 0.2rem;
-  flex-shrink: 0;
+.placement-card:hover .placement-meta-item {
+  background: #ffffff;
+  border-color: rgba(28, 53, 87, 0.12);
+  box-shadow: 0 2px 8px rgba(28, 53, 87, 0.04);
+}
+
+.meta-icon-wrapper {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(28, 53, 87, 0.08);
   color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
 }
 
-.placement-detail.highlight .detail-icon {
-  margin-top: 0;
-  color: #ffffff;
+.meta-text-group {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-/* Pagination */
+.meta-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--gray-400);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.meta-value {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--gray-700);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.role-value {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.program-value {
+  color: var(--gray-600);
+}
+
+/* ── Card Footer ────────────────────────────────── */
+.placement-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  border-top: 1px solid var(--gray-100);
+  margin-top: auto;
+}
+
+.footer-batch {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--gray-500);
+}
+
+.footer-cta {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s;
+}
+
+.cta-arrow {
+  transition: transform 0.25s ease;
+}
+
+.placement-card:hover .footer-cta {
+  color: var(--accent);
+}
+
+.placement-card:hover .cta-arrow {
+  transform: translateX(4px);
+}
+
+/* ── Empty State ────────────────────────────────── */
+.placement-empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px dashed var(--gray-200);
+  max-width: 600px;
+  margin: 40px auto;
+}
+
+.placement-empty-state .empty-icon {
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.placement-empty-state h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 8px;
+}
+
+.placement-empty-state p {
+  color: var(--gray-500);
+  font-size: 0.95rem;
+  margin-bottom: 24px;
+}
+
+/* ── Pagination ─────────────────────────────────── */
 .placement-pagination {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  margin-top: 48px;
+  margin-top: 50px;
   flex-wrap: wrap;
 }
 
@@ -130,12 +489,12 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 10px 20px;
+  padding: 10px 22px;
   border-radius: 50px;
   border: 1.5px solid var(--primary);
   color: var(--primary);
   background: transparent;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -144,6 +503,7 @@
 .page-btn:hover:not(:disabled) {
   background: var(--primary);
   color: #fff;
+  box-shadow: 0 4px 14px rgba(28, 53, 87, 0.2);
 }
 
 .page-btn:disabled {
@@ -159,13 +519,13 @@
 }
 
 .page-num {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   border: 1.5px solid var(--gray-200);
   background: #fff;
   color: var(--gray-600);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -180,4 +540,283 @@
   background: var(--primary);
   border-color: var(--primary);
   color: #fff;
+  box-shadow: 0 4px 12px rgba(28, 53, 87, 0.25);
 }
+
+/* ── Full Photo Lightbox Modal ──────────────────── */
+.placement-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 20, 34, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.placement-modal-content {
+  background: #ffffff;
+  border-radius: 24px;
+  max-width: 960px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.placement-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(15, 34, 55, 0.08);
+  color: var(--navy);
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s;
+}
+
+.placement-modal-close:hover {
+  background: var(--danger);
+  color: #fff;
+  transform: rotate(90deg);
+}
+
+.modal-grid {
+  display: grid;
+  grid-template-columns: 440px 1fr;
+  min-height: 520px;
+}
+
+.modal-photo-col {
+  background: #0f2237;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 24px 0 0 24px;
+  position: relative;
+}
+
+.modal-full-img {
+  width: 100%;
+  max-height: 440px;
+  object-fit: contain;
+  border-radius: 16px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+}
+
+.modal-photo-caption {
+  margin-top: 16px;
+  font-size: 0.8rem;
+  color: #aab7c6;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.caption-check {
+  color: var(--success);
+}
+
+.modal-details-col {
+  padding: 44px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.modal-badge-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.modal-badge-company {
+  background: rgba(28, 53, 87, 0.08);
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 6px 14px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.modal-badge-package {
+  background: linear-gradient(135deg, #C9960C 0%, #e0aa15 100%);
+  color: #0f2237;
+  font-weight: 800;
+  font-size: 0.85rem;
+  padding: 6px 14px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.modal-student-name {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 6px;
+  line-height: 1.15;
+}
+
+.modal-role-highlight {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 24px;
+}
+
+.modal-info-card {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-100);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.modal-info-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.field-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--gray-400);
+  letter-spacing: 0.8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.field-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gray-800);
+}
+
+.modal-congrats-box {
+  background: rgba(201, 150, 12, 0.08);
+  border: 1px solid rgba(201, 150, 12, 0.25);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.congrats-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(201, 150, 12, 0.2);
+  color: var(--accent-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.modal-congrats-box strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--navy);
+  margin-bottom: 2px;
+}
+
+.modal-congrats-box p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--gray-600);
+  line-height: 1.4;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ── Responsive Adaptations ─────────────────────── */
+@media (max-width: 992px) {
+  .placement-stats-bar {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 24px;
+  }
+  .stat-divider {
+    display: none;
+  }
+  .modal-grid {
+    grid-template-columns: 1fr;
+  }
+  .modal-photo-col {
+    border-radius: 24px 24px 0 0;
+    padding: 24px;
+  }
+  .modal-full-img {
+    max-height: 320px;
+  }
+  .modal-details-col {
+    padding: 28px 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .placement-header-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .placement-search-box {
+    min-width: 100%;
+  }
+  .placement-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .placement-avatar-container {
+    height: 300px;
+  }
+  .stat-num {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .placement-stats-bar {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .placement-student-name {
+    font-size: 1.2rem;
+  }
+  .modal-student-name {
+    font-size: 1.6rem;
+  }
+}
+
