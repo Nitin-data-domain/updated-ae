@@ -89,6 +89,7 @@ if (activeDbUrl && activeDbUrl.startsWith('postgres')) {
   // Auto-initialize schema & seed users on GoDaddy MySQL
   async function autoInitMySQL(pool) {
     try {
+      // 1. Create table users if it does not exist at all
       await pool.query(`
         CREATE TABLE IF NOT EXISTS users (
           user_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -101,9 +102,99 @@ if (activeDbUrl && activeDbUrl.startsWith('postgres')) {
           is_active TINYINT(1) NOT NULL DEFAULT 1,
           otp VARCHAR(10),
           otp_expires DATETIME,
+          can_manage_staff TINYINT(1) NOT NULL DEFAULT 0,
           created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
       `);
+
+      // 2. Safely verify & migrate columns on existing users table (e.g. created by Sequelize)
+      try {
+        const [columns] = await pool.query('SHOW COLUMNS FROM users');
+        const colMap = new Set(columns.map(c => c.Field.toLowerCase()));
+
+        // Ensure user_id column exists
+        if (!colMap.has('user_id')) {
+          if (colMap.has('id')) {
+            try {
+              await pool.query('ALTER TABLE users ADD COLUMN user_id INT GENERATED ALWAYS AS (id) VIRTUAL');
+              console.log('✅ Added user_id (virtual) column to users table');
+            } catch (vErr) {
+              try {
+                await pool.query('ALTER TABLE users ADD COLUMN user_id INT NULL');
+                await pool.query('UPDATE users SET user_id = id WHERE user_id IS NULL');
+                console.log('✅ Added user_id column and backfilled from id');
+              } catch (e2) {
+                console.warn('⚠️ user_id migration note:', e2.message);
+              }
+            }
+          }
+        }
+
+        // Ensure id column exists if table only had user_id
+        if (!colMap.has('id') && colMap.has('user_id')) {
+          try {
+            await pool.query('ALTER TABLE users ADD COLUMN id INT GENERATED ALWAYS AS (user_id) VIRTUAL');
+          } catch (_) {}
+        }
+
+        // Ensure role column is NOT restricted to ENUM in MySQL
+        try {
+          await pool.query("ALTER TABLE users MODIFY COLUMN role VARCHAR(50) NOT NULL DEFAULT 'Student'");
+        } catch (_) {}
+
+        // Ensure phone column exists
+        if (!colMap.has('phone')) {
+          try {
+            await pool.query('ALTER TABLE users ADD COLUMN phone VARCHAR(20) DEFAULT NULL');
+          } catch (_) {}
+        }
+
+        // Ensure department column exists
+        if (!colMap.has('department')) {
+          try {
+            await pool.query('ALTER TABLE users ADD COLUMN department VARCHAR(100) DEFAULT NULL');
+          } catch (_) {}
+        }
+
+        // Ensure is_active column exists
+        if (!colMap.has('is_active')) {
+          try {
+            await pool.query('ALTER TABLE users ADD COLUMN is_active TINYINT(1) NOT NULL DEFAULT 1');
+          } catch (_) {}
+        }
+
+        // Ensure otp column exists
+        if (!colMap.has('otp')) {
+          try {
+            await pool.query('ALTER TABLE users ADD COLUMN otp VARCHAR(10) DEFAULT NULL');
+          } catch (_) {}
+        }
+
+        // Ensure otp_expires column exists
+        if (!colMap.has('otp_expires')) {
+          try {
+            await pool.query('ALTER TABLE users ADD COLUMN otp_expires DATETIME DEFAULT NULL');
+          } catch (_) {}
+        }
+
+        // Ensure can_manage_staff column exists
+        if (!colMap.has('can_manage_staff')) {
+          try {
+            await pool.query('ALTER TABLE users ADD COLUMN can_manage_staff TINYINT(1) NOT NULL DEFAULT 0');
+          } catch (_) {}
+        }
+
+        // Ensure created_at column exists
+        if (!colMap.has('created_at')) {
+          try {
+            await pool.query('ALTER TABLE users ADD COLUMN created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP');
+          } catch (_) {}
+        }
+      } catch (colInspectErr) {
+        console.warn('⚠️ Users table column inspection note:', colInspectErr.message);
+      }
+
+      // 3. Ensure grievances table exists
       await pool.query(`
         CREATE TABLE IF NOT EXISTS grievances (
           grievance_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -131,6 +222,8 @@ if (activeDbUrl && activeDbUrl.startsWith('postgres')) {
           updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         )
       `);
+
+      // 4. Ensure grievance_history table exists
       await pool.query(`
         CREATE TABLE IF NOT EXISTS grievance_history (
           history_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -142,42 +235,50 @@ if (activeDbUrl && activeDbUrl.startsWith('postgres')) {
           changed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
       `);
-      const [rows] = await pool.query('SELECT COUNT(*) as count FROM users');
-      if (rows && rows[0] && rows[0].count === 0) {
-        console.log('🌱 Seeding initial administrative accounts in GoDaddy MySQL...');
-        await pool.query(`
-          INSERT IGNORE INTO users (name, email, phone, password, role, department)
-          VALUES
-            ('Capt. Deepak Dhalla', 'md@aharadaedu.in', '+919800000001', '$2a$10$lxEh3jfA0RFElSxW/6QvSu7QwBjfrdfla5GOTbeSSReScwZlEjKC2', 'Dean', 'Administration'),
-            ('Mr. Deepak Dhalla Sir', 'nitingirdhar521@gmail.com', '+919800000002', '$2a$10$lxEh3jfA0RFElSxW/6QvSu7QwBjfrdfla5GOTbeSSReScwZlEjKC2', 'Dean', 'Administration'),
-            ('Ms. Somya Pal', 'somya@aharadaedu.in', '+919800000003', '$2a$10$lxEh3jfA0RFElSxW/6QvSu7QwBjfrdfla5GOTbeSSReScwZlEjKC2', 'HOD', 'Computer Science'),
-            ('Mr. Nitin Girdhar', 'nitin@aharadaedu.in', '+919800000004', '$2a$10$lxEh3jfA0RFElSxW/6QvSu7QwBjfrdfla5GOTbeSSReScwZlEjKC2', 'Faculty', 'Computer Science'),
-            ('Rahul Sharma', 'girdharnitin4@gmail.com', '+919800000005', '$2a$10$lxEh3jfA0RFElSxW/6QvSu7QwBjfrdfla5GOTbeSSReScwZlEjKC2', 'Student', 'BCA')
-        `);
-        console.log('✅ Seed users created.');
-      }
+
+      // 5. Ensure core administrative and staff accounts exist
       try {
-        await pool.query('ALTER TABLE users ADD COLUMN can_manage_staff TINYINT(1) NOT NULL DEFAULT 0');
-      } catch (colErr) {}
+        await pool.query(`
+          INSERT IGNORE INTO users (name, email, phone, password, role, department, can_manage_staff, is_active)
+          VALUES
+            ('Capt. Deepak Dhalla', 'md@aharadaedu.in', '+919800000001', '$2a$10$lxEh3jfA0RFElSxW/6QvSu7QwBjfrdfla5GOTbeSSReScwZlEjKC2', 'Dean', 'Administration', 1, 1),
+            ('Mr. Deepak Dhalla Sir', 'nitingirdhar521@gmail.com', '+919800000002', '$2a$10$lxEh3jfA0RFElSxW/6QvSu7QwBjfrdfla5GOTbeSSReScwZlEjKC2', 'Dean', 'Administration', 1, 1),
+            ('Ms. Somya Pal', 'somya@aharadaedu.in', '+919800000003', '$2a$10$lxEh3jfA0RFElSxW/6QvSu7QwBjfrdfla5GOTbeSSReScwZlEjKC2', 'HOD', 'Computer Science', 0, 1),
+            ('Mr. Nitin Girdhar', 'nitin@aharadaedu.in', '+919800000004', '$2a$10$lxEh3jfA0RFElSxW/6QvSu7QwBjfrdfla5GOTbeSSReScwZlEjKC2', 'Faculty', 'Computer Science', 0, 1),
+            ('Rahul Sharma', 'girdharnitin4@gmail.com', '+919800000005', '$2a$10$lxEh3jfA0RFElSxW/6QvSu7QwBjfrdfla5GOTbeSSReScwZlEjKC2', 'Student', 'BCA', 0, 1)
+        `);
+        await pool.query(`
+          UPDATE users SET can_manage_staff = 1 WHERE role = 'Dean' OR email IN ('md@aharadaedu.in', 'nitingirdhar521@gmail.com')
+        `);
+        console.log('✅ Core Grievance Portal staff accounts verified in GoDaddy MySQL.');
+      } catch (seedErr) {
+        console.warn('⚠️ Portal account seeding notice:', seedErr.message);
+      }
     } catch (err) {
       console.warn('⚠️ MySQL auto-init note:', err.message);
     }
   }
 
-  autoInitMySQL(mysqlPool);
+  const initPromise = autoInitMySQL(mysqlPool);
 
   if (process.env.NODE_ENV !== 'production') {
     console.log('🗄️ MySQL Connection Pool initialized');
   }
 
   /**
-   * Normalize MySQL rows: convert TINYINT is_active (0/1) to boolean true/false
-   * and ensure COUNT/SUM results are consistent
+   * Normalize MySQL rows: convert TINYINT is_active (0/1) to boolean true/false,
+   * ensure both id and user_id are set, and ensure COUNT/SUM results are consistent
    */
   function normalizeRows(rows) {
     if (!Array.isArray(rows)) return rows;
     return rows.map(row => {
       const normalized = { ...row };
+      if ('id' in normalized && !('user_id' in normalized)) {
+        normalized.user_id = normalized.id;
+      }
+      if ('user_id' in normalized && !('id' in normalized)) {
+        normalized.id = normalized.user_id;
+      }
       if ('is_active' in normalized) {
         normalized.is_active = !!normalized.is_active;
       }
@@ -192,6 +293,11 @@ if (activeDbUrl && activeDbUrl.startsWith('postgres')) {
 
   module.exports = {
     query: async (sqlText, params = []) => {
+      // Ensure schema initialization and migration has finished before handling queries
+      if (initPromise) {
+        try { await initPromise; } catch (_) {}
+      }
+
       // 1. Convert PostgreSQL $1, $2 positional placeholders to MySQL ? syntax
       let formattedSql = sqlText;
       let paramIndex = 1;

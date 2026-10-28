@@ -119,8 +119,12 @@ async function login(req, res) {
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(401).json({ error: 'Invalid email or password.' });
 
+    const effectiveId = user.user_id || user.id;
+    user.id = effectiveId;
+    user.user_id = effectiveId;
+
     const token = jwt.sign(
-      { user_id: user.user_id, email: user.email, role: user.role, name: user.name, can_manage_staff: !!user.can_manage_staff },
+      { id: effectiveId, user_id: effectiveId, email: user.email, role: user.role, name: user.name, can_manage_staff: !!user.can_manage_staff },
       JWT_SECRET,
       { expiresIn: '24h' }
     );
@@ -135,9 +139,10 @@ async function login(req, res) {
 // ─── GET /api/auth/me ─────────────────────────────────────────
 async function getMe(req, res) {
   try {
+    const currentId = req.user.user_id || req.user.id;
     const result = await pool.query(
       'SELECT user_id, name, email, phone, role, department, is_active, can_manage_staff FROM users WHERE user_id = $1',
-      [req.user.user_id]
+      [currentId]
     );
     if (result.rows.length === 0) return res.status(404).json({ error: 'User not found.' });
     res.json({ user: result.rows[0] });
@@ -198,10 +203,13 @@ async function forgotPassword(req, res) {
 // ─── POST /api/auth/verify-otp ───────────────────────────────
 async function verifyOTP(req, res) {
   try {
-    const { email, otp } = req.body;
-    if (!email || !otp) return res.status(400).json({ error: 'Email and OTP are required.' });
+    const rawEmail = req.body.email;
+    const rawOtp = req.body.otp;
+    if (!rawEmail || !rawOtp) return res.status(400).json({ error: 'Email and OTP are required.' });
+    const email = rawEmail.trim().toLowerCase();
+    const otp = rawOtp.toString().trim();
 
-    const result = await pool.query('SELECT otp, otp_expires FROM users WHERE email = $1', [email]);
+    const result = await pool.query('SELECT otp, otp_expires FROM users WHERE LOWER(TRIM(email)) = $1', [email]);
     if (result.rows.length === 0) return res.status(404).json({ error: 'User not found.' });
 
     const user = result.rows[0];
@@ -218,12 +226,14 @@ async function verifyOTP(req, res) {
 // ─── POST /api/auth/reset-password ───────────────────────────
 async function resetPassword(req, res) {
   try {
-    const { email, otp, new_password } = req.body;
-    if (!email || !otp || !new_password) {
+    const { email: rawEmail, otp: rawOtp, new_password } = req.body;
+    if (!rawEmail || !rawOtp || !new_password) {
       return res.status(400).json({ error: 'Email, OTP, and new password are required.' });
     }
+    const email = rawEmail.trim().toLowerCase();
+    const otp = rawOtp.toString().trim();
 
-    const result = await pool.query('SELECT otp, otp_expires FROM users WHERE email = $1', [email]);
+    const result = await pool.query('SELECT otp, otp_expires FROM users WHERE LOWER(TRIM(email)) = $1', [email]);
     if (result.rows.length === 0) return res.status(404).json({ error: 'User not found.' });
 
     const user = result.rows[0];
@@ -231,7 +241,7 @@ async function resetPassword(req, res) {
     if (new Date() > new Date(user.otp_expires)) return res.status(400).json({ error: 'OTP has expired.' });
 
     const hashed = await bcrypt.hash(new_password, 10);
-    await pool.query('UPDATE users SET password = $1, otp = NULL, otp_expires = NULL WHERE email = $2', [hashed, email]);
+    await pool.query('UPDATE users SET password = $1, otp = NULL, otp_expires = NULL WHERE LOWER(TRIM(email)) = $2', [hashed, email]);
     res.json({ message: 'Password reset successfully. You can now login.' });
   } catch (err) {
     console.error('Reset password error:', err);

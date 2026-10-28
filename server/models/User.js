@@ -9,7 +9,10 @@ class User extends Model {
 
   toJSON() {
     const values = { ...this.get() };
-    values._id = values.id;
+    const effectiveId = values.id || values.user_id;
+    values._id = effectiveId;
+    values.id = effectiveId;
+    values.user_id = effectiveId;
     return values;
   }
 }
@@ -51,13 +54,19 @@ User.init(
       },
     },
     role: {
-      type: DataTypes.ENUM('admin', 'superadmin'),
+      type: DataTypes.STRING,
       defaultValue: 'admin',
     },
     _id: {
       type: DataTypes.VIRTUAL,
       get() {
-        return this.getDataValue('id');
+        return this.getDataValue('id') || this.getDataValue('user_id');
+      },
+    },
+    user_id: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        return this.getDataValue('id') || this.getDataValue('user_id');
       },
     },
   },

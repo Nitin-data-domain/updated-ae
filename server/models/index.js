@@ -120,6 +120,104 @@ async function syncModels() {
     console.warn('Notice: Faculty column migration check:', colErr.message);
   }
 
+  // Ensure columns exist on users table for Grievance Portal compatibility
+  try {
+    const queryInterface = sequelize.getQueryInterface();
+    const userDesc = await queryInterface.describeTable('users');
+
+    // 1. Ensure user_id exists if table has id
+    const isMysql = sequelize.getDialect() === 'mysql';
+    if (!userDesc.user_id && userDesc.id) {
+      if (isMysql) {
+        try {
+          await sequelize.query('ALTER TABLE users ADD COLUMN user_id INT GENERATED ALWAYS AS (id) VIRTUAL');
+          console.log('✅ Added user_id (virtual) column to users table');
+        } catch (e1) {
+          try {
+            await queryInterface.addColumn('users', 'user_id', {
+              type: sequelize.Sequelize.INTEGER,
+              allowNull: true,
+            });
+            await sequelize.query('UPDATE users SET user_id = id WHERE user_id IS NULL');
+            console.log('✅ Added user_id column and backfilled from id');
+          } catch (_) {}
+        }
+      } else {
+        try {
+          await queryInterface.addColumn('users', 'user_id', {
+            type: sequelize.Sequelize.INTEGER,
+            allowNull: true,
+          });
+          await sequelize.query('UPDATE users SET user_id = id WHERE user_id IS NULL');
+          console.log('✅ Added user_id column and backfilled from id');
+        } catch (_) {}
+      }
+    }
+
+    // 2. Ensure role is not restricted to ENUM in MySQL
+    try {
+      await sequelize.query("ALTER TABLE users MODIFY COLUMN role VARCHAR(50) NOT NULL DEFAULT 'Student'");
+    } catch (_) {}
+
+    // 3. Ensure phone column exists
+    if (!userDesc.phone) {
+      await queryInterface.addColumn('users', 'phone', {
+        type: sequelize.Sequelize.STRING(20),
+        allowNull: true,
+      });
+      console.log('✅ Added phone column to users table');
+    }
+
+    // 4. Ensure department column exists
+    if (!userDesc.department) {
+      await queryInterface.addColumn('users', 'department', {
+        type: sequelize.Sequelize.STRING(100),
+        allowNull: true,
+      });
+      console.log('✅ Added department column to users table');
+    }
+
+    // 5. Ensure is_active column exists
+    if (!userDesc.is_active) {
+      await queryInterface.addColumn('users', 'is_active', {
+        type: sequelize.Sequelize.BOOLEAN,
+        defaultValue: true,
+        allowNull: false,
+      });
+      console.log('✅ Added is_active column to users table');
+    }
+
+    // 6. Ensure otp column exists
+    if (!userDesc.otp) {
+      await queryInterface.addColumn('users', 'otp', {
+        type: sequelize.Sequelize.STRING(10),
+        allowNull: true,
+      });
+      console.log('✅ Added otp column to users table');
+    }
+
+    // 7. Ensure otp_expires column exists
+    if (!userDesc.otp_expires) {
+      await queryInterface.addColumn('users', 'otp_expires', {
+        type: sequelize.Sequelize.DATE,
+        allowNull: true,
+      });
+      console.log('✅ Added otp_expires column to users table');
+    }
+
+    // 8. Ensure can_manage_staff column exists
+    if (!userDesc.can_manage_staff) {
+      await queryInterface.addColumn('users', 'can_manage_staff', {
+        type: sequelize.Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      });
+      console.log('✅ Added can_manage_staff column to users table');
+    }
+  } catch (colErr) {
+    console.warn('Notice: Users table column migration check:', colErr.message);
+  }
+
   // Automatic photo and notes sync: Link faculty, events, placements, and notes to physical assets
   try {
     const path = require('path');
@@ -322,6 +420,31 @@ async function seedInitialData() {
     console.log('   ✅ Default Admin Accounts created:');
     console.log('      - admin@aharada.edu / admin123');
     console.log('      - md@aharadaedu.in / Aharada@Prabhu');
+    }
+
+    // Ensure essential grievance portal accounts exist (e.g. on GoDaddy MySQL)
+    try {
+      const portalStaff = [
+        { name: 'Capt. Deepak Dhalla', email: 'md@aharadaedu.in', role: 'Dean' },
+        { name: 'Mr. Deepak Dhalla Sir', email: 'nitingirdhar521@gmail.com', role: 'Dean' },
+        { name: 'Ms. Somya Pal', email: 'somya@aharadaedu.in', role: 'HOD' },
+        { name: 'Mr. Nitin Girdhar', email: 'nitin@aharadaedu.in', role: 'Faculty' },
+        { name: 'Rahul Sharma', email: 'girdharnitin4@gmail.com', role: 'Student' }
+      ];
+      for (const staff of portalStaff) {
+        const existing = await User.findOne({ where: { email: staff.email.toLowerCase() } });
+        if (!existing) {
+          await User.create({
+            name: staff.name,
+            email: staff.email.toLowerCase(),
+            password: 'Admin@1234',
+            role: staff.role,
+          });
+          console.log(`   ✅ Seeded missing portal account: ${staff.email} (${staff.role})`);
+        }
+      }
+    } catch (seedErr) {
+      console.warn('Notice: Portal staff account seeding:', seedErr.message);
     }
 
     // Programs

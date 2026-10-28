@@ -26,17 +26,19 @@ exports.login = async (req, res) => {
     // 1. Try Admin (MySQL Sequelize)
     try {
       const user = await User.findOne({ where: { email: cleanEmail } });
-      if (user) {
+      if (user && (user.role === 'admin' || user.role === 'superadmin')) {
         const isMatch = await user.matchPassword(password);
         if (isMatch) {
-          const token = generateToken(user.id);
+          const effectiveId = user.id || user.user_id;
+          const token = generateToken(effectiveId);
           return res.json({
             success: true,
             message: 'Login successful.',
             token,
             user: {
-              id: user.id,
-              _id: user.id,
+              id: effectiveId,
+              user_id: effectiveId,
+              _id: effectiveId,
               name: user.name,
               email: user.email,
               role: user.role,
@@ -48,7 +50,7 @@ exports.login = async (req, res) => {
       console.warn('Admin DB lookup note:', adminErr.message);
     }
 
-    // 2. Try Portal Staff / User (Neon PostgreSQL)
+    // 2. Try Portal Staff / User (Neon PostgreSQL or GoDaddy MySQL)
     try {
       const result = await pool.query(
         'SELECT user_id, name, email, phone, password, role, department, is_active, can_manage_staff FROM users WHERE LOWER(email) = LOWER($1)',
@@ -62,8 +64,11 @@ exports.login = async (req, res) => {
 
         const valid = await bcrypt.compare(password, pUser.password);
         if (valid) {
+          const effectiveId = pUser.user_id || pUser.id;
+          pUser.user_id = effectiveId;
+          pUser.id = effectiveId;
           const portalToken = jwt.sign(
-            { user_id: pUser.user_id, email: pUser.email, role: pUser.role, name: pUser.name, can_manage_staff: !!pUser.can_manage_staff },
+            { user_id: effectiveId, email: pUser.email, role: pUser.role, name: pUser.name, can_manage_staff: !!pUser.can_manage_staff },
             process.env.JWT_SECRET || 'college_grievance_portal_secret_2026',
             { expiresIn: '24h' }
           );
@@ -95,11 +100,11 @@ exports.getMe = async (req, res) => {
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.split(' ')[1];
       try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'college_grievance_portal_secret_2026');
-        if (decoded && decoded.user_id) {
+        const currentUserId = decoded ? (decoded.user_id || decoded.id) : null;
+        if (currentUserId) {
           const result = await pool.query(
             'SELECT user_id, name, email, phone, role, department, is_active, can_manage_staff FROM users WHERE user_id = $1',
-            [decoded.user_id]
+            [currentUserId]
           );
           if (result.rows.length === 0) return res.status(404).json({ error: 'User not found.' });
           return res.json({ success: true, user: result.rows[0] });
