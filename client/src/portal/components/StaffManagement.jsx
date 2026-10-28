@@ -90,7 +90,8 @@ export default function StaffManagement() {
     setSaving(true);
     try {
       if (editingUser) {
-        await api.put(`/users/${editingUser.user_id}`, userForm);
+        const targetId = editingUser.user_id || editingUser.id;
+        await api.put(`/users/${targetId}`, userForm);
         toast.success(`Staff account for ${editingUser.name} updated.`);
       } else {
         await api.post('/users', userForm);
@@ -109,7 +110,8 @@ export default function StaffManagement() {
   // Toggle Active/Inactive
   async function handleToggleActive(u) {
     try {
-      const res = await api.put(`/users/${u.user_id}/toggle`);
+      const targetId = u.user_id || u.id;
+      const res = await api.put(`/users/${targetId}/toggle`);
       toast.success(res.data.message);
       loadUsers();
     } catch (err) {
@@ -135,7 +137,8 @@ export default function StaffManagement() {
     if (!userToDelete) return;
     setSaving(true);
     try {
-      const res = await api.delete(`/users/${userToDelete.user_id}`);
+      const targetId = userToDelete.user_id || userToDelete.id;
+      const res = await api.delete(`/users/${targetId}`);
       toast.success(res.data.message || 'Staff account deleted.');
       setUserToDelete(null);
       loadUsers();
@@ -162,7 +165,8 @@ export default function StaffManagement() {
     }
     setSaving(true);
     try {
-      const res = await api.post(`/users/${userToReassignDelete.user_id}/reassign-and-delete`, {
+      const targetId = userToReassignDelete.user_id || userToReassignDelete.id;
+      const res = await api.post(`/users/${targetId}/reassign-and-delete`, {
         reassignToUserId: Number(reassignToUserId),
       });
       toast.success(res.data.message || 'Tasks reassigned and account deleted successfully.');
@@ -190,7 +194,7 @@ export default function StaffManagement() {
 
   // Candidate replacement staff list (active, not the one being deleted, not student)
   const candidateStaff = staffList.filter(
-    u => Boolean(u.is_active) && u.user_id !== userToReassignDelete?.user_id
+    u => Boolean(u.is_active) && (u.user_id || u.id) !== (userToReassignDelete?.user_id || userToReassignDelete?.id)
   );
 
   return (
@@ -274,13 +278,14 @@ export default function StaffManagement() {
               </thead>
               <tbody>
                 {filteredStaff.map(u => {
-                  const isCurrent = Number(u.user_id) === Number(currentUser?.user_id);
+                  const uId = u.user_id || u.id;
+                  const isCurrent = Number(uId) === Number(currentUser?.user_id || currentUser?.id);
                   const isDean = u.role === 'Dean';
                   const pendingCount = Number(u.pending_tasks_count || 0);
                   const canManage = Boolean(u.can_manage_staff) || isDean;
 
                   return (
-                    <tr key={u.user_id}>
+                    <tr key={uId}>
                       <td style={{ whiteSpace: 'nowrap' }}>
                         <div style={{ fontWeight: 600, color: 'var(--slate-900)' }}>
                           {u.name} {isCurrent && <span style={{ fontSize: 11, color: 'var(--blue-600)', fontWeight: 500 }}>(You)</span>}
@@ -607,11 +612,14 @@ export default function StaffManagement() {
                     onChange={e => setReassignToUserId(e.target.value)}
                   >
                     <option value="">Select active staff member...</option>
-                    {candidateStaff.map(c => (
-                      <option key={c.user_id} value={c.user_id}>
-                        {c.role === 'HOD' ? 'HOD' : 'Prof.'} {c.name} — {c.department || 'General'} ({c.role})
-                      </option>
-                    ))}
+                    {candidateStaff.map(c => {
+                      const cId = c.user_id || c.id;
+                      return (
+                        <option key={cId} value={cId}>
+                          {c.role === 'HOD' ? 'HOD' : 'Prof.'} {c.name} — {c.department || 'General'} ({c.role})
+                        </option>
+                      );
+                    })}
                   </select>
                   <small style={{ color: 'var(--slate-500)', marginTop: 4, display: 'block' }}>
                     All {userToReassignDelete.pending_tasks_count} grievance(s) will be automatically transferred, audit history will be updated, and then the account will be safely deleted.

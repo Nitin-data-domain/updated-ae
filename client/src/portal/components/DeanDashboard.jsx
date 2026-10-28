@@ -159,7 +159,8 @@ export default function DeanDashboard() {
     e.preventDefault(); setSaving(true);
     try {
       if (editingUser) {
-        await api.put(`/users/${editingUser.user_id}`, userForm);
+        const targetId = editingUser.user_id || editingUser.id;
+        await api.put(`/users/${targetId}`, userForm);
         toast.success(`User ${editingUser.name} updated.`);
       } else {
         await api.post('/users', userForm);
@@ -172,7 +173,8 @@ export default function DeanDashboard() {
 
   async function handleToggleActive(u) {
     try {
-      const res = await api.put(`/users/${u.user_id}/toggle`);
+      const targetId = u.user_id || u.id;
+      const res = await api.put(`/users/${targetId}/toggle`);
       toast.success(res.data.message); loadData();
     } catch { toast.error('Failed to update status.'); }
   }

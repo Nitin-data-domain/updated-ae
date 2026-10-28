@@ -273,11 +273,15 @@ if (activeDbUrl && activeDbUrl.startsWith('postgres')) {
     if (!Array.isArray(rows)) return rows;
     return rows.map(row => {
       const normalized = { ...row };
-      if ('id' in normalized && !('user_id' in normalized)) {
-        normalized.user_id = normalized.id;
+      if (normalized.user_id === undefined || normalized.user_id === null) {
+        if (normalized.id !== undefined && normalized.id !== null) {
+          normalized.user_id = normalized.id;
+        }
       }
-      if ('user_id' in normalized && !('id' in normalized)) {
-        normalized.id = normalized.user_id;
+      if (normalized.id === undefined || normalized.id === null) {
+        if (normalized.user_id !== undefined && normalized.user_id !== null) {
+          normalized.id = normalized.user_id;
+        }
       }
       if ('is_active' in normalized) {
         normalized.is_active = !!normalized.is_active;
@@ -298,13 +302,8 @@ if (activeDbUrl && activeDbUrl.startsWith('postgres')) {
         try { await initPromise; } catch (_) {}
       }
 
-      // 1. Convert PostgreSQL $1, $2 positional placeholders to MySQL ? syntax
-      let formattedSql = sqlText;
-      let paramIndex = 1;
-      while (formattedSql.includes(`$${paramIndex}`)) {
-        formattedSql = formattedSql.replace(`$${paramIndex}`, '?');
-        paramIndex++;
-      }
+      // 1. Convert PostgreSQL $1, $2, $10 positional placeholders to MySQL ? syntax
+      let formattedSql = sqlText.replace(/\$\d+/g, '?');
 
       // 2. Handle RETURNING clause for MySQL compatibility
       const returningMatch = formattedSql.match(/RETURNING\s+([\s\S]+)$/i);
@@ -324,20 +323,32 @@ if (activeDbUrl && activeDbUrl.startsWith('postgres')) {
       // Remove ::int type casts (Postgres-specific)
       formattedSql = formattedSql.replace(/::int/gi, '');
 
-      // 5. Cast LIMIT and OFFSET params to integers (mysql2 execute doesn't support ? for LIMIT/OFFSET)
-      const queryParams = [...params];
+      // 5. Cast booleans to 1/0 for MySQL TINYINT compatibility
+      const queryParams = params.map(p => (typeof p === 'boolean' ? (p ? 1 : 0) : p));
+
+      // 6. Cast LIMIT and OFFSET params to integers (mysql2 execute doesn't support ? for LIMIT/OFFSET)
       const limitMatch = formattedSql.match(/LIMIT\s+\?\s+OFFSET\s+\?/i);
       if (limitMatch && queryParams.length >= 2) {
-        const offsetVal = parseInt(queryParams.pop());
-        const limitVal = parseInt(queryParams.pop());
+        const offsetVal = parseInt(queryParams.pop(), 10);
+        const limitVal = parseInt(queryParams.pop(), 10);
         formattedSql = formattedSql.replace(
           /LIMIT\s+\?\s+OFFSET\s+\?/i,
           `LIMIT ${limitVal} OFFSET ${offsetVal}`
         );
       }
 
-      // Use query() instead of execute() for broader compatibility
-      const [results] = await mysqlPool.query(formattedSql, queryParams);
+      // Execute query with auto-fallback if user_id column isn't supported in current schema
+      let results;
+      try {
+        [results] = await mysqlPool.query(formattedSql, queryParams);
+      } catch (queryErr) {
+        if (queryErr.message && queryErr.message.includes("Unknown column 'user_id'")) {
+          const retrySql = formattedSql.replace(/\buser_id\b/g, 'id');
+          [results] = await mysqlPool.query(retrySql, queryParams);
+        } else {
+          throw queryErr;
+        }
+      }
       
       let rows = Array.isArray(results) ? results : [];
 
@@ -348,26 +359,49 @@ if (activeDbUrl && activeDbUrl.startsWith('postgres')) {
           if (tableMatch) {
             const tableName = tableMatch[1].toLowerCase();
             const pkField = tableName === 'users' ? 'user_id' : (tableName === 'grievances' ? 'grievance_id' : 'history_id');
-            const [inserted] = await mysqlPool.query(`SELECT * FROM ${tableName} WHERE ${pkField} = ?`, [results.insertId]);
-            rows = inserted;
+            try {
+              const [inserted] = await mysqlPool.query(`SELECT * FROM ${tableName} WHERE ${pkField} = ?`, [results.insertId]);
+              rows = inserted;
+            } catch (_) {
+              if (tableName === 'users') {
+                try {
+                  const [byFallback] = await mysqlPool.query('SELECT * FROM users WHERE id = ?', [results.insertId]);
+                  rows = byFallback;
+                } catch (e2) {}
+              }
+            }
           }
         } 
-        // If it was an UPDATE with RETURNING
-        else if (results.affectedRows > 0) {
+        // If it was an UPDATE with RETURNING (retrieve updated row even if MySQL reported 0 rows changed)
+        else {
           const tableMatch = sqlText.match(/UPDATE\s+([^\s]+)/i);
           if (tableMatch) {
             const tableName = tableMatch[1].toLowerCase();
             const pkField = tableName === 'users' ? 'user_id' : (tableName === 'grievances' ? 'grievance_id' : 'history_id');
-            const lastParam = params[params.length - 1];
+            const lastParam = queryParams[queryParams.length - 1];
             if (lastParam !== undefined) {
-              const [updated] = await mysqlPool.query(`SELECT * FROM ${tableName} WHERE ${pkField} = ?`, [lastParam]);
-              rows = updated;
+              try {
+                const [updated] = await mysqlPool.query(`SELECT * FROM ${tableName} WHERE ${pkField} = ?`, [lastParam]);
+                if (updated && updated.length > 0) {
+                  rows = updated;
+                } else if (tableName === 'users') {
+                  const [byFallback] = await mysqlPool.query('SELECT * FROM users WHERE id = ?', [lastParam]);
+                  if (byFallback && byFallback.length > 0) rows = byFallback;
+                }
+              } catch (_) {
+                if (tableName === 'users') {
+                  try {
+                    const [byFallback] = await mysqlPool.query('SELECT * FROM users WHERE id = ?', [lastParam]);
+                    rows = byFallback;
+                  } catch (e2) {}
+                }
+              }
             }
           }
         }
       }
 
-      // Normalize is_active and count fields
+      // Normalize is_active, can_manage_staff, user_id, and count fields
       rows = normalizeRows(rows);
 
       return { rows, insertId: results ? results.insertId : null, affectedRows: results ? results.affectedRows : 0 };

@@ -84,17 +84,32 @@ async function createUser(req, res) {
        RETURNING user_id, name, email, phone, role, department, is_active, can_manage_staff`,
       [name.trim(), email.trim(), phone ? phone.trim() : null, hashed, role, department ? department.trim() : null, managePower]
     );
-    res.status(201).json({ message: `${role} account created.`, user: result.rows[0] });
+
+    let createdUser = (result.rows && result.rows.length > 0) ? result.rows[0] : null;
+    if (!createdUser && result.insertId) {
+      const fetchRes = await pool.query(
+        'SELECT user_id, name, email, phone, role, department, is_active, can_manage_staff FROM users WHERE user_id = $1',
+        [result.insertId]
+      );
+      if (fetchRes.rows && fetchRes.rows.length > 0) createdUser = fetchRes.rows[0];
+    }
+
+    res.status(201).json({ message: `${role} account created.`, user: createdUser || result.rows[0] });
   } catch (err) {
     console.error('Create user error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: err.message || 'Internal server error' });
   }
 }
 
 // ─── PUT /api/users/:id — Update user credentials and permissions
 async function updateUser(req, res) {
   try {
-    const { id } = req.params;
+    const rawId = req.params.id;
+    const userId = parseInt(rawId, 10);
+    if (!userId || isNaN(userId)) {
+      return res.status(400).json({ error: 'A valid numeric user ID is required.' });
+    }
+
     const { name, email, phone, password, department, role, can_manage_staff } = req.body;
 
     const updates = [];
@@ -106,7 +121,10 @@ async function updateUser(req, res) {
       params.push(name.trim());
     }
     if (email) {
-      const existing = await pool.query('SELECT user_id FROM users WHERE LOWER(email) = LOWER($1) AND user_id != $2', [email.trim(), id]);
+      const existing = await pool.query(
+        'SELECT user_id FROM users WHERE LOWER(email) = LOWER($1) AND user_id != $2',
+        [email.trim(), userId]
+      );
       if (existing.rows.length > 0) return res.status(409).json({ error: 'Email already in use.' });
       updates.push(`email = $${idx++}`);
       params.push(email.trim());
@@ -139,26 +157,47 @@ async function updateUser(req, res) {
 
     if (updates.length === 0) return res.status(400).json({ error: 'No fields provided.' });
 
-    params.push(id);
+    params.push(userId);
     const result = await pool.query(
       `UPDATE users SET ${updates.join(', ')} WHERE user_id = $${idx}
        RETURNING user_id, name, email, phone, role, department, is_active, can_manage_staff`,
       params
     );
-    if (result.rows.length === 0) return res.status(404).json({ error: 'User not found.' });
-    res.json({ message: 'User updated successfully.', user: result.rows[0] });
+
+    let updatedUser = (result.rows && result.rows.length > 0) ? result.rows[0] : null;
+
+    // In MySQL or edge cases where RETURNING clause does not return rows (e.g. 0 rows changed), fetch the user directly
+    if (!updatedUser) {
+      const fetchUpdated = await pool.query(
+        'SELECT user_id, name, email, phone, role, department, is_active, can_manage_staff FROM users WHERE user_id = $1',
+        [userId]
+      );
+      if (fetchUpdated.rows && fetchUpdated.rows.length > 0) {
+        updatedUser = fetchUpdated.rows[0];
+      }
+    }
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    res.json({ message: 'User updated successfully.', user: updatedUser });
   } catch (err) {
     console.error('Update user error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: err.message || 'Internal server error' });
   }
 }
 
 // ─── DELETE /api/users/:id — Delete user (blocks if pending tasks exist)
 async function deleteUser(req, res) {
   try {
-    const { id } = req.params;
+    const rawId = req.params.id;
+    const id = parseInt(rawId, 10);
+    if (!id || isNaN(id)) {
+      return res.status(400).json({ error: 'A valid numeric user ID is required.' });
+    }
 
-    if (parseInt(id) === parseInt(req.user.user_id)) {
+    if (id === parseInt(req.user.user_id, 10)) {
       return res.status(400).json({ error: 'You cannot delete your own account.' });
     }
 
@@ -197,29 +236,34 @@ async function deleteUser(req, res) {
     res.json({ success: true, message: `Account for ${targetUser.name} has been deleted.` });
   } catch (err) {
     console.error('Delete user error:', err);
-    res.status(500).json({ error: 'Internal server error while deleting user.' });
+    res.status(500).json({ error: err.message || 'Internal server error while deleting user.' });
   }
 }
 
 // ─── POST /api/users/:id/reassign-and-delete — Reassign all pending tasks to another staff member, then delete
 async function reassignAndDeleteUser(req, res) {
   try {
-    const { id } = req.params;
+    const rawId = req.params.id;
+    const id = parseInt(rawId, 10);
     const { reassignToUserId } = req.body;
+    const targetUserId = parseInt(reassignToUserId, 10);
 
-    if (!reassignToUserId) {
+    if (!id || isNaN(id)) {
+      return res.status(400).json({ error: 'Valid user ID is required.' });
+    }
+    if (!targetUserId || isNaN(targetUserId)) {
       return res.status(400).json({ error: 'Replacement staff member (reassignToUserId) is required.' });
     }
-    if (parseInt(id) === parseInt(req.user.user_id)) {
+    if (id === parseInt(req.user.user_id, 10)) {
       return res.status(400).json({ error: 'You cannot delete your own account.' });
     }
-    if (parseInt(id) === parseInt(reassignToUserId)) {
+    if (id === targetUserId) {
       return res.status(400).json({ error: 'Cannot reassign tasks to the user being deleted.' });
     }
 
     const targetNew = await pool.query(
       'SELECT user_id, name, role FROM users WHERE user_id = $1 AND is_active = true',
-      [reassignToUserId]
+      [targetUserId]
     );
     if (targetNew.rows.length === 0) {
       return res.status(400).json({ error: 'Selected replacement staff member not found or inactive.' });
@@ -245,7 +289,7 @@ async function reassignAndDeleteUser(req, res) {
            assigned_hod = CASE WHEN assigned_hod = $1 THEN $2 ELSE assigned_hod END,
            assigned_dean = CASE WHEN assigned_dean = $1 THEN $2 ELSE assigned_dean END
          WHERE grievance_id = $3`,
-        [id, reassignToUserId, g.grievance_id]
+        [id, targetUserId, g.grievance_id]
       );
 
       await pool.query(
@@ -271,25 +315,39 @@ async function reassignAndDeleteUser(req, res) {
     });
   } catch (err) {
     console.error('Reassign and delete user error:', err);
-    res.status(500).json({ error: 'Internal server error during reassign and delete.' });
+    res.status(500).json({ error: err.message || 'Internal server error during reassign and delete.' });
   }
 }
 
 // ─── PUT /api/users/:id/toggle — Toggle is_active for faculty/HOD
 async function toggleActive(req, res) {
   try {
-    const { id } = req.params;
+    const rawId = req.params.id;
+    const id = parseInt(rawId, 10);
+    if (!id || isNaN(id)) {
+      return res.status(400).json({ error: 'A valid numeric user ID is required.' });
+    }
+
     const result = await pool.query(
       `UPDATE users SET is_active = NOT is_active WHERE user_id = $1
        RETURNING user_id, name, email, is_active, role`,
       [id]
     );
-    if (result.rows.length === 0) return res.status(404).json({ error: 'User not found.' });
-    const user = result.rows[0];
+
+    let user = (result.rows && result.rows.length > 0) ? result.rows[0] : null;
+    if (!user) {
+      const fetchRes = await pool.query(
+        'SELECT user_id, name, email, is_active, role FROM users WHERE user_id = $1',
+        [id]
+      );
+      if (fetchRes.rows && fetchRes.rows.length > 0) user = fetchRes.rows[0];
+    }
+
+    if (!user) return res.status(404).json({ error: 'User not found.' });
     res.json({ message: `${user.name} has been ${user.is_active ? 'activated' : 'deactivated'}.`, user });
   } catch (err) {
     console.error('Toggle active error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: err.message || 'Internal server error' });
   }
 }
 
@@ -309,7 +367,7 @@ async function updateProfile(req, res) {
     res.json({ message: 'Profile updated.', user: result.rows[0] });
   } catch (err) {
     console.error('Update profile error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: err.message || 'Internal server error' });
   }
 }
 
