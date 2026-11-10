@@ -8,14 +8,15 @@ const {
   deleteFeedback,
 } = require('../controllers/feedbackController');
 const { protect } = require('../middleware/auth');
+const { requirePermission } = require('../middleware/permissionMiddleware');
 
 // Public route to submit feedback
 router.post('/', submitFeedback);
 
 // Admin routes
-router.get('/', protect, getFeedbacks);
-router.get('/stats', protect, getFeedbackStats);
-router.put('/:id/status', protect, updateFeedbackStatus);
-router.delete('/:id', protect, deleteFeedback);
+router.get('/', protect, requirePermission('feedback'), getFeedbacks);
+router.get('/stats', protect, requirePermission('feedback'), getFeedbackStats);
+router.put('/:id/status', protect, requirePermission('feedback'), updateFeedbackStatus);
+router.delete('/:id', protect, requirePermission('feedback'), deleteFeedback);
 
 module.exports = router;

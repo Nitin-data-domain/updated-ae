@@ -483,12 +483,38 @@ exports.getAllBooks = async (req, res) => {
       where.isApproved = false;
     }
 
+    // Role-based isolation:
+    // Super Admin ('superadmin') can view and manage all notes across all staff.
+    // Staff Admin can ONLY see study materials they personally uploaded.
+    const isSuperAdmin = req.user && req.user.role === 'superadmin';
+    if (!isSuperAdmin && req.user) {
+      const userEmail = (req.user.email || '').trim();
+      const userName = (req.user.name || '').trim();
+      const userConditions = [];
+      if (userEmail) {
+        userConditions.push({ uploadedByEmail: { [Op.like]: userEmail } });
+      }
+      if (userName) {
+        userConditions.push({ uploadedBy: { [Op.like]: userName } });
+      }
+      if (userConditions.length > 0) {
+        where[Op.or] = userConditions;
+      } else {
+        where.uploadedBy = '__non_existent_uploader__';
+      }
+    }
+
     const books = await Book.findAll({
       where,
       order: [['createdAt', 'DESC']],
     });
     const sanitizedBooks = books.map(sanitizeBookRecord);
-    res.json({ success: true, count: sanitizedBooks.length, data: sanitizedBooks });
+    res.json({
+      success: true,
+      count: sanitizedBooks.length,
+      isSuperAdmin,
+      data: sanitizedBooks,
+    });
   } catch (error) {
     console.error('getAllBooks error:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch admin books' });
@@ -629,6 +655,19 @@ exports.updateBook = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Book not found' });
     }
 
+    // Role-based authorization:
+    // Non-superadmin staff can only update materials they uploaded themselves.
+    const isSuperAdmin = req.user && req.user.role === 'superadmin';
+    if (!isSuperAdmin && req.user) {
+      const userEmail = (req.user.email || '').trim().toLowerCase();
+      const userName = (req.user.name || '').trim().toLowerCase();
+      const bookEmail = (book.uploadedByEmail || '').trim().toLowerCase();
+      const bookName = (book.uploadedBy || '').trim().toLowerCase();
+      if (bookEmail !== userEmail && bookName !== userName) {
+        return res.status(403).json({ success: false, message: 'You can only edit study materials you uploaded yourself' });
+      }
+    }
+
     const updateData = { ...req.body };
 
     // Handle file upload if new file provided
@@ -663,6 +702,19 @@ exports.deleteBook = async (req, res) => {
     const book = await Book.findByPk(req.params.id);
     if (!book) {
       return res.status(404).json({ success: false, message: 'Book not found' });
+    }
+
+    // Role-based authorization:
+    // Non-superadmin staff can only delete materials they uploaded themselves.
+    const isSuperAdmin = req.user && req.user.role === 'superadmin';
+    if (!isSuperAdmin && req.user) {
+      const userEmail = (req.user.email || '').trim().toLowerCase();
+      const userName = (req.user.name || '').trim().toLowerCase();
+      const bookEmail = (book.uploadedByEmail || '').trim().toLowerCase();
+      const bookName = (book.uploadedBy || '').trim().toLowerCase();
+      if (bookEmail !== userEmail && bookName !== userName) {
+        return res.status(403).json({ success: false, message: 'You can only delete study materials you uploaded yourself' });
+      }
     }
 
     await book.destroy();

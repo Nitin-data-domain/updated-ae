@@ -77,6 +77,25 @@ function PortalDashboardRouter() {
   }
 }
 
+function RequireAdminPerm({ perm, superAdminOnly = false, children }) {
+  const user = JSON.parse(localStorage.getItem('aharada_user') || '{}')
+  const isSuper = user.role === 'superadmin'
+  if (superAdminOnly) {
+    if (!isSuper) return <Navigate to="/admin" replace />
+    return children
+  }
+  const userPerms = Array.isArray(user.permissions)
+    ? user.permissions
+    : typeof user.permissions === 'string'
+      ? (() => { try { return JSON.parse(user.permissions) } catch (_) { return [user.permissions] } })()
+      : []
+  const hasAccess = isSuper || userPerms.includes('*') || userPerms.includes(perm)
+  if (!hasAccess) {
+    return <Navigate to="/admin" replace />
+  }
+  return children
+}
+
 function App() {
   const location = useLocation()
 
@@ -132,17 +151,17 @@ function App() {
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
-            <Route path="programs" element={<AdminPrograms />} />
-            <Route path="books" element={<AdminBooks />} />
-            <Route path="feedback" element={<AdminFeedback />} />
-            <Route path="faculty" element={<AdminFaculty />} />
-            <Route path="faculty-roles" element={<AdminFacultyRoles />} />
-            <Route path="events" element={<AdminEvents />} />
-            <Route path="admission-leads" element={<AdminAdmissionLeads />} />
-            <Route path="enquiries" element={<AdminEnquiries />} />
-            <Route path="brochures" element={<AdminBrochures />} />
-            <Route path="placements" element={<AdminPlacements />} />
-            <Route path="users" element={<AdminUsers />} />
+            <Route path="programs" element={<RequireAdminPerm perm="programs"><AdminPrograms /></RequireAdminPerm>} />
+            <Route path="books" element={<RequireAdminPerm perm="books"><AdminBooks /></RequireAdminPerm>} />
+            <Route path="feedback" element={<RequireAdminPerm perm="feedback"><AdminFeedback /></RequireAdminPerm>} />
+            <Route path="faculty" element={<RequireAdminPerm perm="faculty"><AdminFaculty /></RequireAdminPerm>} />
+            <Route path="faculty-roles" element={<RequireAdminPerm perm="faculty-roles"><AdminFacultyRoles /></RequireAdminPerm>} />
+            <Route path="events" element={<RequireAdminPerm perm="events"><AdminEvents /></RequireAdminPerm>} />
+            <Route path="admission-leads" element={<RequireAdminPerm perm="leads"><AdminAdmissionLeads /></RequireAdminPerm>} />
+            <Route path="enquiries" element={<RequireAdminPerm perm="enquiries"><AdminEnquiries /></RequireAdminPerm>} />
+            <Route path="brochures" element={<RequireAdminPerm perm="brochures"><AdminBrochures /></RequireAdminPerm>} />
+            <Route path="placements" element={<RequireAdminPerm perm="placements"><AdminPlacements /></RequireAdminPerm>} />
+            <Route path="users" element={<RequireAdminPerm superAdminOnly><AdminUsers /></RequireAdminPerm>} />
           </Route>
 
           {/* Legacy redirects from old .in website URLs & alternate paths */}

@@ -4,16 +4,17 @@ const {
   getEvents, getAllEvents, createEvent, updateEvent, deleteEvent
 } = require('../controllers/eventController');
 const { protect } = require('../middleware/auth');
+const { requirePermission } = require('../middleware/permissionMiddleware');
 const { uploadImage, downloadExternalImage } = require('../middleware/upload');
 
 router.get('/', getEvents);
-router.get('/admin', protect, getAllEvents);
-router.post('/', protect, createEvent);
-router.put('/:id', protect, updateEvent);
-router.delete('/:id', protect, deleteEvent);
+router.get('/admin', protect, requirePermission('events'), getAllEvents);
+router.post('/', protect, requirePermission('events'), createEvent);
+router.put('/:id', protect, requirePermission('events'), updateEvent);
+router.delete('/:id', protect, requirePermission('events'), deleteEvent);
 
 // Upload event photo → GoDaddy Local Storage
-router.post('/upload-image', protect, uploadImage.single('image'), (req, res) => {
+router.post('/upload-image', protect, requirePermission('events'), uploadImage.single('image'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ success: false, message: 'No image provided' });
   }
@@ -22,7 +23,7 @@ router.post('/upload-image', protect, uploadImage.single('image'), (req, res) =>
 });
 
 // Fetch image from external URL (Google Drive, etc.) → GoDaddy Local Storage
-router.post('/fetch-image', protect, async (req, res) => {
+router.post('/fetch-image', protect, requirePermission('events'), async (req, res) => {
   try {
     const { url } = req.body;
     if (!url) return res.status(400).json({ success: false, message: 'URL required' });

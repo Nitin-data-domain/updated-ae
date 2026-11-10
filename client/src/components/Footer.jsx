@@ -106,7 +106,7 @@ export default function Footer() {
             <Link to="/grievance">Student Grievance</Link>
             <Link to="/faculty-roles">Faculty Roles</Link>
             <Link to="/privacy-policy">Privacy Policy</Link>
-            <a href="#">Terms of Service</a>
+            <Link to="/privacy-policy">Terms of Service</Link>
           </div>
         </div>
       </div>

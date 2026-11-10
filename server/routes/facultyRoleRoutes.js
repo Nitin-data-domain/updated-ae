@@ -8,14 +8,15 @@ const {
   deleteFacultyRole,
 } = require('../controllers/facultyRoleController');
 const { protect } = require('../middleware/auth');
+const { requirePermission } = require('../middleware/permissionMiddleware');
 
 // Public route
 router.get('/', getFacultyRoles);
 
 // Protected admin routes
-router.get('/admin', protect, getAllFacultyRolesAdmin);
-router.post('/', protect, createFacultyRole);
-router.put('/:id', protect, updateFacultyRole);
-router.delete('/:id', protect, deleteFacultyRole);
+router.get('/admin', protect, requirePermission('faculty-roles'), getAllFacultyRolesAdmin);
+router.post('/', protect, requirePermission('faculty-roles'), createFacultyRole);
+router.put('/:id', protect, requirePermission('faculty-roles'), updateFacultyRole);
+router.delete('/:id', protect, requirePermission('faculty-roles'), deleteFacultyRole);
 
 module.exports = router;

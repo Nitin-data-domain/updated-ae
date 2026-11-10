@@ -400,9 +400,13 @@ export default function AdminBooks() {
     <div className="admin-page">
       <div className="admin-page-header">
         <div>
-          <h1 className="admin-page-title">Digital Library &amp; Unit Notes</h1>
+          <h1 className="admin-page-title">
+            {isSuperAdmin ? 'Digital Library & Unit Notes' : 'My Uploaded Notes & Books'}
+          </h1>
           <p className="admin-page-desc">
-            Upload and manage official course books, unit-wise notes, and study materials for student downloads.
+            {isSuperAdmin
+              ? 'Upload and manage official course books, unit-wise notes, and study materials for student downloads.'
+              : 'Upload and manage your unit-wise notes and study materials. Notes submitted will be reviewed and approved by the Super Admin before going live.'}
           </p>
         </div>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
@@ -431,7 +435,7 @@ export default function AdminBooks() {
         }}>
           <FiAlertCircle size={22} style={{ flexShrink: 0, color: '#D97706' }} />
           <span>
-            <strong>Staff Notice:</strong> Study materials you upload will be reviewed and approved by the Super Admin before appearing on the public Digital Library.
+            <strong>Staff Notice:</strong> You only see study materials you have personally uploaded. Notes you upload will be reviewed and approved by the Super Admin before appearing publicly on the Digital Library.
           </span>
         </div>
       )}
@@ -475,7 +479,7 @@ export default function AdminBooks() {
           </div>
           <div className="admin-stat-content">
             <div className="admin-stat-value" style={{ color: 'var(--accent)' }}>{notesCount}</div>
-            <div className="admin-stat-label">Unit-Wise Notes</div>
+            <div className="admin-stat-label">{isSuperAdmin ? 'Unit-Wise Notes' : 'My Unit Notes'}</div>
           </div>
         </div>
         <div className="admin-stat-card">
@@ -484,7 +488,7 @@ export default function AdminBooks() {
           </div>
           <div className="admin-stat-content">
             <div className="admin-stat-value">{booksCount}</div>
-            <div className="admin-stat-label">Textbooks &amp; References</div>
+            <div className="admin-stat-label">{isSuperAdmin ? 'Textbooks & References' : 'My Textbooks'}</div>
           </div>
         </div>
         <div className="admin-stat-card">
@@ -507,7 +511,9 @@ export default function AdminBooks() {
               {pendingCount > 0 ? `${pendingCount} Pending` : `${approvedCount} Live`}
             </div>
             <div className="admin-stat-label">
-              {pendingCount > 0 ? 'Awaiting Approval' : 'All Approved'}
+              {isSuperAdmin
+                ? (pendingCount > 0 ? 'Awaiting Approval' : 'All Approved')
+                : (pendingCount > 0 ? 'My Notes Under Review' : 'My Notes Approved & Live')}
             </div>
           </div>
         </div>
@@ -613,8 +619,27 @@ export default function AdminBooks() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '40px' }}>Loading resources...</div>
         ) : filteredBooks.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px', color: 'var(--gray-500)' }}>
-            No books or notes found matching the filter criteria.
+          <div style={{ textAlign: 'center', padding: '48px 24px', color: 'var(--gray-500)' }}>
+            <FiBookOpen size={42} style={{ color: '#CBD5E1', marginBottom: '14px' }} />
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#334155', marginBottom: '8px' }}>
+              {books.length === 0
+                ? (isSuperAdmin ? 'No books or notes in the library yet.' : 'You have not uploaded any study notes yet.')
+                : 'No books or notes found matching the filter criteria.'}
+            </h3>
+            <p style={{ fontSize: '0.88rem', color: '#64748B', maxWidth: '480px', margin: '0 auto 20px', lineHeight: 1.5 }}>
+              {books.length === 0
+                ? (isSuperAdmin
+                    ? 'Upload textbooks and study notes for students to access from the Digital Library.'
+                    : 'Click below to submit your first unit notes or study material. It will be sent to the Super Admin for review.')
+                : 'Try adjusting your search terms or filters above.'}
+            </p>
+            {books.length === 0 && (
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                <button className="admin-btn admin-btn-primary" onClick={() => openAddModal('notes')}>
+                  <FiPlus /> Upload Your First Unit Notes
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="admin-table-wrap">
@@ -724,11 +749,18 @@ export default function AdminBooks() {
                       </td>
                       <td style={{ fontSize: '0.85rem', color: 'var(--gray-600)' }}>
                         <div>{book.author || '—'}</div>
-                        {book.uploadedBy && (
+                        {book.uploadedBy ? (
                           <div style={{ fontSize: '0.74rem', color: '#64748B', marginTop: '3px' }}>
-                            By: <strong>{book.uploadedBy}</strong>
+                            {!isSuperAdmin && (
+                              (book.uploadedByEmail && book.uploadedByEmail.toLowerCase() === (currentUser.email || '').toLowerCase()) ||
+                              (book.uploadedBy && book.uploadedBy.toLowerCase() === (currentUser.name || '').toLowerCase())
+                            ) ? (
+                              <span style={{ color: '#059669', fontWeight: 600 }}>• Uploaded by You</span>
+                            ) : (
+                              <>By: <strong>{book.uploadedBy}</strong></>
+                            )}
                           </div>
-                        )}
+                        ) : null}
                       </td>
                       <td>
                         <span style={{ fontWeight: 600, color: 'var(--navy)' }}>

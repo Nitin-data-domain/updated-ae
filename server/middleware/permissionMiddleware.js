@@ -33,13 +33,14 @@ const requirePermission = (permission) => {
       perms = [];
     }
 
-    if (perms.includes('*') || perms.includes(permission)) {
+    const allowed = Array.isArray(permission) ? permission : [permission];
+    if (perms.includes('*') || allowed.some((p) => perms.includes(p))) {
       return next();
     }
 
     return res.status(403).json({
       success: false,
-      message: `Access denied. You do not have permission to manage '${permission}'. Please contact the Super Admin.`,
+      message: `Access denied. You do not have permission to manage '${Array.isArray(permission) ? permission.join('/') : permission}'. Please contact the Super Admin.`,
     });
   };
 };
