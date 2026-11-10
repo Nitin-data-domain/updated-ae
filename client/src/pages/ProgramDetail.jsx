@@ -246,6 +246,50 @@ const getStudentLifeByCategory = (category) => {
   return data[category] || data.aviation
 }
 
+/* ── Course-Specific SEO Keyword Mappings (High-Intent Admission & Syllabus Terms) ── */
+const COURSE_SEO_METADATA = {
+  'bba-aviation-travel': {
+    title: 'BBA Aviation and Travel Course & Admissions 2026-2027 | Aharada Education',
+    description: 'Enroll in BBA Aviation and Travel in India. Industry-integrated program covering airport management, airline operations, eligibility after 12th, and 100% placement support.',
+    keywords: 'BBA Aviation and Travel, BBA Aviation course, BBA Aviation in India, Aviation management after 12th, BBA Aviation admission, BBA Travel and Tourism, BBA Aviation colleges, BBA Aviation eligibility, BBA in Airport Management, Career after BBA Aviation, BBA Aviation colleges in Delhi NCR, Aviation courses in Uttar Pradesh',
+  },
+  'btech-aerospace-engineering': {
+    title: 'B.Tech Aerospace Engineering Course & Admissions | Aharada Education',
+    description: 'Pursue B.Tech Aerospace Engineering with hands-on aircraft design, flight simulator labs, and airline tie-ups. Eligibility, admissions, and career scope after 12th.',
+    keywords: 'B.Tech Aerospace Engineering, Aerospace engineering course, Aerospace engineering colleges in India, Aerospace engineering after 12th, B.Tech Aerospace admission, Aerospace engineering eligibility, Aerospace engineering degree, Aircraft design engineering, Aerospace engineering career, Aerospace technology courses, Aerospace engineering colleges in Greater Noida, Uttar Pradesh',
+  },
+  'mba-aviation-management': {
+    title: 'MBA Aviation Management Course & Admissions | Aharada Education',
+    description: 'Accelerate your executive career with MBA Aviation Management in India. Advanced curriculum in airport operations, airline management, leadership, and corporate placements.',
+    keywords: 'MBA Aviation Management, MBA Aviation course, MBA Aviation Management in India, Aviation MBA admission, MBA Airport Management, MBA Aviation eligibility, Aviation management colleges, Airport management MBA, MBA in Airline Management, Aviation management career',
+  },
+  'bsc-aeronautical-science': {
+    title: 'B.Sc Aeronautical Science Course & Admissions | Aharada Education',
+    description: 'Join B.Sc Aeronautical Science in India. Comprehensive study of flight mechanics, avionics, navigation, commercial pilot foundation, and aircraft maintenance career.',
+    keywords: 'B.Sc Aeronautical Science, Aeronautical science course, B.Sc Aeronautical Science in India, Aeronautical science colleges, B.Sc Aeronautical admission, Aeronautical science eligibility, Aeronautical science degree, Aircraft maintenance career, Career in aeronautical science, Aviation science courses',
+  },
+  'bba-data-analytics-ai': {
+    title: 'BBA Data Analytics and AI Course & Admissions | Aharada Education',
+    description: 'Study BBA Data Analytics and Artificial Intelligence. Learn business analytics, machine learning, data science after 12th with direct industry placements.',
+    keywords: 'BBA Data Analytics and AI, BBA Data Analytics course, BBA Artificial Intelligence, BBA AI course, BBA Business Analytics, Data analytics courses after 12th, BBA AI admission, Business analytics degree, BBA Data Science, AI courses for management students',
+  },
+  'bba-entrepreneurship-innovation': {
+    title: 'BBA Entrepreneurship and Innovation Course | Aharada Education',
+    description: 'Launch your venture with BBA Entrepreneurship and Innovation. Startup incubation, venture capital mentorship, and hands-on business management after 12th.',
+    keywords: 'BBA Entrepreneurship and Innovation, BBA Entrepreneurship course, BBA Entrepreneurship in India, Entrepreneurship degree, BBA startup management, Entrepreneurship courses after 12th, BBA Innovation Management, Business startup courses',
+  },
+  'bachelor-fashion-design': {
+    title: 'Bachelor of Fashion Design (B.Des) Course | Aharada Education',
+    description: 'Industry-oriented Bachelor in Fashion Design program. Explore apparel design, textile technology, styling, and fashion industry placements.',
+    keywords: 'Bachelor of Fashion Design, Fashion design course, BDes Fashion India, Fashion design colleges in Uttar Pradesh, Fashion design career',
+  },
+  'bachelor-fine-arts': {
+    title: 'Bachelor of Fine Arts (BFA) Course | Aharada Education',
+    description: 'Master creative arts with Bachelor of Fine Arts (BFA). Painting, sculpture, visual communication, digital illustration, and exhibitions.',
+    keywords: 'Bachelor of Fine Arts, BFA course in India, Fine arts degree, Visual communication, Fine arts admission',
+  },
+}
+
 export default function ProgramDetail() {
   const { slug } = useParams()
   const [program, setProgram] = useState(null)
@@ -255,20 +299,58 @@ export default function ProgramDetail() {
     getProgramBySlug(slug)
       .then(res => {
         setProgram(res.data.data)
-        document.title = `${res.data.data.title} | Aharada Education`
 
-        // Dynamic SEO injection
-        let metaDescription = document.querySelector('meta[name="description"]')
-        if (metaDescription && res.data.data.shortDescription) {
-          metaDescription.setAttribute('content', res.data.data.shortDescription)
+        const seoData = COURSE_SEO_METADATA[slug]
+        if (seoData) {
+          document.title = seoData.title
+          const metaDescription = document.querySelector('meta[name="description"]')
+          if (metaDescription) metaDescription.setAttribute('content', seoData.description)
+          const metaKeywords = document.querySelector('meta[name="keywords"]')
+          if (metaKeywords) metaKeywords.setAttribute('content', seoData.keywords)
+        } else {
+          document.title = `${res.data.data.title} | Aharada Education`
+          const metaDescription = document.querySelector('meta[name="description"]')
+          if (metaDescription && res.data.data.shortDescription) {
+            metaDescription.setAttribute('content', res.data.data.shortDescription)
+          }
+          const metaKeywords = document.querySelector('meta[name="keywords"]')
+          if (metaKeywords && res.data.data.title) {
+            metaKeywords.setAttribute('content', `${res.data.data.title}, Aharada Education, Admission, College, ${res.data.data.category}`)
+          }
         }
-        let metaKeywords = document.querySelector('meta[name="keywords"]')
-        if (metaKeywords && res.data.data.title) {
-          metaKeywords.setAttribute('content', `${res.data.data.title}, Aharada Education, Admission, College, ${res.data.data.category}`)
+
+        // Injects schema.org/Course JSON-LD for rich Google snippets
+        let scriptTag = document.getElementById('course-jsonld')
+        if (!scriptTag) {
+          scriptTag = document.createElement('script')
+          scriptTag.id = 'course-jsonld'
+          scriptTag.type = 'application/ld+json'
+          document.head.appendChild(scriptTag)
         }
+        scriptTag.text = JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Course",
+          "name": res.data.data.title,
+          "description": (seoData && seoData.description) || res.data.data.shortDescription,
+          "provider": {
+            "@type": "EducationalOrganization",
+            "name": "Aharada Education",
+            "sameAs": "https://aharadaedu.com"
+          },
+          "offers": {
+            "@type": "Offer",
+            "category": "Admissions 2026-2027",
+            "availability": "https://schema.org/InStock"
+          }
+        })
       })
       .catch(() => { })
       .finally(() => setLoading(false))
+
+    return () => {
+      const scriptTag = document.getElementById('course-jsonld')
+      if (scriptTag) scriptTag.remove()
+    }
   }, [slug])
 
   if (loading) return <div className="loading-container"><div className="spinner" /></div>

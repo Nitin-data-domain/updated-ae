@@ -40,3 +40,4 @@
   RewriteRule ^books/?$ /library [R=301,L]
   RewriteRule ^digital-library/?$ /library [R=301,L]
 </IfModule>
+

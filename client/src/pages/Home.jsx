@@ -219,7 +219,7 @@ export default function Home() {
   const [activeTestimonial, setActiveTestimonial] = useState(0)
 
   useEffect(() => {
-    document.title = 'Aharada Education | Educate . Empower . Excel'
+    document.title = 'Aharada Education – Aviation, Aerospace & Management Courses'
     getPrograms().then(res => setPrograms(res.data.data)).catch(() => { })
     const interval = setInterval(() => {
       setActiveTestimonial(prev => (prev + 1) % testimonials.length)
@@ -254,15 +254,15 @@ export default function Home() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3, duration: 0.5 }}
             >
-              <FiNavigation size={14} /> India's Premier Multi-Discipline Education Platform
+              <FiNavigation size={14} /> Premier Aviation & Aerospace Education in India
             </motion.span>
             <h1 className="hero-title">
               Get Your Wings<br />
               <span className="hero-title-accent">to Fly</span>
             </h1>
             <p className="hero-subtitle">
-              Empowering future aviators, aerospace engineers, and business leaders through
-              industry-integrated programs across top partner universities.
+              Shape your future with premier aviation courses in India, aerospace engineering,
+              and industry-oriented management education across top accredited partner universities.
             </p>
             <motion.p
               className="hero-tagline"

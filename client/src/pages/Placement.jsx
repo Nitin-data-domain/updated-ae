@@ -28,7 +28,15 @@ export default function Placement() {
   const [selectedStudent, setSelectedStudent] = useState(null)
 
   useEffect(() => {
-    document.title = 'Placements | Aharada Education'
+    document.title = 'Aviation Placements & Career Opportunities | Aharada Education'
+    const metaDescription = document.querySelector('meta[name="description"]')
+    if (metaDescription) {
+      metaDescription.setAttribute('content', 'Explore verified placements at Aharada Education. Over 250+ students placed in top airlines including IndiGo, Air India, SpiceJet, Vistara, and aerospace organizations.')
+    }
+    const metaKeywords = document.querySelector('meta[name="keywords"]')
+    if (metaKeywords) {
+      metaKeywords.setAttribute('content', 'Aviation courses with placement, Career opportunities in aviation, Airline recruitment IndiGo Air India SpiceJet, Airport management careers, Aerospace engineering career scope')
+    }
     fetchPage(page)
   }, [page])
 

@@ -75,7 +75,15 @@ export default function Programs() {
   const [activeUni, setActiveUni] = useState('all')
 
   useEffect(() => {
-    document.title = 'Programs | Aharada Education'
+    document.title = 'Aviation Courses & Degree Programs in India | Aharada Education'
+    const metaDescription = document.querySelector('meta[name="description"]')
+    if (metaDescription) {
+      metaDescription.setAttribute('content', 'Explore professional aviation courses in India, B.Tech Aerospace Engineering, BBA Aviation & Travel, MBA Aviation Management, and B.Sc Aeronautical Science with 100% placement assistance.')
+    }
+    const metaKeywords = document.querySelector('meta[name="keywords"]')
+    if (metaKeywords) {
+      metaKeywords.setAttribute('content', 'Aviation courses in India, Aviation education in India, BBA Aviation, B.Tech Aerospace Engineering, MBA Aviation Management, B.Sc Aeronautical Science, Aviation colleges in Uttar Pradesh, Aviation colleges in Delhi NCR, Professional aviation courses')
+    }
     getPrograms()
       .then(res => setPrograms(res.data.data))
       .catch(() => {})

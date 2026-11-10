@@ -1,74 +1,100 @@
 ======================================================
-AHARADA EDUCATION - SEO & GOOGLE ADS KEYWORDS MASTER LIST
+AHARADA EDUCATION - MASTER SEO & GOOGLE ADS KEYWORDS STRATEGY
+Website: https://aharadaedu.com/
 ======================================================
-Use these exact keyword phrases in your Google Search Campaigns, 
-Social Media Ads (Facebook/Instagram), and Blog tags to drive highly targeted student traffic. 
+
+1. Top 20 Priority Keywords (Implemented on Core Website)
+------------------------------------------------------
+1. Aviation courses in India
+2. Aviation education in India
+3. BBA Aviation and Travel
+4. BBA Aviation admission
+5. B.Tech Aerospace Engineering
+6. Aerospace engineering colleges in India
+7. MBA Aviation Management
+8. MBA Aviation admission
+9. B.Sc Aeronautical Science
+10. Aviation management courses
+11. Aviation courses after 12th
+12. Aviation colleges in Uttar Pradesh
+13. Aerospace engineering career
+14. Career in aviation after 12th
+15. BBA Data Analytics and AI
+16. BBA Entrepreneurship and Innovation
+17. Aviation courses in Meerut
+18. Aviation colleges in Delhi NCR
+19. Airport management courses
+20. Future of aviation in India
 
 ------------------------------------------------------
-1. BBA Aviation & Travel Management
+2. Course-Specific SEO Keywords
 ------------------------------------------------------
-▶ Primary SEO Keywords (For Blogs & Page Titles):
-BBA Aviation Management admission, best college for BBA Aviation in India, travel and tourism degree, airport management course, BBA Airport Management.
-▶ Google Ads Keywords (High Intent - Bidding):
-"BBA Aviation admission 2026", "Aviation colleges near me", "best airport management institute", "travel and tourism degree placements"
+▶ BBA Aviation & Travel
+   Primary: BBA Aviation and Travel, BBA Aviation course, BBA Aviation in India, Aviation management after 12th, BBA Aviation admission
+   Secondary: BBA Travel and Tourism, BBA Aviation colleges, BBA Aviation eligibility, BBA in Airport Management, Career after BBA Aviation
+
+▶ B.Tech Aerospace Engineering
+   Primary: B.Tech Aerospace Engineering, Aerospace engineering course, Aerospace engineering colleges in India, Aerospace engineering after 12th, B.Tech Aerospace admission
+   Secondary: Aerospace engineering eligibility, Aerospace engineering degree, Aircraft design engineering, Aerospace engineering career, Aerospace technology courses
+
+▶ MBA Aviation Management
+   Primary: MBA Aviation Management, MBA Aviation course, MBA Aviation Management in India, Aviation MBA admission, MBA Airport Management
+   Secondary: MBA Aviation eligibility, Aviation management colleges, Airport management MBA, MBA in Airline Management, Aviation management career
+
+▶ B.Sc Aeronautical Science
+   Primary: B.Sc Aeronautical Science, Aeronautical science course, B.Sc Aeronautical Science in India, Aeronautical science colleges, B.Sc Aeronautical admission
+   Secondary: Aeronautical science eligibility, Aeronautical science degree, Aircraft maintenance career, Career in aeronautical science, Aviation science courses
+
+▶ BBA Data Analytics & AI
+   Primary: BBA Data Analytics and AI, BBA Data Analytics course, BBA Artificial Intelligence, BBA AI course, BBA Business Analytics
+   Secondary: Data analytics courses after 12th, BBA AI admission, Business analytics degree, BBA Data Science, AI courses for management students
+
+▶ BBA Entrepreneurship & Innovation
+   Primary: BBA Entrepreneurship and Innovation, BBA Entrepreneurship course, BBA Entrepreneurship in India, Entrepreneurship degree, BBA startup management
+   Secondary: Entrepreneurship courses after 12th, BBA Innovation Management, Business startup courses
 
 ------------------------------------------------------
-2. B.Tech Aerospace Engineering
+3. Location-Based SEO Keywords
 ------------------------------------------------------
-▶ Primary SEO Keywords:
-B.Tech Aerospace Engineering India, aerospace engineering colleges, become an aerospace engineer, aerospace degree placements, aeronautics vs aerospace.
-▶ Google Ads Keywords:
-"BTech Aerospace admission", "top aerospace engineering colleges", "aerospace engineering fees", "space technology degree"
+- Uttar Pradesh: Aviation courses in Uttar Pradesh
+- Meerut: Aviation courses in Meerut
+- Delhi NCR: Aviation colleges in Delhi NCR
+- Noida: Aviation courses in Noida
+- Greater Noida: Aerospace engineering colleges in Greater Noida
+- Ghaziabad: Aviation management courses in Ghaziabad
+- Hapur: Colleges in Hapur
+- Delhi: BBA Aviation colleges in Delhi
+- Lucknow: Aviation courses in Lucknow
+- India: Best aviation courses in India
 
 ------------------------------------------------------
-3. B.Sc Aeronautical Science
+4. High-Intent Admission & Student Search Keywords
 ------------------------------------------------------
-▶ Primary SEO Keywords:
-BSc Aeronautical Science syllabus, aeronautical science colleges India, become a pilot degree, commercial pilot license course, aviation science degree.
-▶ Google Ads Keywords:
-"BSc Aeronautical Science admission", "commercial pilot degree college", "Aeronautical science fees", "pilot training courses after 12th"
+- Aviation courses after 12th
+- Aviation admission 2026 / 2027
+- BBA Aviation admission 2026 / 2027
+- MBA Aviation admission 2026 / 2027
+- Aerospace engineering admission 2026 / 2027
+- Aviation course eligibility
+- Aviation course fees in India
+- Aviation colleges admission process
+- Best courses after 12th for aviation
+- Career opportunities in aviation
+- Aviation courses with placement
+- Aerospace engineering career scope
+- Management courses after 12th
+- Data analytics courses after 12th
 
 ------------------------------------------------------
-4. MBA Aviation Management
+5. Blog & Content Strategy Topics
 ------------------------------------------------------
-▶ Primary SEO Keywords:
-MBA in Aviation Management, best MBA Aviation colleges India, airport operations MBA, aviation business degree, postgraduate aviation courses.
-▶ Google Ads Keywords:
-"MBA Aviation admission 2026", "MBA airport management", "aviation management masters", "MBA supply chain and aviation"
-
-------------------------------------------------------
-5. BBA Entrepreneurship & Innovation
-------------------------------------------------------
-▶ Primary SEO Keywords:
-BBA Entrepreneurship degree, business management innovator course, start-up degree programs, best entrepreneurship colleges India.
-▶ Google Ads Keywords:
-"BBA Entrepreneurship admission", "start my own business degree", "innovation management course", "BBA family business management"
-
-------------------------------------------------------
-6. BBA Data Analytics & Artificial Intelligence
-------------------------------------------------------
-▶ Primary SEO Keywords:
-BBA Data Analytics India, BBA Artificial Intelligence course, business analytics degree, data science for business, best AI management colleges.
-▶ Google Ads Keywords:
-"BBA Data Analytics admission", "AI and Data Science BBA", "business analytics degree fees", "managerial data science courses"
-
-------------------------------------------------------
-7. Bachelor in Fashion Design
-------------------------------------------------------
-▶ Primary SEO Keywords:
-Bachelor of Fashion Design, best fashion designing colleges, BDes Fashion, fashion industry career, fashion design placements.
-▶ Google Ads Keywords:
-"Fashion designing course after 12th", "BDes Fashion admission", "fashion design college fees", "top fashion institutes"
-
-------------------------------------------------------
-8. Bachelor in Fine Arts (BFA)
-------------------------------------------------------
-▶ Primary SEO Keywords:
-Bachelor of Fine Arts (BFA), visual arts degree, best fine arts colleges in India, applied arts courses, painting and digital arts.
-▶ Google Ads Keywords:
-"BFA admission 2026", "fine arts colleges near me", "commercial art degree", "Bachelor of Fine Arts fees"
-
-------------------------------------------------------
-GENERAL BRAND KEYWORDS (Always target these!)
-------------------------------------------------------
-"Aharada Education", "Aharada Education admission", "Aharada Education placement reviews", "100% placement aviation college", "best aviation institute with UGC approval"
+1. Career opportunities in aviation -> Target: Career in aviation after 12th
+2. Aviation vs Aerospace Engineering -> Target: Aviation vs aerospace engineering
+3. MBA Aviation Management scope -> Target: MBA aviation career opportunities
+4. BBA Aviation eligibility -> Target: BBA aviation eligibility after 12th
+5. Career in aerospace engineering -> Target: Aerospace engineering career scope
+6. Airport management careers -> Target: Airport management career
+7. Future of aviation industry -> Target: Future of aviation in India
+8. AI in aviation -> Target: Artificial intelligence in aviation
+9. Drone technology careers -> Target: Career in drone technology
+10. Data analytics career -> Target: Data analytics career after 12th

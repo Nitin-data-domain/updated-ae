@@ -7,7 +7,15 @@ import './AboutUs.css'
 
 export default function AboutUs() {
   useEffect(() => {
-    document.title = 'About Us | Aharada Education'
+    document.title = 'About Aharada Education | Premier Aviation & Aerospace Institute'
+    const metaDescription = document.querySelector('meta[name="description"]')
+    if (metaDescription) {
+      metaDescription.setAttribute('content', 'Learn about Aharada Education, India premier aviation and aerospace education institute. Industry-oriented curriculum, university partnerships, and professional leadership.')
+    }
+    const metaKeywords = document.querySelector('meta[name="keywords"]')
+    if (metaKeywords) {
+      metaKeywords.setAttribute('content', 'Aharada Education, Aviation and aerospace institute, Industry oriented education, Aviation education in India, Aviation colleges in Uttar Pradesh')
+    }
   }, [])
 
   return (

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FiPhone, FiMail, FiMapPin, FiClock, FiSend, FiArrowRight } from 'react-icons/fi'
 import toast from 'react-hot-toast'
@@ -31,7 +31,17 @@ export default function Contact() {
     }
   }
 
-  document.title = 'Contact Us | Aharada Education'
+  useEffect(() => {
+    document.title = 'Contact & Campus Locations | Aharada Education - Delhi NCR & Meerut'
+    const metaDescription = document.querySelector('meta[name="description"]')
+    if (metaDescription) {
+      metaDescription.setAttribute('content', 'Connect with Aharada Education admission offices in Meerut and Delhi NCR, Uttar Pradesh. Get in touch for aviation and aerospace course counseling and campus visits.')
+    }
+    const metaKeywords = document.querySelector('meta[name="keywords"]')
+    if (metaKeywords) {
+      metaKeywords.setAttribute('content', 'Aviation courses in Meerut, Aviation colleges in Delhi NCR, Aviation courses in Uttar Pradesh, Colleges in Hapur, Aviation courses in Noida, Aviation management courses in Ghaziabad, Aharada Education contact')
+    }
+  }, [])
 
   return (
     <div className="contact-page">

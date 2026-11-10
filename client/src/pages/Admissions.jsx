@@ -21,7 +21,15 @@ export default function Admissions() {
   const [submitted, setSubmitted]   = useState(false)
 
   useEffect(() => {
-    document.title = 'Admission Enquiry | Aharada Education'
+    document.title = 'Aviation & Aerospace Admission 2026-2027 | Aharada Education'
+    const metaDescription = document.querySelector('meta[name="description"]')
+    if (metaDescription) {
+      metaDescription.setAttribute('content', 'Apply for Aviation and Aerospace degree admissions 2026-2027 at Aharada Education. BBA Aviation, B.Tech Aerospace Engineering, MBA Aviation eligibility, fees, and scholarship counseling.')
+    }
+    const metaKeywords = document.querySelector('meta[name="keywords"]')
+    if (metaKeywords) {
+      metaKeywords.setAttribute('content', 'Aviation admission 2026 2027, BBA Aviation admission 2027, MBA Aviation admission 2027, Aerospace engineering admission 2027, Aviation course eligibility, Aviation course fees in India, Aviation colleges admission process, Best courses after 12th for aviation, Career opportunities in aviation')
+    }
     getPrograms().then(res => setAllPrograms(res.data.data)).catch(() => {})
   }, [])
 
