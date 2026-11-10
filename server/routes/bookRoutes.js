@@ -9,9 +9,11 @@ const {
   createBook,
   updateBook,
   deleteBook,
+  approveBook,
 } = require('../controllers/bookController');
 const { protect } = require('../middleware/auth');
 const { uploadBook } = require('../middleware/upload');
+const { requirePermission, requireSuperAdmin } = require('../middleware/permissionMiddleware');
 
 // Public routes
 router.get('/', getBooks);
@@ -23,10 +25,13 @@ router.head('/file/:id', serveBookFile);
 router.get('/view/:id', serveBookFile);
 router.head('/view/:id', serveBookFile);
 
-// Admin routes
-router.get('/admin', protect, getAllBooks);
-router.post('/', protect, uploadBook.single('file'), createBook);
-router.put('/:id', protect, uploadBook.single('file'), updateBook);
-router.delete('/:id', protect, deleteBook);
+// Admin routes (requires 'books' permission or superadmin)
+router.get('/admin', protect, requirePermission('books'), getAllBooks);
+router.post('/', protect, requirePermission('books'), uploadBook.single('file'), createBook);
+router.put('/:id', protect, requirePermission('books'), uploadBook.single('file'), updateBook);
+router.delete('/:id', protect, requirePermission('books'), deleteBook);
+
+// Super Admin approval endpoint
+router.patch('/:id/approve', protect, requireSuperAdmin, approveBook);
 
 module.exports = router;

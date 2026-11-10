@@ -147,20 +147,38 @@ export default function ApplyNowSection({ heroMode = false }) {
           </button>
         </div>
       ) : (
-        <form className="apply-form" onSubmit={handleSubmit} id={heroMode ? 'hero-apply-form' : 'home-apply-form'} noValidate>
+        <form className="apply-form" onSubmit={handleSubmit} id={heroMode ? 'hero-apply-form' : 'home-apply-form'} name="admission-enquiry" aria-label="Admission enquiry form" noValidate>
           <h3 className="apply-form-title">Admission Enquiry</h3>
 
           <div className="aform-row">
             <div className="aform-group">
-              <input id="apply-name" className={`aform-input ${errors.name?'err':''}`}
-                type="text" placeholder="Full Name *" value={form.name}
-                onChange={e => set('name', e.target.value)} />
+              <input
+                id="apply-name"
+                name="name"
+                aria-label="Full Name"
+                autoComplete="name"
+                required
+                className={`aform-input ${errors.name?'err':''}`}
+                type="text"
+                placeholder="Full Name *"
+                value={form.name}
+                onChange={e => set('name', e.target.value)}
+              />
               {errors.name && <span className="aform-err">{errors.name}</span>}
             </div>
             <div className="aform-group">
-              <input id="apply-email" className={`aform-input ${errors.email?'err':''}`}
-                type="email" placeholder="Email Address *" value={form.email}
-                onChange={e => set('email', e.target.value)} />
+              <input
+                id="apply-email"
+                name="email"
+                aria-label="Email Address"
+                autoComplete="email"
+                required
+                className={`aform-input ${errors.email?'err':''}`}
+                type="email"
+                placeholder="Email Address *"
+                value={form.email}
+                onChange={e => set('email', e.target.value)}
+              />
               {errors.email && <span className="aform-err">{errors.email}</span>}
             </div>
           </div>
@@ -171,6 +189,10 @@ export default function ApplyNowSection({ heroMode = false }) {
               <span className="otp-cc">+91</span>
               <input
                 id="apply-phone"
+                name="phone"
+                aria-label="Mobile Number"
+                autoComplete="tel"
+                required
                 type="tel"
                 inputMode="numeric"
                 maxLength={10}
@@ -185,16 +207,31 @@ export default function ApplyNowSection({ heroMode = false }) {
 
           <div className="aform-row">
             <div className="aform-group">
-              <select id="apply-state" className={`aform-select ${errors.state?'err':''}`}
-                value={form.state} onChange={e => set('state', e.target.value)}>
+              <select
+                id="apply-state"
+                name="state"
+                aria-label="Select State"
+                required
+                className={`aform-select ${errors.state?'err':''}`}
+                value={form.state}
+                onChange={e => set('state', e.target.value)}
+              >
                 <option value="">Select State *</option>
                 {STATES.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
               {errors.state && <span className="aform-err">{errors.state}</span>}
             </div>
             <div className="aform-group">
-              <select id="apply-city" className={`aform-select ${errors.city?'err':''}`}
-                value={form.city} onChange={e => set('city', e.target.value)} disabled={!form.state}>
+              <select
+                id="apply-city"
+                name="city"
+                aria-label="Select City"
+                required
+                className={`aform-select ${errors.city?'err':''}`}
+                value={form.city}
+                onChange={e => set('city', e.target.value)}
+                disabled={!form.state}
+              >
                 <option value="">{form.state ? 'Select City *' : 'Select State first'}</option>
                 {cities.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
@@ -204,17 +241,31 @@ export default function ApplyNowSection({ heroMode = false }) {
 
           <div className="aform-row">
             <div className="aform-group">
-              <select id="apply-university" className={`aform-select ${errors.university?'err':''}`}
-                value={form.university} onChange={e => set('university', e.target.value)}>
+              <select
+                id="apply-university"
+                name="university"
+                aria-label="Select University"
+                required
+                className={`aform-select ${errors.university?'err':''}`}
+                value={form.university}
+                onChange={e => set('university', e.target.value)}
+              >
                 <option value="">Select University *</option>
                 {universities.map(u => <option key={u} value={u}>{u}</option>)}
               </select>
               {errors.university && <span className="aform-err">{errors.university}</span>}
             </div>
             <div className="aform-group">
-              <select id="apply-program" className={`aform-select ${errors.program?'err':''}`}
-                value={form.program} onChange={e => set('program', e.target.value)}
-                disabled={!form.university}>
+              <select
+                id="apply-program"
+                name="program"
+                aria-label="Select Academic Program"
+                required
+                className={`aform-select ${errors.program?'err':''}`}
+                value={form.program}
+                onChange={e => set('program', e.target.value)}
+                disabled={!form.university}
+              >
                 <option value="">{form.university ? 'Select Program *' : 'Select University first'}</option>
                 {filteredPrograms.map(p => <option key={p._id} value={p.title}>{p.title}</option>)}
               </select>
@@ -224,15 +275,24 @@ export default function ApplyNowSection({ heroMode = false }) {
 
           {/* Consent */}
           <label className={`aform-consent ${errors.consent?'err':''}`}>
-            <input type="checkbox" checked={form.consent} onChange={e => set('consent', e.target.checked)}/>
+            <input
+              type="checkbox"
+              id="apply-consent"
+              name="consent"
+              aria-label="I authorize Aharada Education to contact me"
+              checked={form.consent}
+              onChange={e => set('consent', e.target.checked)}
+            />
             <span>I authorise Aharada Education and its representatives to Call, SMS, Email or WhatsApp me regarding admission enquiries.</span>
           </label>
           {errors.consent && <span className="aform-err">{errors.consent}</span>}
 
           <button
-            type="submit" id={heroMode ? 'hero-apply-submit-btn' : 'home-apply-submit-btn'}
+            type="submit"
+            id={heroMode ? 'hero-apply-submit-btn' : 'home-apply-submit-btn'}
             className="aform-submit-btn"
             disabled={submitting}
+            aria-label="Submit Admission Application"
           >
             {submitting ? 'Submitting…' : <><FiSend size={16}/> Submit Application</>}
           </button>

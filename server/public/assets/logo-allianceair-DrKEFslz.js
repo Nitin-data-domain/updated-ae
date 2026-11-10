@@ -1,0 +1,1 @@
+var e=`/assets/logo-akasaair-CeIOmK_x.png`,t=`/assets/logo-gofirst-1UnWzStH.png`,n=`/assets/logo-airasia-CHbWwglY.png`,r=`/assets/logo-allianceair-D8BPbNPq.png`;export{e as i,n,t as r,r as t};

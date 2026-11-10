@@ -1,22 +1,38 @@
 import { useState, useEffect } from 'react'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
-import { FiGrid, FiBook, FiUsers, FiCalendar, FiMail, FiFile, FiLogOut, FiMenu, FiX, FiAward, FiMessageSquare, FiBookOpen, FiShield } from 'react-icons/fi'
+import {
+  FiGrid,
+  FiBook,
+  FiUsers,
+  FiCalendar,
+  FiMail,
+  FiFile,
+  FiLogOut,
+  FiMenu,
+  FiX,
+  FiAward,
+  FiMessageSquare,
+  FiBookOpen,
+  FiShield,
+  FiLock,
+} from 'react-icons/fi'
 import { HiAcademicCap } from 'react-icons/hi'
 import Logo from '../Logo'
 import './AdminLayout.css'
 
-const sidebarLinks = [
-  { path: '/admin', label: 'Dashboard', icon: <FiGrid />, exact: true },
-  { path: '/admin/programs', label: 'Programs', icon: <FiBook /> },
-  { path: '/admin/books', label: 'Library Books', icon: <FiBookOpen /> },
-  { path: '/admin/feedback', label: 'Student Feedback', icon: <FiMessageSquare /> },
-  { path: '/admin/faculty', label: 'Faculty', icon: <FiUsers /> },
-  { path: '/admin/faculty-roles', label: 'Faculty Roles', icon: <FiShield /> },
-  { path: '/admin/placements', label: 'Placements', icon: <FiAward /> },
-  { path: '/admin/events', label: 'Events', icon: <FiCalendar /> },
-  { path: '/admin/admission-leads', label: 'Admission Leads', icon: <HiAcademicCap /> },
-  { path: '/admin/enquiries', label: 'Enquiries (Contact)', icon: <FiMail /> },
-  { path: '/admin/brochures', label: 'Brochures', icon: <FiFile /> },
+const allSidebarLinks = [
+  { path: '/admin', label: 'Dashboard', icon: <FiGrid />, exact: true, perm: 'dashboard' },
+  { path: '/admin/programs', label: 'Programs', icon: <FiBook />, perm: 'programs' },
+  { path: '/admin/books', label: 'Library Books & Notes', icon: <FiBookOpen />, perm: 'books' },
+  { path: '/admin/feedback', label: 'Student Feedback', icon: <FiMessageSquare />, perm: 'feedback' },
+  { path: '/admin/faculty', label: 'Faculty', icon: <FiUsers />, perm: 'faculty' },
+  { path: '/admin/faculty-roles', label: 'Faculty Roles', icon: <FiShield />, perm: 'faculty-roles' },
+  { path: '/admin/placements', label: 'Placements', icon: <FiAward />, perm: 'placements' },
+  { path: '/admin/events', label: 'Events', icon: <FiCalendar />, perm: 'events' },
+  { path: '/admin/admission-leads', label: 'Admission Leads', icon: <HiAcademicCap />, perm: 'leads' },
+  { path: '/admin/enquiries', label: 'Enquiries (Contact)', icon: <FiMail />, perm: 'enquiries' },
+  { path: '/admin/brochures', label: 'Brochures', icon: <FiFile />, perm: 'brochures' },
+  { path: '/admin/users', label: 'Admin Users & Rights', icon: <FiLock />, perm: 'users', superAdminOnly: true },
 ]
 
 export default function AdminLayout() {
@@ -24,6 +40,26 @@ export default function AdminLayout() {
   const location = useLocation()
   const navigate = useNavigate()
   const user = JSON.parse(localStorage.getItem('aharada_user') || '{}')
+
+  const isSuper = user.role === 'superadmin'
+  const userPerms = Array.isArray(user.permissions)
+    ? user.permissions
+    : typeof user.permissions === 'string'
+    ? (function () {
+        try {
+          return JSON.parse(user.permissions)
+        } catch (_) {
+          return [user.permissions]
+        }
+      })()
+    : []
+
+  const visibleLinks = allSidebarLinks.filter((link) => {
+    if (link.superAdminOnly) return isSuper
+    if (link.perm === 'dashboard') return true
+    if (isSuper || userPerms.includes('*')) return true
+    return userPerms.includes(link.perm)
+  })
 
   useEffect(() => {
     const token = localStorage.getItem('aharada_token')
@@ -54,7 +90,7 @@ export default function AdminLayout() {
         </div>
 
         <nav className="admin-nav">
-          {sidebarLinks.map(link => (
+          {visibleLinks.map((link) => (
             <Link
               key={link.path}
               to={link.path}
@@ -73,12 +109,14 @@ export default function AdminLayout() {
 
         <div className="admin-sidebar-footer">
           <div className="admin-user">
-            <div className="admin-user-avatar">
+            <div className={`admin-user-avatar ${isSuper ? 'avatar-super' : ''}`}>
               {user.name?.charAt(0) || 'A'}
             </div>
             <div>
               <div className="admin-user-name">{user.name || 'Admin'}</div>
-              <div className="admin-user-role">{user.role || 'admin'}</div>
+              <div className="admin-user-role">
+                {isSuper ? 'Super Admin' : 'Staff Admin'}
+              </div>
             </div>
           </div>
           <button className="btn-logout" onClick={handleLogout}>

@@ -14,8 +14,13 @@ import {
   FiCheckCircle,
   FiFileText,
   FiFilter,
+  FiClock,
+  FiAlertCircle,
+  FiShield,
+  FiThumbsUp,
+  FiThumbsDown,
 } from 'react-icons/fi'
-import { getAllBooksAdmin, createBook, updateBook, deleteBook, getPrograms } from '../../api'
+import { getAllBooksAdmin, createBook, updateBook, deleteBook, getPrograms, approveBook } from '../../api'
 
 const defaultCourseOptions = [
   'BBA Aviation & Travel',
@@ -67,6 +72,11 @@ export default function AdminBooks() {
   const [selectedSemester, setSelectedSemester] = useState('all')
   const [selectedYear, setSelectedYear] = useState('all')
   const [selectedType, setSelectedType] = useState('all')
+  const [selectedApproval, setSelectedApproval] = useState('all')
+  const [approvingId, setApprovingId] = useState(null)
+
+  const currentUser = JSON.parse(localStorage.getItem('aharada_user') || '{}')
+  const isSuperAdmin = currentUser.role === 'superadmin'
 
   // Modals state
   const [showModal, setShowModal] = useState(false)
@@ -136,6 +146,23 @@ export default function AdminBooks() {
       toast.error('Failed to load books and notes')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleApprove = async (book, newStatus) => {
+    setApprovingId(book.id)
+    try {
+      await approveBook(book.id, newStatus)
+      toast.success(
+        newStatus
+          ? `"${book.title}" approved and published to the live Digital Library!`
+          : `"${book.title}" marked as pending approval.`
+      )
+      loadBooks()
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update approval status')
+    } finally {
+      setApprovingId(null)
     }
   }
 
@@ -342,6 +369,11 @@ export default function AdminBooks() {
       if (selectedType === 'notes' && !isNoteItem) return false
       if (selectedType === 'book' && isNoteItem) return false
     }
+    if (selectedApproval === 'approved') {
+      if (b.isApproved === false) return false
+    } else if (selectedApproval === 'pending') {
+      if (b.isApproved !== false) return false
+    }
     if (search.trim()) {
       const q = search.toLowerCase()
       const match =
@@ -351,7 +383,8 @@ export default function AdminBooks() {
         b.author?.toLowerCase().includes(q) ||
         b.unit?.toLowerCase().includes(q) ||
         b.courseName?.toLowerCase().includes(q) ||
-        b.semester?.toLowerCase().includes(q)
+        b.semester?.toLowerCase().includes(q) ||
+        b.uploadedBy?.toLowerCase().includes(q)
       if (!match) return false
     }
     return true
@@ -360,6 +393,8 @@ export default function AdminBooks() {
   const totalDownloads = books.reduce((acc, b) => acc + (b.downloadCount || 0), 0)
   const notesCount = books.filter((b) => (b.materialType || '').toLowerCase() === 'notes').length
   const booksCount = books.filter((b) => (b.materialType || '').toLowerCase() !== 'notes').length
+  const pendingCount = books.filter((b) => b.isApproved === false).length
+  const approvedCount = books.filter((b) => b.isApproved !== false).length
 
   return (
     <div className="admin-page">
@@ -379,6 +414,58 @@ export default function AdminBooks() {
           </button>
         </div>
       </div>
+
+      {/* Staff Upload Notice */}
+      {!isSuperAdmin && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          padding: '14px 18px',
+          background: '#FEF3C7',
+          border: '1px solid #FDE68A',
+          borderRadius: '10px',
+          color: '#92400E',
+          marginBottom: '20px',
+          fontSize: '0.9rem'
+        }}>
+          <FiAlertCircle size={22} style={{ flexShrink: 0, color: '#D97706' }} />
+          <span>
+            <strong>Staff Notice:</strong> Study materials you upload will be reviewed and approved by the Super Admin before appearing on the public Digital Library.
+          </span>
+        </div>
+      )}
+
+      {/* Super Admin Action Banner */}
+      {isSuperAdmin && pendingCount > 0 && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '14px 18px',
+          background: '#FFFBEB',
+          border: '1.5px solid #F59E0B',
+          borderRadius: '10px',
+          color: '#B45309',
+          marginBottom: '20px',
+          fontSize: '0.92rem'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <FiClock size={20} style={{ color: '#D97706' }} />
+            <span>
+              <strong>Action Required:</strong> You have <strong>{pendingCount}</strong> study material(s) waiting for Super Admin approval.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSelectedApproval('pending')}
+            className="btn btn-sm btn-gold"
+            style={{ padding: '6px 12px', fontSize: '0.8rem' }}
+          >
+            Review Pending ({pendingCount})
+          </button>
+        </div>
+      )}
 
       {/* Stats Cards */}
       <div className="admin-stats-grid" style={{ marginBottom: '24px' }}>
@@ -412,14 +499,16 @@ export default function AdminBooks() {
           </div>
         </div>
         <div className="admin-stat-card">
-          <div className="admin-stat-icon" style={{ background: '#e6f7ed', color: 'var(--success)' }}>
-            <FiCheckCircle />
+          <div className="admin-stat-icon" style={{ background: pendingCount > 0 ? '#FEF3C7' : '#e6f7ed', color: pendingCount > 0 ? '#B45309' : 'var(--success)' }}>
+            {pendingCount > 0 ? <FiClock /> : <FiCheckCircle />}
           </div>
           <div className="admin-stat-content">
-            <div className="admin-stat-value" style={{ color: 'var(--success)' }}>
-              {books.filter((b) => b.isActive).length}
+            <div className="admin-stat-value" style={{ color: pendingCount > 0 ? '#B45309' : 'var(--success)' }}>
+              {pendingCount > 0 ? `${pendingCount} Pending` : `${approvedCount} Live`}
             </div>
-            <div className="admin-stat-label">Active &amp; Published</div>
+            <div className="admin-stat-label">
+              {pendingCount > 0 ? 'Awaiting Approval' : 'All Approved'}
+            </div>
           </div>
         </div>
       </div>
@@ -499,6 +588,23 @@ export default function AdminBooks() {
               </option>
             ))}
           </select>
+
+          <select
+            className="admin-form-select"
+            style={{
+              width: 'auto',
+              minWidth: '160px',
+              border: selectedApproval === 'pending' ? '1.5px solid #F59E0B' : undefined,
+              background: selectedApproval === 'pending' ? '#FEF3C7' : undefined,
+              fontWeight: selectedApproval === 'pending' ? 700 : 500,
+            }}
+            value={selectedApproval}
+            onChange={(e) => setSelectedApproval(e.target.value)}
+          >
+            <option value="all">All Approval Status</option>
+            <option value="approved">Approved &amp; Live Only</option>
+            <option value="pending">Pending Approval {pendingCount > 0 ? `(${pendingCount})` : ''}</option>
+          </select>
         </div>
       </div>
 
@@ -518,17 +624,18 @@ export default function AdminBooks() {
                   <th>Subject Code</th>
                   <th>Title &amp; Resource Details</th>
                   <th>Course, Year &amp; Sem</th>
-                  <th>Faculty / Author</th>
+                  <th>Faculty / Uploader</th>
                   <th>Downloads</th>
-                  <th>Status</th>
+                  <th>Approval Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredBooks.map((book) => {
                   const isNoteItem = (book.materialType || '').toLowerCase() === 'notes'
+                  const isApprovedItem = book.isApproved !== false
                   return (
-                    <tr key={book.id || book._id}>
+                    <tr key={book.id || book._id} style={{ background: !isApprovedItem ? '#FFFDF5' : undefined }}>
                       <td>
                         <span
                           style={{
@@ -616,7 +723,12 @@ export default function AdminBooks() {
                         </div>
                       </td>
                       <td style={{ fontSize: '0.85rem', color: 'var(--gray-600)' }}>
-                        {book.author || '—'}
+                        <div>{book.author || '—'}</div>
+                        {book.uploadedBy && (
+                          <div style={{ fontSize: '0.74rem', color: '#64748B', marginTop: '3px' }}>
+                            By: <strong>{book.uploadedBy}</strong>
+                          </div>
+                        )}
                       </td>
                       <td>
                         <span style={{ fontWeight: 600, color: 'var(--navy)' }}>
@@ -624,21 +736,76 @@ export default function AdminBooks() {
                         </span>
                       </td>
                       <td>
-                        <span
-                          style={{
-                            padding: '3px 8px',
-                            borderRadius: '12px',
-                            fontSize: '0.78rem',
-                            fontWeight: 600,
-                            background: book.isActive ? '#e6f7ed' : '#fbebee',
-                            color: book.isActive ? 'var(--success)' : 'var(--danger)',
-                          }}
-                        >
-                          {book.isActive ? 'Active' : 'Inactive'}
-                        </span>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <span
+                            style={{
+                              padding: '3px 8px',
+                              borderRadius: '12px',
+                              fontSize: '0.75rem',
+                              fontWeight: 700,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              background: isApprovedItem ? '#DCFCE7' : '#FEF3C7',
+                              color: isApprovedItem ? '#15803D' : '#B45309',
+                              border: isApprovedItem ? '1px solid #BBF7D0' : '1px solid #FDE68A',
+                              width: 'fit-content',
+                            }}
+                          >
+                            {isApprovedItem ? (
+                              <>
+                                <FiCheckCircle size={12} /> Approved
+                              </>
+                            ) : (
+                              <>
+                                <FiClock size={12} /> Pending Approval
+                              </>
+                            )}
+                          </span>
+                          <span
+                            style={{
+                              fontSize: '0.72rem',
+                              color: book.isActive ? 'var(--success)' : 'var(--danger)',
+                              fontWeight: 500,
+                            }}
+                          >
+                            {book.isActive ? '• Active' : '• Inactive'}
+                          </span>
+                        </div>
                       </td>
                       <td>
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+                          {/* 1-Click Super Admin Approval Button */}
+                          {isSuperAdmin && !isApprovedItem && (
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-gold"
+                              style={{
+                                padding: '4px 10px',
+                                fontSize: '0.78rem',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                              }}
+                              onClick={() => handleApprove(book, true)}
+                              disabled={approvingId === book.id}
+                              title="Approve note and publish to live website"
+                            >
+                              <FiCheck size={13} /> {approvingId === book.id ? 'Approving...' : 'Approve'}
+                            </button>
+                          )}
+                          {isSuperAdmin && isApprovedItem && (
+                            <button
+                              type="button"
+                              className="admin-btn-icon"
+                              style={{ color: '#D97706', border: '1px solid #FDE68A', background: '#FEF3C7' }}
+                              onClick={() => handleApprove(book, false)}
+                              disabled={approvingId === book.id}
+                              title="Move back to pending review"
+                            >
+                              <FiThumbsDown size={14} />
+                            </button>
+                          )}
                           <button
                             type="button"
                             onClick={() => handleAdminDownload(book)}

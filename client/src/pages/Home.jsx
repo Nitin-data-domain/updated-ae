@@ -342,6 +342,10 @@ export default function Home() {
                   <img
                     src={company.logo}
                     alt={company.name}
+                    loading="lazy"
+                    decoding="async"
+                    width="160"
+                    height="56"
                     style={{ height: '56px', width: 'auto', maxWidth: '160px', objectFit: 'contain' }}
                   />
                 </div>
@@ -445,7 +449,15 @@ export default function Home() {
                   {/* Brand Display */}
                   <div className="uni-card-brand">
                     <div className="uni-brand-logo-frame">
-                      <img src={uni.logo} alt={uni.name} className="uni-brand-logo-img" />
+                      <img
+                        src={uni.logo}
+                        alt={`${uni.name} Logo`}
+                        loading="lazy"
+                        decoding="async"
+                        width="108"
+                        height="82"
+                        className="uni-brand-logo-img"
+                      />
                     </div>
                     <div className="uni-brand-headings">
                       <h3 className="uni-card-title">{uni.name}</h3>
@@ -566,7 +578,14 @@ export default function Home() {
               viewport={{ once: true }}
               whileHover={{ scale: 1.01 }}
             >
-              <img src={campusIsro} alt="Students at U.R. Rao Satellite Centre" />
+              <img
+                src={campusIsro}
+                alt="Students at U.R. Rao Satellite Centre"
+                loading="lazy"
+                decoding="async"
+                width="700"
+                height="450"
+              />
               <div className="campus-img-caption">
                 <FiNavigation size={18} />
                 <div>
@@ -585,7 +604,14 @@ export default function Home() {
                 transition={{ delay: 0.15 }}
                 whileHover={{ scale: 1.02 }}
               >
-                <img src={campusGroupStudy} alt="Students in Classroom" />
+                <img
+                  src={campusGroupStudy}
+                  alt="Students in Classroom"
+                  loading="lazy"
+                  decoding="async"
+                  width="350"
+                  height="220"
+                />
                 <div className="campus-img-caption">
                    <FiBookOpen size={16} />
                    <div>
@@ -603,7 +629,14 @@ export default function Home() {
                 transition={{ delay: 0.3 }}
                 whileHover={{ scale: 1.02 }}
               >
-                <img src={campusClassroom} alt="Students Group Study" />
+                <img
+                  src={campusClassroom}
+                  alt="Students Group Study"
+                  loading="lazy"
+                  decoding="async"
+                  width="350"
+                  height="220"
+                />
                 <div className="campus-img-caption">
                    <FiUsers size={16} />
                    <div>
@@ -875,7 +908,15 @@ export default function Home() {
                 whileHover={{ y: -6, boxShadow: 'var(--shadow-lg)' }}
               >
                 <div className="company-logo-icon" style={{ background: 'var(--white)', border: '1px solid var(--gray-100)', padding: '0', overflow: 'hidden' }}>
-                  <img src={company.logo} alt={company.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '6px' }} />
+                  <img
+                    src={company.logo}
+                    alt={company.name}
+                    loading="lazy"
+                    decoding="async"
+                    width="120"
+                    height="50"
+                    style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '6px' }}
+                  />
                 </div>
                 <span className="company-logo-name">{company.name}</span>
                 <span className="company-logo-tag">Hiring Partner</span>

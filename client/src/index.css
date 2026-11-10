@@ -359,6 +359,7 @@ input, textarea, select {
 .btn-sm {
   padding: 10px 20px;
   font-size: 0.85rem;
+  min-height: 44px;
 }
 
 .btn-lg {

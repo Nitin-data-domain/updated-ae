@@ -236,6 +236,7 @@ app.use('/api/site-content', require('./routes/siteContentRoutes'));
 app.use('/api/books', require('./routes/bookRoutes'));
 app.use('/api/feedback', require('./routes/feedbackRoutes'));
 app.use('/api/faculty-roles', require('./routes/facultyRoleRoutes'));
+app.use('/api/admin-users', require('./routes/adminUserRoutes'));
 
 // College Grievance Portal API Routes
 app.use('/api/grievances', require('./portal/routes/grievances'));
@@ -345,6 +346,20 @@ app.get('/sitemap.xml', (req, res) => {
   return res.status(404).send('Sitemap not found');
 });
 
+app.get('/llms.txt', (req, res) => {
+  res.type('text/plain; charset=utf-8');
+  const possiblePaths = [
+    path.join(__dirname, 'public', 'llms.txt'),
+    path.join(__dirname, '../client/public', 'llms.txt'),
+    path.join(__dirname, '../client/dist', 'llms.txt'),
+  ];
+  const found = possiblePaths.find(p => fs.existsSync(p));
+  if (found) {
+    return res.sendFile(found);
+  }
+  return res.status(404).send('llms.txt not found');
+});
+
 // ── Serve Frontend SPA & Static Assets ────────────────────────────────────────
 const possibleDistPaths = [
   path.join(__dirname, 'public'),
@@ -357,14 +372,21 @@ const distPath = possibleDistPaths.find(p => fs.existsSync(path.join(p, 'index.h
 
 if (distPath) {
   console.log(`🌐 Serving frontend static files from: ${distPath}`);
-  app.use(express.static(distPath));
+  // Long-term immutable caching for hashed assets in /assets/
+  app.use('/assets', express.static(path.join(distPath, 'assets'), {
+    maxAge: '1y',
+    immutable: true,
+  }));
+  app.use(express.static(distPath, {
+    maxAge: '1d',
+  }));
 
   // Handle SPA routing for any non-API and non-upload route
   app.get('*', (req, res, next) => {
     if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
       return next();
     }
-    if (req.path === '/robots.txt' || req.path === '/sitemap.xml') {
+    if (req.path === '/robots.txt' || req.path === '/sitemap.xml' || req.path === '/llms.txt') {
       return next();
     }
     res.sendFile(path.join(distPath, 'index.html'));

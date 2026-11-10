@@ -22,7 +22,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50)
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
@@ -32,15 +32,15 @@ export default function Navbar() {
   }, [location])
 
   return (
-    <>
+    <header role="banner" className="site-header">
       {/* Top Bar */}
       <div className="topbar">
         <div className="container topbar-inner">
           <div className="topbar-left">
-            <a href="tel:+919259870433" className="topbar-link">
+            <a href="tel:+919259870433" className="topbar-link" aria-label="Call +91 92598 70433">
               <FiPhone size={13} /> +91 92598 70433
             </a>
-            <a href="mailto:info@aharadaedu.in" className="topbar-link">
+            <a href="mailto:info@aharadaedu.in" className="topbar-link" aria-label="Email info@aharadaedu.in">
               <FiMail size={13} /> info@aharadaedu.in
             </a>
           </div>
@@ -52,13 +52,13 @@ export default function Navbar() {
       </div>
 
       {/* Main Navbar */}
-      <nav className={`navbar ${isScrolled ? 'navbar-scrolled' : ''}`} id="main-navbar">
+      <nav className={`navbar ${isScrolled ? 'navbar-scrolled' : ''}`} id="main-navbar" role="navigation" aria-label="Main Navigation">
         <div className="container navbar-inner">
-          <Link to="/" className="navbar-brand" id="navbar-brand">
+          <Link to="/" className="navbar-brand" id="navbar-brand" aria-label="Aharada Education Home">
             <Logo size="default" />
           </Link>
 
-          <div className={`navbar-links ${isMobileOpen ? 'active' : ''}`}>
+          <div className={`navbar-links ${isMobileOpen ? 'active' : ''}`} id="navbar-menu">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
@@ -77,13 +77,15 @@ export default function Navbar() {
           <button
             className="navbar-toggle"
             onClick={() => setIsMobileOpen(!isMobileOpen)}
-            aria-label="Toggle navigation"
+            aria-label={isMobileOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={isMobileOpen}
+            aria-controls="navbar-menu"
             id="navbar-toggle"
           >
             {isMobileOpen ? <HiX size={28} /> : <HiMenu size={28} />}
           </button>
         </div>
       </nav>
-    </>
+    </header>
   )
 }

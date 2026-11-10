@@ -8,7 +8,14 @@
     <title>Aharada Education – Aviation, Aerospace & Management Courses</title>
     <meta name="description" content="Aharada Education offers premier industry-oriented aviation courses in India, B.Tech Aerospace Engineering, BBA Aviation & Travel, MBA Aviation Management, and B.Sc Aeronautical Science with university partnerships, NAAC accreditation, and 100% placement support." />
     <meta name="keywords" content="Aviation courses in India, Aviation education in India, BBA Aviation and Travel, BBA Aviation admission, B.Tech Aerospace Engineering, Aerospace engineering colleges in India, MBA Aviation Management, MBA Aviation admission, B.Sc Aeronautical Science, Aviation management courses, Aviation courses after 12th, Aviation colleges in Uttar Pradesh, Aerospace engineering career, Career in aviation after 12th, BBA Data Analytics and AI, BBA Entrepreneurship and Innovation, Aviation courses in Meerut, Aviation colleges in Delhi NCR, Airport management courses, Future of aviation in India" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <link rel="canonical" href="https://aharadaedu.com/" />
+
+    <!-- Google Fonts Preconnect & Display Swap -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
@@ -17,6 +24,8 @@
     <meta property="og:title" content="Aharada Education – Aviation, Aerospace & Management Courses" />
     <meta property="og:description" content="Shape your future with premier aviation education in India, aerospace engineering degrees, and career-oriented management programs." />
     <meta property="og:image" content="https://aharadaedu.com/logo-full.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:locale" content="en_IN" />
 
     <!-- Twitter -->
@@ -26,7 +35,7 @@
     <meta name="twitter:description" content="Shape your future with premier aviation education in India, aerospace engineering degrees, and career-oriented management programs." />
     <meta name="twitter:image" content="https://aharadaedu.com/logo-full.png" />
 
-    <!-- JSON-LD Structured Data for Google Rich Snippets -->
+    <!-- JSON-LD Structured Data for Google Rich Snippets & AI Agents -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -35,9 +44,12 @@
       "alternateName": "Aharada Institute of Aviation & Aerospace",
       "url": "https://aharadaedu.com/",
       "logo": "https://aharadaedu.com/logo-full.png",
+      "telephone": "+919259870433",
+      "email": "info@aharadaedu.in",
       "description": "Premier aviation, aerospace engineering, and management education platform in India offering industry-integrated degree programs.",
       "address": {
         "@type": "PostalAddress",
+        "streetAddress": "Atrara, Hapur-Meerut Highway",
         "addressLocality": "Meerut",
         "addressRegion": "Uttar Pradesh",
         "postalCode": "250001",
@@ -50,7 +62,8 @@
       ],
       "sameAs": [
         "https://www.facebook.com/aharadaeducation",
-        "https://www.instagram.com/aharadaeducation"
+        "https://www.instagram.com/aharadaeducation",
+        "https://www.linkedin.com/company/aharadaeducation/"
       ],
       "hasOfferCatalog": {
         "@type": "OfferCatalog",
@@ -96,17 +109,43 @@
       }
     }
     </script>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7WR2H3YYKW"></script>
+
+    <!-- Google tag (gtag.js) - Non-render-blocking initialization -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
+      gtag('config', 'G-7WR2H3YYKW', { send_page_view: false });
 
-      gtag('config', 'G-7WR2H3YYKW');
+      function loadGtag() {
+        if (window.__gtagLoaded) return;
+        window.__gtagLoaded = true;
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=G-7WR2H3YYKW';
+        document.head.appendChild(s);
+        gtag('event', 'page_view');
+      }
+
+      if (window.requestIdleCallback) {
+        requestIdleCallback(loadGtag, { timeout: 2500 });
+      } else {
+        window.addEventListener('load', loadGtag);
+      }
     </script>
-    <script type="module" crossorigin src="/assets/index-BFQZfg_O.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-Cz_JIk8h.css">
+    <script type="module" crossorigin src="/assets/index-CN07xT-7.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-COnpUsM8.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-framer-Dc4r_RxU.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-libs-C7JD09Gg.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-react-Xa4xGNZy.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-icons-BtXq12hS.js">
+    <link rel="modulepreload" crossorigin href="/assets/api-BK3FNHuL.js">
+    <link rel="modulepreload" crossorigin href="/assets/Logo-CgipogVC.js">
+    <link rel="modulepreload" crossorigin href="/assets/logo-allianceair-DrKEFslz.js">
+    <link rel="modulepreload" crossorigin href="/assets/logo-vistara-CAAUbVvz.js">
+    <link rel="modulepreload" crossorigin href="/assets/BrochureButton-CaqfEKKZ.js">
+    <link rel="modulepreload" crossorigin href="/assets/AuthContext-BIorBJgd.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-DR5uJQM_.css">
   </head>
   <body>
     <div id="root"></div>

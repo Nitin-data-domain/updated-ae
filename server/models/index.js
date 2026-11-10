@@ -53,6 +53,34 @@ async function syncModels() {
       });
       console.log('Added semester column to books table');
     }
+    if (!tableDesc.isApproved) {
+      await queryInterface.addColumn('books', 'isApproved', {
+        type: sequelize.Sequelize.BOOLEAN,
+        defaultValue: true,
+      });
+      console.log('Added isApproved column to books table');
+    }
+    if (!tableDesc.uploadedBy) {
+      await queryInterface.addColumn('books', 'uploadedBy', {
+        type: sequelize.Sequelize.STRING,
+        defaultValue: 'Super Admin',
+      });
+      console.log('Added uploadedBy column to books table');
+    }
+    if (!tableDesc.uploadedByEmail) {
+      await queryInterface.addColumn('books', 'uploadedByEmail', {
+        type: sequelize.Sequelize.STRING,
+        defaultValue: '',
+      });
+      console.log('Added uploadedByEmail column to books table');
+    }
+    if (!tableDesc.approvalNotes) {
+      await queryInterface.addColumn('books', 'approvalNotes', {
+        type: sequelize.Sequelize.TEXT,
+        defaultValue: '',
+      });
+      console.log('Added approvalNotes column to books table');
+    }
 
     // Backfill any books that don't have a semester yet
     const { Op } = require('sequelize');
@@ -213,6 +241,26 @@ async function syncModels() {
         allowNull: false,
       });
       console.log('✅ Added can_manage_staff column to users table');
+    }
+
+    // 9. Ensure permissions column exists for granular admin control
+    if (!userDesc.permissions) {
+      await queryInterface.addColumn('users', 'permissions', {
+        type: sequelize.Sequelize.TEXT,
+        defaultValue: '["books"]',
+        allowNull: true,
+      });
+      console.log('✅ Added permissions column to users table');
+    }
+
+    // 10. Ensure isActive column exists
+    if (!userDesc.isActive && !userDesc.is_active) {
+      await queryInterface.addColumn('users', 'isActive', {
+        type: sequelize.Sequelize.BOOLEAN,
+        defaultValue: true,
+        allowNull: false,
+      });
+      console.log('✅ Added isActive column to users table');
     }
   } catch (colErr) {
     console.warn('Notice: Users table column migration check:', colErr.message);

@@ -94,6 +94,22 @@ Book.init(
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
+    isApproved: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
+    uploadedBy: {
+      type: DataTypes.STRING,
+      defaultValue: 'Super Admin',
+    },
+    uploadedByEmail: {
+      type: DataTypes.STRING,
+      defaultValue: '',
+    },
+    approvalNotes: {
+      type: DataTypes.TEXT,
+      defaultValue: '',
+    },
     order: {
       type: DataTypes.INTEGER,
       defaultValue: 0,

@@ -1,0 +1,334 @@
+/* Admin Users & Permissions Styles */
+
+.admin-users-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.page-header-icon {
+  margin-right: 8px;
+  color: var(--gold-500, #C59B27);
+  vertical-align: middle;
+}
+
+/* Approval Info Banner */
+.approval-info-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 20px;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-radius: 12px;
+  color: #1E40AF;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.info-banner-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #2563EB;
+}
+
+.info-banner-content strong {
+  display: block;
+  margin-bottom: 2px;
+  font-weight: 700;
+  color: #1E3A8A;
+}
+
+/* User cell */
+.user-info-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #E2E8F0;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.user-avatar.avatar-super {
+  background: linear-gradient(135deg, #1E293B, #0F172A);
+  color: #FACC15;
+  border: 2px solid #C59B27;
+}
+
+.user-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-full-name {
+  font-weight: 600;
+  color: var(--gray-900, #0F172A);
+}
+
+.current-user-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: #FEF3C7;
+  color: #92400E;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.user-email-text {
+  font-size: 0.84rem;
+  color: var(--gray-500, #64748B);
+  display: block;
+}
+
+/* Role Badges */
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.role-badge.role-super {
+  background: #FEF3C7;
+  color: #B45309;
+  border: 1px solid #FDE68A;
+}
+
+.role-badge.role-admin {
+  background: #F1F5F9;
+  color: #475569;
+  border: 1px solid #E2E8F0;
+}
+
+/* Permissions Pills */
+.permissions-pills-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: 440px;
+}
+
+.perm-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  color: #334155;
+  font-weight: 500;
+}
+
+.perm-pill.perm-all {
+  background: #ECFDF5;
+  color: #047857;
+  border-color: #A7F3D0;
+  font-weight: 600;
+}
+
+.perm-pill.perm-none {
+  background: #FEF2F2;
+  color: #B91C1C;
+  border-color: #FECACA;
+}
+
+/* Status Button */
+.status-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.status-toggle-btn.active {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.status-toggle-btn.inactive {
+  background: #FEE2E2;
+  color: #B91C1C;
+}
+
+.status-toggle-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Modal and Permission Selection */
+.modal-subhead {
+  font-size: 0.88rem;
+  color: var(--gray-500, #64748B);
+  margin-top: 4px;
+}
+
+.permissions-selection-box {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 14px;
+}
+
+.perm-box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.perm-box-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.perm-box-sub {
+  margin: 2px 0 0;
+  font-size: 0.82rem;
+  color: #64748B;
+}
+
+.perm-toggle-links {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: #2563EB;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
+
+.permissions-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.perm-card {
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.perm-card:hover {
+  border-color: #94A3B8;
+  transform: translateY(-1px);
+}
+
+.perm-card.selected {
+  border-color: #2563EB;
+  background: #F0F7FF;
+}
+
+.perm-checkbox-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.perm-icon-bubble {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #F1F5F9;
+  color: #2563EB;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.perm-card.selected .perm-icon-bubble {
+  background: #DBEAFE;
+  color: #1D4ED8;
+}
+
+.perm-card-title {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.perm-card-desc {
+  font-size: 0.74rem;
+  color: #64748B;
+  line-height: 1.35;
+}
+
+.superadmin-notice-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #FEF3C7;
+  border: 1px solid #FDE68A;
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: #92400E;
+  font-size: 0.88rem;
+  margin-top: 14px;
+}
+
+.super-shield-icon {
+  flex-shrink: 0;
+  color: #D97706;
+}
+
+.superadmin-notice-card p {
+  margin: 4px 0 0;
+  font-size: 0.82rem;
+  color: #78350F;
+}
+
+.row-inactive {
+  opacity: 0.6;
+  background: #F8FAFC;
+}

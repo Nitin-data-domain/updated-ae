@@ -75,7 +75,14 @@ exports.getBooks = async (req, res) => {
   try {
     const { academicYear, courseName, subjectCode, subjectName, search, materialType, unit, semester } = req.query;
 
-    const where = { isActive: true };
+    // Public website only displays active AND approved books/notes
+    const where = {
+      isActive: true,
+      [Op.or]: [
+        { isApproved: true },
+        { isApproved: null },
+      ],
+    };
 
     if (materialType && materialType !== 'all') {
       where.materialType = { [Op.like]: materialType.trim() };
@@ -464,11 +471,20 @@ exports.serveBookFile = async (req, res) => {
   }
 };
 
-// @desc    Get all books for admin panel (including inactive)
+// @desc    Get all books for admin panel (including inactive and approval status)
 // @route   GET /api/books/admin
 exports.getAllBooks = async (req, res) => {
   try {
+    const where = {};
+    const { status } = req.query;
+    if (status === 'approved') {
+      where.isApproved = true;
+    } else if (status === 'pending') {
+      where.isApproved = false;
+    }
+
     const books = await Book.findAll({
+      where,
       order: [['createdAt', 'DESC']],
     });
     const sanitizedBooks = books.map(sanitizeBookRecord);
@@ -479,7 +495,7 @@ exports.getAllBooks = async (req, res) => {
   }
 };
 
-// @desc    Create new book
+// @desc    Create new book or notes entry
 // @route   POST /api/books
 exports.createBook = async (req, res) => {
   try {
@@ -534,6 +550,14 @@ exports.createBook = async (req, res) => {
 
     const isNotes = (materialType || '').toLowerCase() === 'notes';
 
+    // Approval workflow:
+    // Superadmin uploads are automatically approved.
+    // Sub-admins with notes uploading rights submit items as pending approval.
+    const isSuperAdmin = req.user && req.user.role === 'superadmin';
+    const isApproved = isSuperAdmin ? true : false;
+    const uploadedBy = req.user ? req.user.name : 'Super Admin';
+    const uploadedByEmail = req.user ? req.user.email : '';
+
     const book = await Book.create({
       title: title.trim(),
       academicYear: academicYear.trim(),
@@ -549,13 +573,50 @@ exports.createBook = async (req, res) => {
       fileName: fileName || `${subjectCode.trim()}_${isNotes ? unit || 'Notes' : 'Book'}.pdf`,
       fileSize: fileSize || 'PDF Document',
       isActive: isActive !== undefined ? isActive : true,
+      isApproved,
+      uploadedBy,
+      uploadedByEmail,
       order: order ? parseInt(order, 10) : 0,
     });
 
-    res.status(201).json({ success: true, data: sanitizeBookRecord(book) });
+    res.status(201).json({
+      success: true,
+      message: isApproved
+        ? 'Material uploaded and published successfully!'
+        : 'Material uploaded successfully and submitted for Super Admin approval.',
+      data: sanitizeBookRecord(book),
+    });
   } catch (error) {
     console.error('createBook error:', error);
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Approve or unapprove a book / notes entry
+// @route   PATCH /api/books/:id/approve
+// @access  Super Admin only
+exports.approveBook = async (req, res) => {
+  try {
+    const book = await Book.findByPk(req.params.id);
+    if (!book) {
+      return res.status(404).json({ success: false, message: 'Material not found' });
+    }
+
+    const { isApproved, approvalNotes } = req.body;
+    book.isApproved = isApproved !== undefined ? Boolean(isApproved) : true;
+    if (approvalNotes !== undefined) {
+      book.approvalNotes = approvalNotes;
+    }
+    await book.save();
+
+    res.json({
+      success: true,
+      message: `"${book.title}" has been ${book.isApproved ? 'approved and published to the Digital Library' : 'marked as pending approval'}`,
+      data: sanitizeBookRecord(book),
+    });
+  } catch (error) {
+    console.error('approveBook error:', error);
+    res.status(500).json({ success: false, message: 'Failed to update approval status' });
   }
 };
 

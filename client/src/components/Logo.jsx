@@ -8,6 +8,9 @@ export default function Logo({ className = '', size = 'default' }) {
     <img
       src={aeLogo}
       alt="Aharada Education"
+      width="240"
+      height={h}
+      fetchPriority="high"
       style={{
         height: `${h}px`,
         width: 'auto',

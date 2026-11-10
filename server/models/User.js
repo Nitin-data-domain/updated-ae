@@ -13,6 +13,16 @@ class User extends Model {
     values._id = effectiveId;
     values.id = effectiveId;
     values.user_id = effectiveId;
+    if (typeof values.permissions === 'string') {
+      try {
+        values.permissions = JSON.parse(values.permissions);
+      } catch (_) {
+        values.permissions = [values.permissions];
+      }
+    } else if (!values.permissions) {
+      values.permissions = values.role === 'superadmin' ? ['*'] : ['books'];
+    }
+    delete values.password;
     return values;
   }
 }
@@ -56,6 +66,38 @@ User.init(
     role: {
       type: DataTypes.STRING,
       defaultValue: 'admin',
+    },
+    permissions: {
+      type: DataTypes.TEXT,
+      defaultValue: '["books"]',
+      get() {
+        const raw = this.getDataValue('permissions');
+        if (!raw) return this.getDataValue('role') === 'superadmin' ? ['*'] : ['books'];
+        if (Array.isArray(raw)) return raw;
+        try {
+          return JSON.parse(raw);
+        } catch (_) {
+          return [raw];
+        }
+      },
+      set(val) {
+        if (Array.isArray(val)) {
+          this.setDataValue('permissions', JSON.stringify(val));
+        } else if (typeof val === 'string') {
+          try {
+            JSON.parse(val);
+            this.setDataValue('permissions', val);
+          } catch (_) {
+            this.setDataValue('permissions', JSON.stringify([val]));
+          }
+        } else {
+          this.setDataValue('permissions', '[]');
+        }
+      },
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
     },
     _id: {
       type: DataTypes.VIRTUAL,

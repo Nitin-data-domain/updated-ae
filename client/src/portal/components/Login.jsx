@@ -5,6 +5,7 @@ import api from '../api/api';
 import { useAuth } from '../context/AuthContext';
 import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import { MdSchool } from 'react-icons/md';
+import '../index.css';
 
 export default function Login() {
   const [form, setForm]       = useState({ email: '', password: '' });

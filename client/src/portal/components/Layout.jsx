@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { FiLogOut, FiUser, FiMenu, FiX } from 'react-icons/fi';
 import { MdDashboard, MdAssignment, MdSchool } from 'react-icons/md';
+import '../index.css';
 
 const ROLE_MENUS = {
   Faculty: [

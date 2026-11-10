@@ -161,7 +161,7 @@
 
 .hero-tagline {
   font-size: 0.84rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.78);
   letter-spacing: 3px;
   font-weight: 500;
   margin-bottom: 32px;
@@ -423,7 +423,7 @@
 .partners-strip-label {
   text-align: center;
   font-size: 0.75rem;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255, 255, 255, 0.78);
   font-weight: 600;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -841,12 +841,14 @@
 .btn-uni-primary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  padding: 9px 18px;
+  padding: 10px 20px;
+  min-height: 44px;
   border-radius: 50px;
   background: var(--primary);
   color: var(--white);
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 600;
   text-decoration: none;
   transition: all var(--transition-fast);
@@ -869,12 +871,14 @@
 .btn-uni-secondary {
   display: inline-flex;
   align-items: center;
-  padding: 9px 16px;
+  justify-content: center;
+  padding: 10px 18px;
+  min-height: 44px;
   border-radius: 50px;
   background: transparent;
   color: var(--navy);
   border: 1px solid var(--gray-200);
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 600;
   text-decoration: none;
   transition: all var(--transition-fast);
@@ -1474,24 +1478,38 @@
 .testimonial-dots {
   display: flex;
   justify-content: center;
-  gap: 8px;
+  align-items: center;
+  gap: 12px;
 }
 
 .testimonial-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--gray-200);
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
   border: none;
   cursor: pointer;
-  transition: all var(--transition-base);
   padding: 0;
 }
 
-.testimonial-dot.active {
+.testimonial-dot::before {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--gray-300);
+  transition: all var(--transition-base);
+}
+
+.testimonial-dot.active::before {
   background: var(--primary);
-  width: 24px;
-  border-radius: 4px;
+  width: 28px;
+  border-radius: 6px;
 }
 
 /* ============================================

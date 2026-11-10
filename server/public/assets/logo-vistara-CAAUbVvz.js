@@ -1,0 +1,1 @@
+var e=`/assets/logo-indigo-CEA_OWSe.png`,t=`/assets/logo-airindia-Sc8jM-Aa.png`,n=`/assets/logo-spicejet-BxjGiWQL.png`,r=`/assets/logo-vistara-C9uJfIMV.png`;export{e as i,n,t as r,r as t};

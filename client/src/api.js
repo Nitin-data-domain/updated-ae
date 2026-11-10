@@ -162,6 +162,17 @@ export const deleteFacultyRole = (id) => api.delete(`/faculty-roles/${id}`);
 // Storage Diagnostic
 export const getStorageStatus = () => api.get('/storage/status');
 
+// Admin Users & Granular Permission Management (Super Admin)
+export const getAdminUsers = () => api.get('/admin-users');
+export const createAdminUser = (data) => api.post('/admin-users', data);
+export const updateAdminUser = (id, data) => api.put(`/admin-users/${id}`, data);
+export const toggleAdminUserStatus = (id) => api.patch(`/admin-users/${id}/status`);
+export const deleteAdminUser = (id) => api.delete(`/admin-users/${id}`);
+
+// Book & Notes Approval Workflow (Super Admin)
+export const approveBook = (id, isApproved = true, approvalNotes = '') =>
+  api.patch(`/books/${id}/approve`, { isApproved, approvalNotes });
+
 export default api;
 
 

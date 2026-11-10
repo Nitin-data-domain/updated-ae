@@ -27,6 +27,9 @@ exports.login = async (req, res) => {
     try {
       const user = await User.findOne({ where: { email: cleanEmail } });
       if (user && (user.role === 'admin' || user.role === 'superadmin')) {
+        if (user.isActive === false) {
+          return res.status(403).json({ success: false, message: 'Your admin account has been deactivated. Please contact the Super Admin.' });
+        }
         const isMatch = await user.matchPassword(password);
         if (isMatch) {
           const effectiveId = user.id || user.user_id;
@@ -42,6 +45,8 @@ exports.login = async (req, res) => {
               name: user.name,
               email: user.email,
               role: user.role,
+              permissions: user.permissions || (user.role === 'superadmin' ? ['*'] : ['books']),
+              isActive: user.isActive !== false,
             },
           });
         }
