@@ -234,6 +234,55 @@ app.get('/api/storage/status', (req, res) => {
   });
 });
 
+// ── SEO & Crawler Directives (robots.txt & sitemap.xml) ───────────────────────
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain');
+  const possiblePaths = [
+    path.join(__dirname, 'public', 'robots.txt'),
+    path.join(__dirname, '../client/public', 'robots.txt'),
+    path.join(__dirname, '../client/dist', 'robots.txt'),
+  ];
+  const found = possiblePaths.find(p => fs.existsSync(p));
+  if (found) {
+    return res.sendFile(found);
+  }
+  return res.send(
+`# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /admin/
+Disallow: /grievance
+Disallow: /grievance/
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /login
+
+Allow: /uploads/
+Disallow: /uploads/grievances/
+
+Host: https://aharadaedu.com
+Sitemap: https://aharadaedu.com/sitemap.xml
+`
+  );
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  res.type('application/xml');
+  const possiblePaths = [
+    path.join(__dirname, 'public', 'sitemap.xml'),
+    path.join(__dirname, '../client/public', 'sitemap.xml'),
+    path.join(__dirname, '../client/dist', 'sitemap.xml'),
+  ];
+  const found = possiblePaths.find(p => fs.existsSync(p));
+  if (found) {
+    return res.sendFile(found);
+  }
+  return res.status(404).send('Sitemap not found');
+});
+
 // ── Serve Frontend SPA & Static Assets ────────────────────────────────────────
 const possibleDistPaths = [
   path.join(__dirname, 'public'),
@@ -251,6 +300,9 @@ if (distPath) {
   // Handle SPA routing for any non-API and non-upload route
   app.get('*', (req, res, next) => {
     if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+      return next();
+    }
+    if (req.path === '/robots.txt' || req.path === '/sitemap.xml') {
       return next();
     }
     res.sendFile(path.join(distPath, 'index.html'));

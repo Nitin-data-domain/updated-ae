@@ -1,4 +1,5 @@
 $ErrorActionPreference = "Stop"
+$ProgressPreference = "SilentlyContinue"
 $destZip = "godaddy-deploy.zip"
 
 if (Test-Path $destZip) {

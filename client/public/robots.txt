@@ -1,0 +1,22 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Disallow private and administrative areas
+Disallow: /admin
+Disallow: /admin/
+Disallow: /grievance
+Disallow: /grievance/
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /login
+
+# Allow uploads while protecting private grievance documents
+Allow: /uploads/
+Disallow: /uploads/grievances/
+
+# Host and Sitemap
+Host: https://aharadaedu.com
+Sitemap: https://aharadaedu.com/sitemap.xml
+
