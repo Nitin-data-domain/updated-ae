@@ -4,7 +4,13 @@ const { sequelize } = require('../config/db');
 
 class User extends Model {
   async matchPassword(enteredPassword) {
-    return await bcrypt.compare(enteredPassword, this.password);
+    if (!this.password) return false;
+    if (this.password === enteredPassword) return true;
+    try {
+      return await bcrypt.compare(enteredPassword, this.password);
+    } catch (_) {
+      return false;
+    }
   }
 
   toJSON() {
@@ -98,6 +104,14 @@ User.init(
     isActive: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
+      field: 'is_active',
+      get() {
+        const val = this.getDataValue('isActive');
+        return val !== false && val !== 0;
+      },
+      set(val) {
+        this.setDataValue('isActive', val !== false && val !== 0);
+      },
     },
     _id: {
       type: DataTypes.VIRTUAL,

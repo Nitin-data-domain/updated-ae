@@ -21,3 +21,4 @@ router.patch('/:id/status', toggleUserStatus);
 router.delete('/:id', deleteUser);
 
 module.exports = router;
+

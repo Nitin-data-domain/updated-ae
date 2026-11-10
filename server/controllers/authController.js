@@ -22,15 +22,16 @@ exports.login = async (req, res) => {
     }
 
     const cleanEmail = email.trim().toLowerCase();
+    const cleanPassword = typeof password === 'string' ? password.trim() : password;
 
-    // 1. Try Admin (MySQL Sequelize)
+    // 1. Try Admin (MySQL Sequelize / SQLite)
     try {
       const user = await User.findOne({ where: { email: cleanEmail } });
-      if (user && (user.role === 'admin' || user.role === 'superadmin')) {
+      if (user && (user.role === 'admin' || user.role === 'superadmin' || (user.permissions && user.permissions.length > 0))) {
         if (user.isActive === false) {
           return res.status(403).json({ success: false, message: 'Your admin account has been deactivated. Please contact the Super Admin.' });
         }
-        const isMatch = await user.matchPassword(password);
+        const isMatch = await user.matchPassword(password) || await user.matchPassword(cleanPassword);
         if (isMatch) {
           const effectiveId = user.id || user.user_id;
           const token = generateToken(effectiveId);
@@ -45,9 +46,15 @@ exports.login = async (req, res) => {
               name: user.name,
               email: user.email,
               role: user.role,
-              permissions: user.permissions || (user.role === 'superadmin' ? ['*'] : ['books']),
+              permissions: user.role === 'superadmin' ? ['*'] : (user.permissions || ['books']),
               isActive: user.isActive !== false,
             },
+          });
+        } else {
+          return res.status(401).json({
+            success: false,
+            error: 'Invalid password. Please double-check your credentials.',
+            message: 'Invalid password. Please double-check your credentials.',
           });
         }
       }
@@ -105,25 +112,44 @@ exports.getMe = async (req, res) => {
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.split(' ')[1];
       try {
+        const decoded = jwt.verify(
+          token,
+          process.env.JWT_SECRET || 'aharada_edu_jwt_secret_key_2024_secure'
+        );
+        const currentUserId = decoded ? (decoded.id || decoded.user_id) : null;
+        if (currentUserId) {
+          const user = await User.findByPk(currentUserId, {
+            attributes: { exclude: ['password'] },
+          });
+          if (user) {
+            return res.json({ success: true, user });
+          }
+        }
+      } catch (tokenErr) {
+        // Continue to portal check
+      }
+
+      // Check portal db
+      try {
+        const decoded = jwt.decode(token);
         const currentUserId = decoded ? (decoded.user_id || decoded.id) : null;
         if (currentUserId) {
           const result = await pool.query(
             'SELECT user_id, name, email, phone, role, department, is_active, can_manage_staff FROM users WHERE user_id = $1',
             [currentUserId]
           );
-          if (result.rows.length === 0) return res.status(404).json({ error: 'User not found.' });
-          return res.json({ success: true, user: result.rows[0] });
+          if (result.rows.length > 0) {
+            return res.json({ success: true, user: result.rows[0] });
+          }
         }
-      } catch (tokenErr) {
-        // Continue to Admin check
-      }
+      } catch (_) {}
     }
 
     if (req.user && req.user.id) {
       const user = await User.findByPk(req.user.id, {
         attributes: { exclude: ['password'] },
       });
-      return res.json({ success: true, user });
+      if (user) return res.json({ success: true, user });
     }
 
     res.status(401).json({ success: false, message: 'Not authorized' });

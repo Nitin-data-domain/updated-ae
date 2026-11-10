@@ -45,14 +45,14 @@ export default function AdminLayout() {
   const userPerms = Array.isArray(user.permissions)
     ? user.permissions
     : typeof user.permissions === 'string'
-    ? (function () {
+      ? (function () {
         try {
           return JSON.parse(user.permissions)
         } catch (_) {
           return [user.permissions]
         }
       })()
-    : []
+      : []
 
   const visibleLinks = allSidebarLinks.filter((link) => {
     if (link.superAdminOnly) return isSuper
@@ -94,11 +94,10 @@ export default function AdminLayout() {
             <Link
               key={link.path}
               to={link.path}
-              className={`admin-nav-link ${
-                link.exact
-                  ? location.pathname === link.path ? 'active' : ''
-                  : location.pathname.startsWith(link.path) ? 'active' : ''
-              }`}
+              className={`admin-nav-link ${link.exact
+                ? location.pathname === link.path ? 'active' : ''
+                : location.pathname.startsWith(link.path) ? 'active' : ''
+                }`}
               onClick={() => setSidebarOpen(false)}
             >
               {link.icon}

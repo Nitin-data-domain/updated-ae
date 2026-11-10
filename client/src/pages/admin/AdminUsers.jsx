@@ -157,14 +157,14 @@ export default function AdminUsers() {
     const perms = Array.isArray(user.permissions)
       ? user.permissions
       : typeof user.permissions === 'string'
-      ? (function () {
+        ? (function () {
           try {
             return JSON.parse(user.permissions)
           } catch (_) {
             return [user.permissions]
           }
         })()
-      : []
+        : []
 
     setForm({
       name: user.name || '',
@@ -253,8 +253,7 @@ export default function AdminUsers() {
     try {
       await toggleAdminUserStatus(user.id)
       toast.success(
-        `Account for ${user.name} has been ${
-          user.isActive === false ? 'activated' : 'deactivated'
+        `Account for ${user.name} has been ${user.isActive === false ? 'activated' : 'deactivated'
         }`
       )
       loadUsers()
@@ -340,14 +339,14 @@ export default function AdminUsers() {
                   const rawPerms = Array.isArray(u.permissions)
                     ? u.permissions
                     : typeof u.permissions === 'string'
-                    ? (function () {
+                      ? (function () {
                         try {
                           return JSON.parse(u.permissions)
                         } catch (_) {
                           return [u.permissions]
                         }
                       })()
-                    : []
+                      : []
 
                   const activeState = u.isActive !== false && u.is_active !== false
 
@@ -544,7 +543,7 @@ export default function AdminUsers() {
                             <input
                               type="checkbox"
                               checked={isChecked}
-                              onChange={() => {}} // Handled by card click
+                              onChange={() => { }} // Handled by card click
                             />
                           </div>
                           <span className="perm-card-title">{perm.label}</span>
@@ -598,3 +597,4 @@ export default function AdminUsers() {
     </div>
   )
 }
+
