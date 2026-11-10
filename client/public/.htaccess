@@ -1,0 +1,42 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # 1. Force HTTPS
+  RewriteCond %{HTTPS} off
+  RewriteCond %{HTTP_HOST} ^(www\.)?aharadaedu\.(com|in)$ [NC]
+  RewriteRule ^(.*)$ https://aharadaedu.com/$1 [R=301,L]
+
+  # 2. Redirect old .in domain (and www.aharadaedu.in) to https://aharadaedu.com
+  RewriteCond %{HTTP_HOST} ^(www\.)?aharadaedu\.in$ [NC]
+  RewriteRule ^(.*)$ https://aharadaedu.com/$1 [R=301,L]
+
+  # 3. Redirect www.aharadaedu.com to non-www https://aharadaedu.com
+  RewriteCond %{HTTP_HOST} ^www\.aharadaedu\.com$ [NC]
+  RewriteRule ^(.*)$ https://aharadaedu.com/$1 [R=301,L]
+
+  # 4. Redirect legacy flat program URLs to /programs/
+  RewriteRule ^btech-aerospace-engineering/?$ /programs/btech-aerospace-engineering [R=301,L]
+  RewriteRule ^btech-aerospace/?$ /programs/btech-aerospace-engineering [R=301,L]
+  RewriteRule ^bba-aviation-travel/?$ /programs/bba-aviation-travel [R=301,L]
+  RewriteRule ^bba-aviation/?$ /programs/bba-aviation-travel [R=301,L]
+  RewriteRule ^bsc-aeronautical-science/?$ /programs/bsc-aeronautical-science [R=301,L]
+  RewriteRule ^bsc-aviation/?$ /programs/bsc-aeronautical-science [R=301,L]
+  RewriteRule ^mba-aviation-management/?$ /programs/mba-aviation-management [R=301,L]
+  RewriteRule ^mba-aviation/?$ /programs/mba-aviation-management [R=301,L]
+  RewriteRule ^bba-entrepreneurship-innovation/?$ /programs/bba-entrepreneurship-innovation [R=301,L]
+  RewriteRule ^bba-entrepreneurship/?$ /programs/bba-entrepreneurship-innovation [R=301,L]
+  RewriteRule ^bba-data-analytics-ai/?$ /programs/bba-data-analytics-ai [R=301,L]
+  RewriteRule ^bba-analytics/?$ /programs/bba-data-analytics-ai [R=301,L]
+  RewriteRule ^bachelor-fashion-design/?$ /programs/bachelor-fashion-design [R=301,L]
+  RewriteRule ^fashion-design/?$ /programs/bachelor-fashion-design [R=301,L]
+  RewriteRule ^bachelor-fine-arts/?$ /programs/bachelor-fine-arts [R=301,L]
+  RewriteRule ^fine-arts/?$ /programs/bachelor-fine-arts [R=301,L]
+  RewriteRule ^about-us/?$ /about [R=301,L]
+  RewriteRule ^contact-us/?$ /contact [R=301,L]
+  RewriteRule ^placements/?$ /placement [R=301,L]
+  RewriteRule ^courses/?$ /programs [R=301,L]
+  RewriteRule ^courses/(.*)$ /programs/$1 [R=301,L]
+  RewriteRule ^course/(.*)$ /programs/$1 [R=301,L]
+  RewriteRule ^books/?$ /library [R=301,L]
+  RewriteRule ^digital-library/?$ /library [R=301,L]
+</IfModule>

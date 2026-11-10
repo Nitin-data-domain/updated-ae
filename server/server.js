@@ -21,6 +21,68 @@ app.use(helmet({
   contentSecurityPolicy: false,
   frameguard: false,
 }));
+
+// ── Canonical 301 Domain & Legacy Route Redirection ──────────────────────────
+// Permanently redirects all traffic from old aharadaedu.in and www subdomains to https://aharadaedu.com
+// and permanently maps legacy URLs (e.g. /btech-aerospace-engineering) to /programs/...
+const legacyRedirects = {
+  '/btech-aerospace-engineering': '/programs/btech-aerospace-engineering',
+  '/btech-aerospace': '/programs/btech-aerospace-engineering',
+  '/btech-aero': '/programs/btech-aerospace-engineering',
+  '/bba-aviation-travel': '/programs/bba-aviation-travel',
+  '/bba-aviation': '/programs/bba-aviation-travel',
+  '/bsc-aeronautical-science': '/programs/bsc-aeronautical-science',
+  '/bsc-aeronautical': '/programs/bsc-aeronautical-science',
+  '/bsc-aviation': '/programs/bsc-aeronautical-science',
+  '/mba-aviation-management': '/programs/mba-aviation-management',
+  '/mba-aviation': '/programs/mba-aviation-management',
+  '/bba-entrepreneurship-innovation': '/programs/bba-entrepreneurship-innovation',
+  '/bba-entrepreneurship': '/programs/bba-entrepreneurship-innovation',
+  '/bba-data-analytics-ai': '/programs/bba-data-analytics-ai',
+  '/bba-analytics': '/programs/bba-data-analytics-ai',
+  '/bachelor-fashion-design': '/programs/bachelor-fashion-design',
+  '/fashion-design': '/programs/bachelor-fashion-design',
+  '/bachelor-fine-arts': '/programs/bachelor-fine-arts',
+  '/fine-arts': '/programs/bachelor-fine-arts',
+  '/about-us': '/about',
+  '/contact-us': '/contact',
+  '/placements': '/placement',
+  '/courses': '/programs',
+  '/admission': '/admissions',
+  '/event': '/events',
+  '/gallery': '/events',
+  '/books': '/library',
+  '/digital-library': '/library',
+};
+
+app.use((req, res, next) => {
+  const host = (req.headers.host || '').toLowerCase().split(':')[0];
+  const isOldInDomain = host === 'aharadaedu.in' || host === 'www.aharadaedu.in';
+  const isWwwCom = host === 'www.aharadaedu.com';
+
+  const rawPath = req.path.toLowerCase().replace(/\/+$/, '') || '/';
+  const targetPath = legacyRedirects[rawPath];
+
+  // 1. If request arrived at the old .in domain or www.aharadaedu.com
+  if (isOldInDomain || isWwwCom) {
+    const destinationPath = targetPath || req.originalUrl;
+    return res.redirect(301, `https://aharadaedu.com${destinationPath}`);
+  }
+
+  // 2. If request arrived at a legacy path on .com
+  if (targetPath && targetPath !== req.path) {
+    const query = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+    return res.redirect(301, `${targetPath}${query}`);
+  }
+
+  // 3. Handle /course/:slug or /courses/:slug -> /programs/:slug
+  const courseMatch = req.path.match(/^\/(?:course|courses)\/([^/]+)/i);
+  if (courseMatch) {
+    return res.redirect(301, `/programs/${courseMatch[1]}`);
+  }
+
+  next();
+});
 app.use(cors((req, callback) => {
   const origin = req.header('Origin');
   // Allow requests with no origin (Postman, curl, server-to-server)

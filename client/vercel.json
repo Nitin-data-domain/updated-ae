@@ -1,4 +1,131 @@
 {
+  "redirects": [
+    {
+      "source": "/btech-aerospace-engineering",
+      "destination": "/programs/btech-aerospace-engineering",
+      "permanent": true
+    },
+    {
+      "source": "/btech-aerospace",
+      "destination": "/programs/btech-aerospace-engineering",
+      "permanent": true
+    },
+    {
+      "source": "/btech-aero",
+      "destination": "/programs/btech-aerospace-engineering",
+      "permanent": true
+    },
+    {
+      "source": "/bba-aviation-travel",
+      "destination": "/programs/bba-aviation-travel",
+      "permanent": true
+    },
+    {
+      "source": "/bba-aviation",
+      "destination": "/programs/bba-aviation-travel",
+      "permanent": true
+    },
+    {
+      "source": "/bsc-aeronautical-science",
+      "destination": "/programs/bsc-aeronautical-science",
+      "permanent": true
+    },
+    {
+      "source": "/bsc-aviation",
+      "destination": "/programs/bsc-aeronautical-science",
+      "permanent": true
+    },
+    {
+      "source": "/mba-aviation-management",
+      "destination": "/programs/mba-aviation-management",
+      "permanent": true
+    },
+    {
+      "source": "/mba-aviation",
+      "destination": "/programs/mba-aviation-management",
+      "permanent": true
+    },
+    {
+      "source": "/bba-entrepreneurship-innovation",
+      "destination": "/programs/bba-entrepreneurship-innovation",
+      "permanent": true
+    },
+    {
+      "source": "/bba-entrepreneurship",
+      "destination": "/programs/bba-entrepreneurship-innovation",
+      "permanent": true
+    },
+    {
+      "source": "/bba-data-analytics-ai",
+      "destination": "/programs/bba-data-analytics-ai",
+      "permanent": true
+    },
+    {
+      "source": "/bba-analytics",
+      "destination": "/programs/bba-data-analytics-ai",
+      "permanent": true
+    },
+    {
+      "source": "/bachelor-fashion-design",
+      "destination": "/programs/bachelor-fashion-design",
+      "permanent": true
+    },
+    {
+      "source": "/fashion-design",
+      "destination": "/programs/bachelor-fashion-design",
+      "permanent": true
+    },
+    {
+      "source": "/bachelor-fine-arts",
+      "destination": "/programs/bachelor-fine-arts",
+      "permanent": true
+    },
+    {
+      "source": "/fine-arts",
+      "destination": "/programs/bachelor-fine-arts",
+      "permanent": true
+    },
+    {
+      "source": "/about-us",
+      "destination": "/about",
+      "permanent": true
+    },
+    {
+      "source": "/contact-us",
+      "destination": "/contact",
+      "permanent": true
+    },
+    {
+      "source": "/placements",
+      "destination": "/placement",
+      "permanent": true
+    },
+    {
+      "source": "/courses",
+      "destination": "/programs",
+      "permanent": true
+    },
+    {
+      "source": "/courses/:slug",
+      "destination": "/programs/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/course/:slug",
+      "destination": "/programs/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/digital-library",
+      "destination": "/library",
+      "permanent": true
+    },
+    {
+      "source": "/books",
+      "destination": "/library",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/:match*",

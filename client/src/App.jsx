@@ -129,6 +129,36 @@ function App() {
           <Route path="brochures" element={<AdminBrochures />} />
           <Route path="placements" element={<AdminPlacements />} />
         </Route>
+
+        {/* Legacy redirects from old .in website URLs & alternate paths */}
+        <Route path="/btech-aerospace-engineering" element={<Navigate to="/programs/btech-aerospace-engineering" replace />} />
+        <Route path="/btech-aerospace" element={<Navigate to="/programs/btech-aerospace-engineering" replace />} />
+        <Route path="/btech-aero" element={<Navigate to="/programs/btech-aerospace-engineering" replace />} />
+        <Route path="/bba-aviation-travel" element={<Navigate to="/programs/bba-aviation-travel" replace />} />
+        <Route path="/bba-aviation" element={<Navigate to="/programs/bba-aviation-travel" replace />} />
+        <Route path="/bsc-aeronautical-science" element={<Navigate to="/programs/bsc-aeronautical-science" replace />} />
+        <Route path="/bsc-aviation" element={<Navigate to="/programs/bsc-aeronautical-science" replace />} />
+        <Route path="/mba-aviation-management" element={<Navigate to="/programs/mba-aviation-management" replace />} />
+        <Route path="/mba-aviation" element={<Navigate to="/programs/mba-aviation-management" replace />} />
+        <Route path="/bba-entrepreneurship-innovation" element={<Navigate to="/programs/bba-entrepreneurship-innovation" replace />} />
+        <Route path="/bba-entrepreneurship" element={<Navigate to="/programs/bba-entrepreneurship-innovation" replace />} />
+        <Route path="/bba-data-analytics-ai" element={<Navigate to="/programs/bba-data-analytics-ai" replace />} />
+        <Route path="/bba-analytics" element={<Navigate to="/programs/bba-data-analytics-ai" replace />} />
+        <Route path="/bachelor-fashion-design" element={<Navigate to="/programs/bachelor-fashion-design" replace />} />
+        <Route path="/fashion-design" element={<Navigate to="/programs/bachelor-fashion-design" replace />} />
+        <Route path="/bachelor-fine-arts" element={<Navigate to="/programs/bachelor-fine-arts" replace />} />
+        <Route path="/fine-arts" element={<Navigate to="/programs/bachelor-fine-arts" replace />} />
+        <Route path="/about-us" element={<Navigate to="/about" replace />} />
+        <Route path="/contact-us" element={<Navigate to="/contact" replace />} />
+        <Route path="/placements" element={<Navigate to="/placement" replace />} />
+        <Route path="/courses" element={<Navigate to="/programs" replace />} />
+        <Route path="/courses/:slug" element={<Navigate to="/programs/:slug" replace />} />
+        <Route path="/course/:slug" element={<Navigate to="/programs/:slug" replace />} />
+        <Route path="/books" element={<Navigate to="/library" replace />} />
+        <Route path="/digital-library" element={<Navigate to="/library" replace />} />
+
+        {/* Global Fallback for unknown URLs */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AuthProvider>
   )
